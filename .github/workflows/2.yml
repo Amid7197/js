@@ -1,0 +1,68 @@
+name: Auto update22
+
+on:
+  schedule:
+    - cron: '37 19 * * *'
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install packages
+        run: |
+          sudo apt-get install -y openssh-client python3-setuptools
+
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GIT_TOKEN }}
+
+      - uses: actions/checkout@v4
+        with:
+          repository: JinnLynn/genpac
+          ref: v2.0.1
+          path: genpac
+
+      - uses: actions/checkout@v4
+        with:
+          repository: gfwlist/gfwlist
+          path: gfwlist
+
+      - uses: petronny/git-config-user@master
+        with:
+          path: .
+
+      - run: |
+          cd genpac
+          sed 's/from collections import Callable/from collections.abc import Callable/g' -i $(grep 'from collections import Callable' . -rIl)
+          sudo python3 setup.py install
+
+      - name: Create user rules
+        run: |
+          cat > userlist.txt <<'EOF'
+          # 自定义规则（本地增强列表）
+          ||sxsylt1.com
+          ||hjd2048.com
+          ||cdn.oaistatic.com
+          EOF
+
+      - name: Generate gfwlist.pac
+        run: |
+          set -x
+          genpac \
+            --pac-proxy "SOCKS5 127.0.0.1:7890; SOCKS5 192.168.1.3:7890; SOCKS5 192.168.5.2:7890; DIRECT;" \
+            --gfwlist-url - \
+            --gfwlist-local gfwlist/gfwlist.txt \
+            --user-rule-from userlist.txt \
+            -o gfwlist.pac
+
+          # 删除前 7 行无关信息
+          sed '1,7d' -i gfwlist.pac
+
+      - name: Commit and push
+        run: |
+          git add gfwlist.pac
+          git commit -m "[$(LANG=C date)] auto update" || exit 0
+          [ -n "${{ secrets.READ_ONLY }}" ] && git show && exit 0
+          git push origin main
