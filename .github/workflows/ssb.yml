@@ -24,7 +24,13 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          DOMAIN="||$(curl -s https://sxsy.org/ | grep -oP '(?<=尚香书苑：<a href=")https[^"]+')"
+          sed -i "3i$DOMAIN" userlist.txt
+          
           git add xin_Discuz.js
           git add ziti.js
+          git add userlist.txt
           git diff --quiet && git diff --staged --quiet || git commit -m "Update xin_Discuz.js match URL"
           git push
+          
