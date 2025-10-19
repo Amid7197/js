@@ -38,15 +38,6 @@ jobs:
           sed 's/from collections import Callable/from collections.abc import Callable/g' -i $(grep 'from collections import Callable' . -rIl)
           sudo python3 setup.py install
 
-      - name: Create user rules
-        run: |
-          cat > userlist.txt <<'EOF'
-          # 自定义规则（本地增强列表）
-          ||sxsylt1.com
-          ||hjd2048.com
-          ||cdn.oaistatic.com
-          EOF
-
       - name: Generate gfwlist.pac
         run: |
           set -x
