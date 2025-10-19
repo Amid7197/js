@@ -121,6 +121,35 @@ def replace_match_line(js_file, new_url):
     except Exception as e:
         logger.error(f"替换失败: {e}")
 
+def update_userlist_domain(file_path, new_url):
+    """
+    ✅ 将 userlist.txt 第二行更新为新 URL 的域名，前面加上 '||'
+    """
+    try:
+        parsed = urlparse(new_url)
+        domain = parsed.netloc or new_url.split('/')[2]
+        domain_line = f"||{domain}\n"   # ✅ 加上 '||'
+
+        with open(file_path, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+
+        old_line = lines[1].strip() if len(lines) > 1 else "(无)"
+        logger.info(f"userlist.txt 原第二行: {old_line}")
+
+        # 确保至少有两行
+        if len(lines) < 2:
+            lines += ['\n'] * (2 - len(lines))
+
+        # 更新第二行
+        lines[1] = domain_line
+
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.writelines(lines)
+
+        logger.info(f"userlist.txt 第二行已更新为: {domain_line.strip()}")
+    except Exception as e:
+        logger.error(f"更新 userlist.txt 失败: {e}")
+
 if __name__ == '__main__':
     try:
         redirect_url = get_refresh_url('http://' + os.environ.get('www.soushu2030.com', 'www.soushu2025.com'))
@@ -133,6 +162,7 @@ if __name__ == '__main__':
         if url:
             replace_match_line("xin_Discuz.js", url)
             replace_match_line("ziti.js", url)
+            update_userlist_domain("userlist.txt", url)
         else:
             logger.error("未能获取到有效URL，无法更新。")
     except Exception as e:
