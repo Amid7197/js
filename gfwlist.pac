@@ -98,7 +98,7 @@ var rules = [
             "1-apple.com.tw",
             "1000giri.net",
             "10beasts.net",
-            "sxsylt1.com",
+            "sxsy*.com",
             "oaistatic.com",
             "hjd2048.com",
             "10conditionsoflove.com",
