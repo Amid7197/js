@@ -7,9 +7,6 @@ var rules = [
     [
         [
             "aftygh.gov.tw",
-            "sxsylt1.com",
-            "oaistatic.com",
-            "hjd2048.com",
             "aide.gov.tw",
             "aliyun.com",
             "arte.gov.tw",
@@ -101,6 +98,9 @@ var rules = [
             "1-apple.com.tw",
             "1000giri.net",
             "10beasts.net",
+            "sxsylt1.com",
+            "oaistatic.com",
+            "hjd2048.com",
             "10conditionsoflove.com",
             "10musume.com",
             "111666.best",
