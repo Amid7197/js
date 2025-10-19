@@ -46,7 +46,7 @@ jobs:
           sed '1,7d' -i gfwlist.pac
           sed '100a\            "hjd2048.com",' -i gfwlist.pac
           sed '100a\            "oaistatic.com",' -i gfwlist.pac
-          sed '100a\            "sxsylt1.com",' -i gfwlist.pac
+          sed '100a\            "sxsy*.com",' -i gfwlist.pac
           git add gfwlist.pac
           git commit -m "[$(LANG=C date)] auto update" || exit 0
 
