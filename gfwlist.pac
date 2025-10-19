@@ -2,7 +2,11 @@ var proxy = 'SOCKS5 127.0.0.1:7890; SOCKS5 192.168.1.3:7890; SOCKS5 192.168.5.2:
 var rules = [
     [
         [],
-        []
+        [
+            "hjd2048.com",
+            "oaistatic.com",
+            "sxsylt1.com"
+        ]
     ],
     [
         [
@@ -98,9 +102,6 @@ var rules = [
             "1-apple.com.tw",
             "1000giri.net",
             "10beasts.net",
-            "sxsy*.com",
-            "oaistatic.com",
-            "hjd2048.com",
             "10conditionsoflove.com",
             "10musume.com",
             "111666.best",
