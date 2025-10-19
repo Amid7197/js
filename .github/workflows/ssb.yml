@@ -26,7 +26,7 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
           DOMAIN="||$(curl -s https://sxsy.org/ | grep -oP '(?<=尚香书苑：<a href=")https[^"]+' | sed 's#https://##')"
-          sed -i "3$DOMAIN" userlist.txt
+          sed -i "3c$DOMAIN" userlist.txt
           
           git add xin_Discuz.js
           git add ziti.js
