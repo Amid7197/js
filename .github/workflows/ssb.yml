@@ -25,7 +25,7 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          DOMAIN="||$(curl -s https://sxsy.org/ | grep -oP '(?<=尚香书苑：<a href=")https[^"]+')"
+          DOMAIN="||$(curl -s https://sxsy.org/ | grep -oP '(?<=尚香书苑：<a href=")https[^"]+' | sed 's#https://##')"
           sed -i "3i$DOMAIN" userlist.txt
           
           git add xin_Discuz.js
