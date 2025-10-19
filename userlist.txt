@@ -1,4 +1,5 @@
 # 自定义规则（本地增强列表）
-||11.com
+||pmvd.btlqb5brd4.com
+||https://sxsylt1.com
 ||sxsy*.com
 ||hjd2048.com
