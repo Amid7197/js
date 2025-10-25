@@ -137,11 +137,11 @@ def update_userlist_domain(file_path, new_url):
         logger.info(f"userlist.txt 原第二行: {old_line}")
 
         # 确保至少有两行
-        if len(lines) < 2:
-            lines += ['\n'] * (2 - len(lines))
+        if len(lines) < 3:
+            lines += ['\n'] * (3 - len(lines))
 
         # 更新第二行
-        lines[1] = domain_line
+        lines[2] = domain_line
 
         with open(file_path, "w", encoding="utf-8") as f:
             f.writelines(lines)
