@@ -1,8 +1,8 @@
 # 自定义规则（本地增强列表）
 #搜书吧
-||pmvd.btlqb5brd4.com
+||pmvd.111.com
 #尚香
-||sxsylt1.com
+||111.com
 ||hjd2048.com
 ||oaistatic.com
 # 色色小说网站
