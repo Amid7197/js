@@ -3,11 +3,14 @@ var rules = [
     [
         [],
         [
+            "66story.com",
+            "alicesw.com",
             "bachashuku.cc",
             "btlqb5brd4.com",
             "hjd2048.com",
             "oaistatic.com",
-            "sxsylt1.com"
+            "sxsylt1.com",
+            "uaa.com"
         ]
     ],
     [
