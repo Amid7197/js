@@ -4,6 +4,8 @@ var rules = [
         [],
         [
             "321cdn.com",
+            "404zu.net",
+            "404zu.org",
             "66story.com",
             "alicesw.com",
             "bachashuku.cc",
