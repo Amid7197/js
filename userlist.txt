@@ -1,6 +1,11 @@
 # 自定义规则（本地增强列表）
 ||pmvd.btlqb5brd4.com
 ||sxsylt1.com
+#上面是搜书吧+尚香
 ||hjd2048.com
 ||oaistatic.com
+# 色色小说网站
 ||bachashuku.cc
+||alicesw.com
+||uaa.com
+||66story.com
