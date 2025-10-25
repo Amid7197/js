@@ -9,6 +9,7 @@ var rules = [
             "bachashuku.cc",
             "btlqb5brd4.com",
             "hjd2048.com",
+            "laowang.vip",
             "oaistatic.com",
             "sxsylt1.com",
             "uaa.com"
