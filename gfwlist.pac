@@ -13,7 +13,7 @@ var rules = [
             "hjd2048.com",
             "laowang.vip",
             "oaistatic.com",
-            "sxsylt1.com",
+            "sxsy97.com",
             "uaa.com"
         ]
     ],
