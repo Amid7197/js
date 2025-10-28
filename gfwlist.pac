@@ -7,6 +7,7 @@ var rules = [
             "404zu.net",
             "404zu.org",
             "66story.com",
+            "69shuba.com",
             "alicesw.com",
             "bachashuku.cc",
             "btlqb5brd4.com",
