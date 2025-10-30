@@ -14,6 +14,7 @@ var rules = [
             "btlqb5brd4.com",
             "hjd2048.com",
             "laowang.vip",
+            "mhh1.com",
             "oaistatic.com",
             "sxsy97.com",
             "uaa.com"
