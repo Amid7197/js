@@ -3,6 +3,7 @@ var rules = [
     [
         [],
         [
+            "2dfan.com",
             "321cdn.com",
             "404zu.net",
             "404zu.org",
@@ -4775,6 +4776,7 @@ var rules = [
             "telesco.pe",
             "tellapart.com",
             "tellme.pw",
+            "temu.com",
             "tenacy.com",
             "tenor.com",
             "tensorflow.org",
