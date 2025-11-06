@@ -3,6 +3,7 @@ var rules = [
     [
         [],
         [
+            "101kanshu.com",
             "2dfan.com",
             "321cdn.com",
             "404zu.net",
