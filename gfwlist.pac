@@ -21,6 +21,8 @@ var rules = [
             "oaistatic.com",
             "sxsy97.com",
             "tongrenquan.org",
+            "trxs.cc",
+            "trxs.me",
             "uaa.com"
         ]
     ],
