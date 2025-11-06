@@ -22,6 +22,7 @@ var rules = [
             "qbtr.org",
             "sxsy97.com",
             "tongrenquan.org",
+            "tongrenshe.cc",
             "trxs.cc",
             "trxs.me",
             "uaa.com"
