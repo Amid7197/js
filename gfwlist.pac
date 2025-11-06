@@ -15,10 +15,12 @@ var rules = [
             "bachashuku.cc",
             "btlqb5brd4.com",
             "hjd2048.com",
+            "jpxs123.com",
             "laowang.vip",
             "mhh1.com",
             "oaistatic.com",
             "sxsy97.com",
+            "tongrenquan.org",
             "uaa.com"
         ]
     ],
