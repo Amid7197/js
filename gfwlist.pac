@@ -20,6 +20,7 @@ var rules = [
             "jpxs123.com",
             "laowang.vip",
             "mhh1.com",
+            "mikanani.me",
             "novel543.com",
             "oaistatic.com",
             "qbtr.org",
