@@ -4,6 +4,7 @@ var rules = [
         [],
         [
             "101kanshu.com",
+            "10minutemail.net",
             "2dfan.com",
             "321cdn.com",
             "404zu.net",
@@ -13,6 +14,7 @@ var rules = [
             "69shuba.cx",
             "alicesw.com",
             "bachashuku.cc",
+            "bgm.tv",
             "btlqb5brd4.com",
             "ffxs8.top",
             "hjd2048.com",
@@ -29,7 +31,8 @@ var rules = [
             "tongrenshe.cc",
             "trxs.cc",
             "trxs.me",
-            "uaa.com"
+            "uaa.com",
+            "yopmail.com"
         ]
     ],
     [
