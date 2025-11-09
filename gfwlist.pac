@@ -15,6 +15,7 @@ var rules = [
             "alicesw.com",
             "bachashuku.cc",
             "bgm.tv",
+            "blacktealab.com",
             "btlqb5brd4.com",
             "ffxs8.top",
             "hjd2048.com",
