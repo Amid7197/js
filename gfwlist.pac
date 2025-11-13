@@ -26,6 +26,7 @@ var rules = [
             "mikanani.me",
             "novel543.com",
             "oaistatic.com",
+            "pqjc.site",
             "qbtr.org",
             "sxsy97.com",
             "tongrenquan.org",
@@ -35,6 +36,7 @@ var rules = [
             "uaa.com",
             "xn--cp3a08l.com",
             "xn--mes358aby2apfg.com",
+            "xn--mes358aby2apfg.site",
             "yopmail.com"
         ]
     ],
