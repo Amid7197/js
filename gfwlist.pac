@@ -33,7 +33,8 @@ var rules = [
             "trxs.cc",
             "trxs.me",
             "uaa.com",
-            "yopmail.com"
+            "yopmail.com",
+            "\u8d54\u94b1\u673a\u573a.com"
         ]
     ],
     [
