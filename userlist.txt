@@ -15,8 +15,6 @@ uaa.com
 hjd2048.com
 laowang.vip
 oaistatic.com
-69shuba.com
-69shuba.cx
 mhh1.com
 2dfan.com
 101kanshu.com
@@ -40,5 +38,6 @@ blacktealab.com
 pqjc.site 
 赔钱.com
 ###
-||site^
+/\.site$/
+/(^|\.)69shuba\..+$/
 ||vip^
