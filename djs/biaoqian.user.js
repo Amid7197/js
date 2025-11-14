@@ -8,8 +8,8 @@
 // @license      MIT
 // @grant        none
 // @run-at       document-start  // 提前执行，优先加载字体资源
-// @downloadURL  https://raw.githubusercontent.com/andadmadm/js/refs/heads/main/biaoqian.js
-// @updateURL    https://raw.githubusercontent.com/andadmadm/js/refs/heads/main/biaoqian.js
+// @downloadURL  https://raw.githubusercontent.com/andadmadm/js/refs/heads/main/djs/biaoqian.user.js
+// @updateURL    https://raw.githubusercontent.com/andadmadm/js/refs/heads/main/djs/biaoqian.user.js
 // ==/UserScript==
 (function () {
     'use strict';
