@@ -1,10 +1,10 @@
 # 自定义规则（本地增强列表）
-#搜书吧
+## 搜书吧
 ||pmvd.btlqb5brd4.com
-#尚香
+## 尚香
 ||sxsy97.com
 
-# 色色小说网站
+## 色色小说网站
 ||bachashuku.cc
 ||alicesw.com
 ||321cdn.com
@@ -14,13 +14,13 @@
 ||404zu.org
 ####
 
-# 图床
+## 图床
 ||acg.lol
 ||inari.site
 ||23img.com
 ####
 
-# 小说
+## 小说
 ||101kanshu.com
 ||jpxs123.com
 ||tongrenquan.org
@@ -34,7 +34,7 @@
 ||novel543.com
 ####
 
-# 机场
+## 机场
 赔钱机场.site
 赔钱机场.com
 pqjc.site 
