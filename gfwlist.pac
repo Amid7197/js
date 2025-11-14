@@ -32,6 +32,7 @@ var rules = [
             "oaistatic.com",
             "pqjc.site",
             "qbtr.org",
+            "sayhanabi.net",
             "sxsy97.com",
             "tongrenquan.org",
             "tongrenshe.cc",
