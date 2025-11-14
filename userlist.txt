@@ -12,6 +12,7 @@
 ||66story.com
 ||404zu.net
 ||404zu.org
+hlib.cc
 ####
 
 ## 图床
