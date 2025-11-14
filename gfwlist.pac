@@ -19,6 +19,7 @@ var rules = [
             "btlqb5brd4.com",
             "ffxs8.top",
             "hjd2048.com",
+            "inari.site",
             "inf.li",
             "jpxs123.com",
             "laowang.vip",
