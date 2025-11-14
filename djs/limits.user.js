@@ -4,13 +4,12 @@
 // @description       解除大部分网站禁止复制、剪切、选择文本、右键菜单的限制。
 // @homepageURL       https://github.com/xinggsf/gm/
 // @author            Cat73  xinggsf
-// @version           1.5.6
+// @version           1.5.8
 // @license           LGPLv3
 // @include           https://www.zhihu.com/*
 // @include           https://www.bilibili.com/read/*
 // @include           *://imac.hk/*
 // @include           https://life.tw/*
-
 // @include           *://b.faloo.com/*
 // @include           *://bbs.coocaa.com/*
 // @include           *://book.hjsm.tom.com/*
@@ -45,6 +44,7 @@
 // @include           *://www.z3z4.com/*
 // @include           *://yuedu.163.com/*
 // @include           *://*2dfan.*/topics/*
+// @include           *://*.sayhanabi.*/thread-*.html
 // @grant             GM_addStyle
 // @run-at            document-start
 // @updateUrl         https://raw.githubusercontent.com/andadmadm/js/refs/heads/main/djs/limits.user.js
