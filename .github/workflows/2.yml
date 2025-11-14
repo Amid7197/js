@@ -40,6 +40,24 @@ jobs:
           sed 's/from collections import Callable/from collections.abc import Callable/g' -i $(grep 'from collections import Callable' . -rIl)
           sudo python3 setup.py install
 
+      - name: Prepare userlist
+        run: |
+          echo "转换裸域名为 gfwlist 规则格式"
+          cp userlist.txt userlist.raw.txt
+
+          # 清理注释与空行，去掉前后空白，再自动加上 ||
+          cat userlist.raw.txt \
+            | sed 's/\r//g' \
+            | sed '/^\s*#/d' \
+            | sed '/^\s*$/d' \
+            | sed 's/^[ \t]*//g' \
+            | sed 's/[ \t]*$//g' \
+            | sed 's/^/||/' \
+            > userlist.txt
+
+          echo "转换后 userlist.txt 内容:"
+          cat userlist.txt
+
       - name: Generate gfwlist.pac
         run: |
           set -x
