@@ -1,46 +1,56 @@
 # 自定义规则（本地增强列表）
 #搜书吧
-pmvd.btlqb5brd4.com
+||pmvd.btlqb5brd4.com
 #尚香
-sxsy97.com
+||sxsy97.com
+
 # 色色小说网站
-bachashuku.cc
-alicesw.com
-321cdn.com
-uaa.com
-66story.com
-404zu.net
-404zu.org
+||bachashuku.cc
+||alicesw.com
+||321cdn.com
+||uaa.com
+||66story.com
+||404zu.net
+||404zu.org
 ####
+
+# 图床
+||acg.lol
+||inari.site
+||23img.com
+####
+
+# 小说
+||101kanshu.com
+||jpxs123.com
+||tongrenquan.org
+||trxs.me
+||trxs.cc
+||qbtr.org
+||tongrenshe.cc
+||ffxs8.top
+||69shuba.com
+||69shuba.cx
+||novel543.com
+####
+
+# 机场
+赔钱机场.site
+赔钱机场.com
+pqjc.site 
+赔钱.com
+####
+
 hjd2048.com
 laowang.vip
 oaistatic.com
-69shuba.com
-69shuba.cx
 mhh1.com
 2dfan.com
-101kanshu.com
-jpxs123.com
-tongrenquan.org
-trxs.me
-trxs.cc
-qbtr.org
-tongrenshe.cc
-ffxs8.top
-novel543.com
 inf.li
 mikanani.me
 bgm.tv 
 10minutemail.net
 yopmail.com 
 blacktealab.com
-##赔钱
-赔钱机场.site
-赔钱机场.com
-pqjc.site 
-赔钱.com
-### 图床
-acg.lol
-inari.site
-23img.com
-### 图床
+
+
