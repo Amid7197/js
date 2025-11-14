@@ -13,8 +13,8 @@
 // @exclude      *://*.bing.*
 // @grant        none
 // @license      MIT
-// @downloadURL https://update.greasyfork.org/scripts/487607/%E5%A4%8D%E5%88%B6%E9%99%90%E5%88%B6%E8%A7%A3%E9%99%A4%28%E6%9C%AC%E5%9C%B0%E7%89%88%29.user.js
-// @updateURL https://update.greasyfork.org/scripts/487607/%E5%A4%8D%E5%88%B6%E9%99%90%E5%88%B6%E8%A7%A3%E9%99%A4%28%E6%9C%AC%E5%9C%B0%E7%89%88%29.meta.js
+// @downloadURL https://raw.githubusercontent.com/andadmadm/js/refs/heads/main/djs/fz.js
+// @updateURL https://raw.githubusercontent.com/andadmadm/js/refs/heads/main/djs/fz.js
 // ==/UserScript==
 
 (function() {
