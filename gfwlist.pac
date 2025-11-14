@@ -14,6 +14,7 @@ var rules = [
             "69shuba.cx",
             "alicesw.com",
             "bachashuku.cc",
+            "baidu.com",
             "bgm.tv",
             "blacktealab.com",
             "btlqb5brd4.com",
