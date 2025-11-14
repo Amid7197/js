@@ -4,8 +4,8 @@
 // @description  仅将那种“链接文本就是 https://...jpg/png/... ”的 <a> 替换为 <img>，已有<img>或包含其它子节点的链接保持不变。
 // @match        https://www.south-plus.net/*
 // @grant        none
-// @downloadURL  https://raw.githubusercontent.com/andadmadm/js/refs/heads/main/nan.js
-// @updateURL    https://raw.githubusercontent.com/andadmadm/js/refs/heads/main/nan.js
+// @downloadURL  https://raw.githubusercontent.com/andadmadm/js/refs/heads/main/djs/nan.js
+// @updateURL    https://raw.githubusercontent.com/andadmadm/js/refs/heads/main/djs/nan.js
 // ==/UserScript==
 
 (function () {
