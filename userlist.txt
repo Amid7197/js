@@ -40,5 +40,5 @@ blacktealab.com
 pqjc.site 
 赔钱.com
 ###
-site^
-vip^
+||site^
+||vip^
