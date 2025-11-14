@@ -42,21 +42,44 @@ jobs:
 
       - name: Prepare userlist
         run: |
-          echo "转换裸域名为 gfwlist 规则格式"
+          echo "处理 userlist：支持中文域名、保留注释行、自动加 ||"
           cp userlist.txt userlist.raw.txt
 
-          # 清理注释与空行，去掉前后空白，再自动加上 ||
-          cat userlist.raw.txt \
-            | sed 's/\r//g' \
-            | sed '/^\s*#/d' \
-            | sed '/^\s*$/d' \
-            | sed 's/^[ \t]*//g' \
-            | sed 's/[ \t]*$//g' \
-            | sed 's/^/||/' \
-            > userlist.txt
+          awk '
+            function puny(s, cmd, out) {
+              cmd = "python3 - <<EOF\nimport idna; print(idna.encode(\"" s "\").decode())\nEOF"
+              cmd | getline out
+              close(cmd)
+              return out
+            }
+
+            # 空行跳过
+            /^\s*$/ { next }
+
+            # 注释行直接输出
+            /^\s*#/ {
+              print
+              next
+            }
+
+            {
+              # 去掉前后空白
+              gsub(/^[ \t]+|[ \t]+$/, "", $0)
+
+              domain=$0
+
+              # 如果包含中文（非 ASCII），自动 punycode 转换
+              if (domain ~ /[^\x00-\x7F]/) {
+                domain = puny(domain)
+              }
+
+              print "||" domain
+            }
+          ' userlist.raw.txt > userlist.txt
 
           echo "转换后 userlist.txt 内容:"
           cat userlist.txt
+
 
       - name: Generate gfwlist.pac
         run: |
