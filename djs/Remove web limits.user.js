@@ -46,7 +46,7 @@
 // @include           *://yuedu.163.com/*
 // @grant             GM_addStyle
 // @run-at            document-start
-// @updateUrl    https://raw.githubusercontent.com/xinggsf/gm/master/Remove%20web%20limits.user.js
+// @updateUrl         https://github.com/andadmadm/js/raw/refs/heads/main/djs/Remove%20web%20limits.user.js
 // ==/UserScript==
 
 "use strict";
