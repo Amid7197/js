@@ -21,6 +21,7 @@ var rules = [
             "btlqb5brd4.com",
             "ffxs8.top",
             "hjd2048.com",
+            "hlib.cc",
             "hmoe.link",
             "inari.site",
             "inf.li",
