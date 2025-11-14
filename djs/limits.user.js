@@ -44,6 +44,7 @@
 // @include           *://www.xxsy.net/*
 // @include           *://www.z3z4.com/*
 // @include           *://yuedu.163.com/*
+// @include           *://*2dfan.*/topics/*
 // @grant             GM_addStyle
 // @run-at            document-start
 // @updateUrl         https://raw.githubusercontent.com/andadmadm/js/refs/heads/main/djs/limits.user.js
