@@ -19,6 +19,7 @@ var rules = [
             "bgm.tv",
             "blacktealab.com",
             "btlqb5brd4.com",
+            "ddfan.org",
             "ffxs8.top",
             "hjd2048.com",
             "hlib.cc",
