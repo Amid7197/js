@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         2dfan / ggbase / moyu / ai2moe / hitomi
+// @name         2dfan跳转
 // @namespace    http://tampermonkey.net/
-// @version      1.0
-// @description  多彩渐变搜索按钮 + 统一搜索引擎 + dfan 自动跳转官方站
+// @version      1.0.1
+// @description  多彩渐变搜索按钮
 // @author       cuddly
 // @match        *://ddfan.*/*
 // @match        *://2dfan.*/*
