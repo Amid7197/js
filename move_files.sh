@@ -1,6 +1,6 @@
 #!/bin/bash
 #机械备份
-#0 11 * * 1,2,3,4,5 move_files.sh
+#30 10 * * 1,2,3,4,5 main_move_files.sh
 
 SRC_DIRS=(
     "/ssd/云盘"
