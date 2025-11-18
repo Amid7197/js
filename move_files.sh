@@ -1,6 +1,6 @@
 #!/bin/bash
-#new Env('机械备份');
 #30 10 * * 1,2,3,4,5 main_move_files.sh
+#new Env('机械备份');
 
 SRC_DIRS=(
     "/ssd/云盘"
