@@ -2,8 +2,6 @@
 #机械备份
 #0 11 * * 1,2,3,4,5 move_files.sh
 
-#!/bin/bash
-
 SRC_DIRS=(
     "/ssd/云盘"
     "/ssd/迅雷下载"
