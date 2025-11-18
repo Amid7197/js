@@ -1,5 +1,5 @@
 #!/bin/bash
-#机械备份
+#new Env('机械备份');
 #30 10 * * 1,2,3,4,5 main_move_files.sh
 
 SRC_DIRS=(
