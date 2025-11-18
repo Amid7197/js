@@ -8,7 +8,7 @@
 // @match        *://2dfan.*/*
 // @match        *://*2dfan.com/*
 // @match        *://*.moyu.moe/*
-// @updateUrl    https://raw.githubusercontent.com/andadmadm/js/refs/heads/main/djs/2dfan.user.js
+// @updateUrl    https://raw.githubusercontent.com/Amid7197/js/refs/heads/main/djs/2dfan.user.js
 // @grant        none
 // ==/UserScript==
 
