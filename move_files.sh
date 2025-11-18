@@ -2,24 +2,36 @@
 #机械备份
 #0 11 * * 1,2,3,4,5 move_files.sh
 
-# 定义源目录（SSD上的目录，根据你的挂载路径修改）
-SSD_DIR1="/ssd/云盘"       # 对应宿主机的/volume1/云盘
-SSD_DIR2="/ssd/迅雷下载"   # 对应宿主机的/volume1/迅雷下载
+SRC_DIRS=(
+    "/ssd/云盘"
+    "/ssd/迅雷下载"
+)
 
-# 定义目标目录（机械硬盘，根据你的挂载路径修改）
-HDD_DIR="/hhd"             # 对应宿主机的/volume2/机械盘1/ssd下载备份
+# 修改目标路径，确保每个源目录有对应的目标子目录
+DEST_DIR="/hdd"
+DAYS=3
 
-# 确保目标目录存在（不存在则创建）
-mkdir -p "$HDD_DIR"
+for SRC_DIR in "${SRC_DIRS[@]}"; do
+    echo "处理目录：$SRC_DIR"
+    
+    # 获取源目录的基准部分，用来在目标目录中创建相应的子目录
+    base_dir_name=$(basename "$SRC_DIR")
 
-# 移动3天前的文件（只处理文件，不处理目录）
-# 处理第一个SSD目录
-find "$SSD_DIR1" -maxdepth 1 -type f -mtime +3 -exec mv {} "$HDD_DIR/" \;
+    find "$SRC_DIR" -type f -mtime +$DAYS -print0 | while IFS= read -r -d '' file; do
+        # 获取文件相对路径
+        rel_path="${file#$SRC_DIR/}"
+        
+        # 构建目标路径，加入基准目录（例如 /hdd/云盘）
+        dest_path="$DEST_DIR/$base_dir_name/$rel_path"
+        
+        # 创建目标目录
+        mkdir -p "$(dirname "$dest_path")"
+        
+        # 执行剪切操作
+        mv "$file" "$dest_path"
+        
+        echo "剪切：$file → $dest_path"
+    done
+done
 
-# 处理第二个SSD目录
-find "$SSD_DIR2" -maxdepth 1 -type f -mtime +3 -exec mv {} "$HDD_DIR/" \;
-
-# 可选：输出执行结果
-echo "已将以下目录中3天前的文件移动到$HDD_DIR："
-echo "- $SSD_DIR1"
-echo "- $SSD_DIR2"
+echo "全部处理完成！"
