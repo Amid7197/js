@@ -49,7 +49,7 @@
 // @include           *://*.sayhanabi.*/thread-*.html
 // @grant             GM_addStyle
 // @run-at            document-start
-// @updateUrl         https://raw.githubusercontent.com/andadmadm/js/refs/heads/main/djs/limits.user.js
+// @updateUrl         https://raw.githubusercontent.com/Amid7197/js/refs/heads/main/djs/limits.user.js
 // ==/UserScript==
 
 (function() {
