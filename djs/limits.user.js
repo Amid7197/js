@@ -46,6 +46,7 @@
 // @include           *://yuedu.163.com/*
 
 // @include           *://*2dfan.*/topics/*
+// @include           *://*sis001.com/forum/viewthread.php?tid=*
 // @include           *://*.sayhanabi.*/thread-*.html
 // @grant             GM_addStyle
 // @run-at            document-start
