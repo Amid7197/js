@@ -22,6 +22,7 @@ var rules = [
             "btlqb5brd4.com",
             "ddfan.org",
             "ffxs8.top",
+            "google.com",
             "googletagmanager.com",
             "hjd2048.com",
             "hlib.cc",
