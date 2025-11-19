@@ -35,7 +35,6 @@ var rules = [
             "novel543.com",
             "oaistatic.com",
             "pqjc.site",
-            "pximg.net",
             "qbtr.org",
             "sayhanabi.net",
             "sxsy97.com",
