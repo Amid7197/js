@@ -58,4 +58,5 @@ yopmail.com
 blacktealab.com
 aicomic.org
 googletagmanager.com
-google.com
+
+dzmm.ai
