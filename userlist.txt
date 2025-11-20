@@ -33,6 +33,7 @@ hlib.cc
 ||69shuba.com
 ||69shuba.cx
 cdnshu.com
+cdnshu.cx
 ||novel543.com
 ####
 
