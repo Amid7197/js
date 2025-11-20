@@ -13,7 +13,6 @@
 ||404zu.net
 ||404zu.org
 ||hlib.cc
-xchina.co
 ####
 
 ## 图床
@@ -62,3 +61,4 @@ aicomic.org
 googletagmanager.com
 cloudflare.com
 dzmm.ai
+xchina.co
