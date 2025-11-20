@@ -21,6 +21,7 @@ var rules = [
             "blacktealab.com",
             "btlqb5brd4.com",
             "cdnshu.com",
+            "cdnshu.cx",
             "ddfan.org",
             "dzmm.ai",
             "ffxs8.top",
