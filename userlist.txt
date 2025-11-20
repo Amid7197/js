@@ -12,7 +12,8 @@
 ||66story.com
 ||404zu.net
 ||404zu.org
-hlib.cc
+||hlib.cc
+xchina.co
 ####
 
 ## 图床
