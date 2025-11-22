@@ -48,6 +48,7 @@
 // @include           *://*2dfan.*/topics/*
 // @include           *://*sis001.com/forum/viewthread.php?tid=*
 // @include           *://*.sayhanabi.*/thread-*.html
+// @include           *://*.uaa*.com/novel/chapter*
 // @grant             GM_addStyle
 // @run-at            document-start
 // @updateUrl         https://raw.githubusercontent.com/Amid7197/js/refs/heads/main/djs/limits.user.js
