@@ -13,6 +13,7 @@
 ||404zu.net
 ||404zu.org
 ||hlib.cc
+xbookcn.org
 ####
 
 ## 图床
