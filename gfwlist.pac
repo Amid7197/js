@@ -47,6 +47,7 @@ var rules = [
             "trxs.cc",
             "trxs.me",
             "uaa.com",
+            "xbookcn.org",
             "xchina.co",
             "xn--cp3a08l.com",
             "xn--mes358aby2apfg.com",
