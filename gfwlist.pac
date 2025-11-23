@@ -13,6 +13,7 @@ var rules = [
             "66story.com",
             "69shuba.com",
             "69shuba.cx",
+            "69shuba.tw",
             "acg.lol",
             "aicomic.org",
             "alicesw.com",
