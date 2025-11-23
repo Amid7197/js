@@ -14,6 +14,7 @@
 ||404zu.org
 ||hlib.cc
 xbookcn.org
+xbookcn.net
 ####
 
 ## 图床
