@@ -27,6 +27,7 @@ var rules = [
             "dzmm.ai",
             "ffxs8.top",
             "googletagmanager.com",
+            "groq.com",
             "hjd2048.com",
             "hlib.cc",
             "hmoe.link",
