@@ -4,7 +4,7 @@
 // @description       解除大部分网站禁止复制、剪切、选择文本、右键菜单的限制。
 // @homepageURL       https://github.com/xinggsf/gm/
 // @author            xinggsf 半烟半雨溪桥畔
-// @version           2.0.3
+// @version           2.0.4
 // @license           LGPLv3
 // @include           https://www.zhihu.com/*
 // @include           https://www.bilibili.com/read/*
@@ -49,6 +49,7 @@
 // @include           *://*sis001.com/forum/viewthread.php?tid=*
 // @include           *://*.sayhanabi.*/thread-*.html
 // @include           *://*.uaa*.com/novel/chapter*
+// @include           *://blog.51cto.com/*
 // @grant             GM_addStyle
 // @run-at            document-start
 // @updateUrl         https://raw.githubusercontent.com/Amid7197/js/refs/heads/main/djs/limits.user.js
