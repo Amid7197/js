@@ -49,6 +49,7 @@ pqjc.site
 ## Ai
 seaart.ai
 seaart.me
+tensor.art
 ####
 hjd2048.com
 laowang.vip
