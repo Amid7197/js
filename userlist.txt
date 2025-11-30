@@ -46,6 +46,10 @@ pqjc.site
 赔钱.com
 ####
 
+## Ai
+seaart.ai
+seaart.me
+####
 hjd2048.com
 laowang.vip
 oaistatic.com
@@ -62,6 +66,7 @@ yopmail.com
 blacktealab.com
 aicomic.org
 googletagmanager.com
+gstatic.com
 cloudflare.com
 dzmm.ai
 xchina.co
