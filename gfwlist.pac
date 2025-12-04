@@ -16,6 +16,7 @@ var rules = [
             "69shuba.tw",
             "acg.lol",
             "aicomic.org",
+            "aikanhanman.top",
             "alicesw.com",
             "bachashuku.cc",
             "bgm.tv",
