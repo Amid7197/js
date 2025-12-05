@@ -18,6 +18,7 @@ var rules = [
             "aicomic.org",
             "aikanhanman.top",
             "alicesw.com",
+            "alicesw.org",
             "bachashuku.cc",
             "bgm.tv",
             "blacktealab.com",
