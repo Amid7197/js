@@ -34,6 +34,7 @@ var rules = [
             "hjd2048.com",
             "hlib.cc",
             "hmoe.link",
+            "ibbs.pro",
             "inari.site",
             "inf.li",
             "jpxs123.com",
