@@ -35,6 +35,7 @@ var rules = [
             "hlib.cc",
             "hmoe.link",
             "ibbs.pro",
+            "imagetwist.com",
             "inari.site",
             "inf.li",
             "jpxs123.com",
