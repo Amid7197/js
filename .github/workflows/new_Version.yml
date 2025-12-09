@@ -1,53 +1,118 @@
-name: Auto Increment Version on JS File Update
+name: Update Version on JS File Change
 
 on:
   push:
     paths:
-      - 'djs/**/*.js'  # 监听 djs 文件夹下所有的 js 文件变化
+      - 'djs/**/*.js'
+    branches: [ main, master ]
 
 jobs:
   update-version:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           token: ${{ secrets.GIT_TOKEN }}
 
-      - name: Get the modified JS file
-        id: get-file
+      - name: Get changed JS files
+        id: changed-files
+        uses: tj-actions/changed-files@v44
+        with:
+          files: |
+            djs/**/*.js
+
+      - name: Debug - List changed files
         run: |
-          # 获取最近修改的 JS 文件
-          modified_file=$(git diff --name-only HEAD^ HEAD | grep '^djs/.*\.js$' || true)
-          echo "Modified file: $modified_file"
-          echo "modified_file=$modified_file" >> $GITHUB_ENV
+          echo "Changed files: ${{ steps.changed-files.outputs.all_changed_files }}"
+          echo "Number of changed files: ${{ steps.changed-files.outputs.all_changed_files_count }}"
 
-      - name: Increment version in the JS file
-        if: env.modified_file != ''  # 只有修改了 JS 文件才执行
+      - name: Update version in changed files
+        if: steps.changed-files.outputs.all_changed_files_count != 0
+        id: update-version
         run: |
-          # 设置目标 JS 文件
-          target_file="${{ env.modified_file }}"
-
-          # 获取当前的版本号，假设版本号是位于第四行的 // @version
-          current_version=$(sed -n '4p' "$target_file" | sed 's/.*@version[[:space:]]*\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/')
+          changed_files="${{ steps.changed-files.outputs.all_changed_files }}"
           
-          # 解析版本号并递增小版本号
-          IFS='.' read -r -a version_parts <<< "$current_version"
-          major=${version_parts[0]}
-          minor=${version_parts[1]}
-          patch=${version_parts[2]}
+          if [ -z "$changed_files" ]; then
+            echo "No JS files changed"
+            exit 0
+          fi
           
-          # 增加小版本号
-          patch=$((patch + 1))
-          new_version="$major.$minor.$patch"
+          # 初始化提交信息
+          commit_message="chore: update version in:"
+          
+          for file in $changed_files; do
+            if [ -f "$file" ]; then
+              echo "Processing file: $file"
+              
+              # 读取当前版本号
+              current_version_line=$(sed -n '4p' "$file")
+              echo "Line 4 content: $current_version_line"
+              
+              if [[ $current_version_line =~ //\s*@version\s+([0-9]+\.[0-9]+\.[0-9]+) ]]; then
+                current_version="${BASH_REMATCH[1]}"
+                echo "Current version: $current_version"
+                
+                # 分割版本号
+                IFS='.' read -r major minor patch <<< "$current_version"
+                
+                # 递增修订版本号
+                new_patch=$((patch + 1))
+                new_version="$major.$minor.$new_patch"
+                echo "New version: $new_version"
+                
+                # 创建临时文件
+                temp_file=$(mktemp)
+                
+                # 替换第4行的版本号
+                awk -v new_version="$new_version" '
+                  NR == 4 {
+                    if (match($0, /\/\/\s*@version\s+[0-9]+\.[0-9]+\.[0-9]+/)) {
+                      print "// @version      " new_version
+                    } else {
+                      print $0
+                    }
+                  }
+                  NR != 4 { print $0 }
+                ' "$file" > "$temp_file"
+                
+                # 检查替换是否成功
+                new_version_line=$(sed -n '4p' "$temp_file")
+                if [[ "$new_version_line" == "// @version      $new_version" ]]; then
+                  # 替换原文件
+                  mv "$temp_file" "$file"
+                  echo "✓ Successfully updated $file to version $new_version"
+                  commit_message="$commit_message $(basename $file)"
+                else
+                  echo "✗ Failed to update version in $file"
+                  rm "$temp_file"
+                fi
+              else
+                echo "✗ Version pattern not found in line 4 of $file"
+              fi
+            else
+              echo "✗ File not found: $file"
+            fi
+          done
+          
+          # 设置输出
+          echo "commit_message=${commit_message}" >> $GITHUB_OUTPUT
 
-          # 使用 sed 更新文件中的版本号
-          sed -i "4s@// @version[[:space:]]*.*@// @version      $new_version@" "$target_file"
-
-          # 提交更改
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git add "$target_file"
-          git commit -m "Auto increment version to $new_version"
+      - name: Commit and push changes
+        if: steps.changed-files.outputs.all_changed_files_count != 0
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          
+          git add .
+          
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          
+          git commit -m "${{ steps.update-version.outputs.commit_message }}"
           git push
