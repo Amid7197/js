@@ -9,9 +9,14 @@ on:
 jobs:
   update:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # 明确授予写入权限
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GIT_TOKEN }}  # 使用默认令牌或 secrets.PAT
 
       - name: Read domain from userlist.txt line 3
         id: vars
@@ -24,14 +29,8 @@ jobs:
         run: |
           DOMAIN="${{ steps.vars.outputs.domain }}"
           FILE="djs/dis.js"
-
-          # 保存修改前的文件（用于判断是否变化）
           cp "$FILE" "${FILE}.bak"
-
-          # 替换第 5 行
           sed -i "5s|.*|// @match        *://$DOMAIN/*|" "$FILE"
-
-          # 检查是否有变化
           if ! diff "$FILE" "${FILE}.bak" >/dev/null; then
             echo "changed=true" >> $GITHUB_OUTPUT
           else
@@ -42,18 +41,13 @@ jobs:
         if: steps.update_match.outputs.changed == 'true'
         run: |
           FILE="djs/dis.js"
-          # 第 4 行格式类似： // @version     1.0.1
-          # 取出数字，最后一段 +1
           OLD_VER=$(sed -n '4p' "$FILE" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
           MAJOR=$(echo $OLD_VER | cut -d. -f1)
           MINOR=$(echo $OLD_VER | cut -d. -f2)
           PATCH=$(echo $OLD_VER | cut -d. -f3)
           NEW_PATCH=$((PATCH + 1))
           NEW_VER="$MAJOR.$MINOR.$NEW_PATCH"
-
           echo "Version: $OLD_VER → $NEW_VER"
-
-          # 替换第 4 行内容
           sed -i "4s|.*|// @version     $NEW_VER|" "$FILE"
 
       - name: Commit changes
@@ -64,6 +58,6 @@ jobs:
           git add djs/dis.js
           git commit -m "Update match domain & bump version" || echo "No changes to commit"
 
-      - name: Push
+      - name: Push changes
         if: steps.update_match.outputs.changed == 'true'
         run: git push
