@@ -1,6 +1,6 @@
 # 自定义规则（本地增强列表）
 ## 搜书吧
-11supn.nypfsdimhg.com
+supn.nypfsdimhg.com
 ## 尚香
 ||sxsy87.com
 
