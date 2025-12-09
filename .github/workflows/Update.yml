@@ -1,13 +1,10 @@
-name: Update js files match and version
+name: Update all files for domain
 
 on:
   workflow_dispatch:
   push:
     paths:
       - "userlist.txt"
-
-env:
-  JS_FILES: "djs/dis.js djs/ziti.js"  # 可以在这里添加更多文件
 
 jobs:
   update:
@@ -16,60 +13,51 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GIT_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Read domain from userlist.txt line 3
+      - name: Read domain
         id: vars
         run: |
           DOMAIN=$(sed -n '3p' userlist.txt)
           echo "domain=$DOMAIN" >> $GITHUB_OUTPUT
 
-      - name: Update multiple JS files
-        id: update_js
+      - name: Update files
+        id: update
         run: |
           DOMAIN="${{ steps.vars.outputs.domain }}"
           CHANGED=false
           
-          for FILE in ${{ env.JS_FILES }}; do
+          # 更新JS文件
+          for FILE in djs/dis.js djs/ziti.js; do
             if [ -f "$FILE" ]; then
-              echo "Processing $FILE"
-              
-              # 备份原文件
+              echo "Updating $FILE"
               cp "$FILE" "${FILE}.bak"
-              
-              # 更新match行（第5行）
               sed -i "5s|.*|// @match        *://$DOMAIN/*|" "$FILE"
-              
-              # 更新版本号（第4行）
-              OLD_VER=$(sed -n '4p' "$FILE" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
-              if [ -n "$OLD_VER" ]; then
-                MAJOR=$(echo $OLD_VER | cut -d. -f1)
-                MINOR=$(echo $OLD_VER | cut -d. -f2)
-                PATCH=$(echo $OLD_VER | cut -d. -f3)
-                NEW_PATCH=$((PATCH + 1))
-                NEW_VER="$MAJOR.$MINOR.$NEW_PATCH"
-                
-                sed -i "4s|.*|// @version     $NEW_VER|" "$FILE"
-                echo "  Updated: $OLD_VER → $NEW_VER"
-              fi
-              
-              # 检查是否有变化
+              sed -i "4s|.*|// @version     $(sed -n '4p' "$FILE" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | awk -F. -vOFS=. '{$NF=$NF+1; print}')|" "$FILE"
               if ! diff -q "$FILE" "${FILE}.bak" >/dev/null; then
                 CHANGED=true
-                echo "  ✓ Changes detected"
               fi
-              
               rm "${FILE}.bak"
             fi
           done
           
+          # 更新ub.txt
+          if [ -f "djs/ub.txt" ]; then
+            cp djs/ub.txt djs/ub.txt.bak
+            sed -i "2s|.*|$DOMAIN##font.jammer|" djs/ub.txt
+            if ! diff -q djs/ub.txt djs/ub.txt.bak >/dev/null; then
+              CHANGED=true
+            fi
+            rm djs/ub.txt.bak
+          fi
+          
           echo "changed=$CHANGED" >> $GITHUB_OUTPUT
 
-      - name: Commit and push if changed
-        if: steps.update_js.outputs.changed == 'true'
+      - name: Commit and push
+        if: steps.update.outputs.changed == 'true'
         run: |
           git config --local user.name "github-actions"
           git config --local user.email "github-actions@github.com"
-          git add ${{ env.JS_FILES }}
-          git commit -m "Update match domain and version in multiple JS files"
+          git add djs/
+          git commit -m "Update files for domain: ${{ steps.vars.outputs.domain }}"
           git push
