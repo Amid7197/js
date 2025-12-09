@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         新Discuz
 // @namespace    ai
-// @version      0.17
+// @version      0.0.1
 // @description  自动调整orderby参数、跳转旧URL格式、修改attachpay为下载链接
 // @match        https://supn.nypfsdimhg.com/*
 // @match        https://sxsy*.*/forum.php?mod=forumdisplay&fid=*
@@ -15,8 +15,6 @@
 // @exclude      https://*/forum.php?mod=collection&action=*
 // @grant        none
 // @run-at       document-start
-// @downloadURL  https://raw.githubusercontent.com/andadmadm/js/refs/heads/main/xin_Discuz.js
-// @updateURL    https://raw.githubusercontent.com/andadmadm/js/refs/heads/main/xin_Discuz.js
 // ==/UserScript==
 
 (function () {
