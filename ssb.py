@@ -235,7 +235,6 @@ if __name__ == '__main__':
             replace_match_line("xin_Discuz.js", url)
             replace_match_line("ziti.js", url)
             update_userlist_domain("userlist.txt", url)
-            update_ub_txt("dwj/ub.txt", url)
             update_ssb_url("ssb_url.txt", url)
         else:
             logger.error("未能获取到有效URL，无法更新。")
