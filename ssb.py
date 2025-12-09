@@ -55,71 +55,6 @@ def get_url(url: str):
             return link['href']
     return None
 
-def replace_match_line(js_file, new_url):
-    """
-    修改JS文件中的 @match URL，并增加版本号。
-    如果URL没有变化，则不进行任何修改。
-    """
-    try:
-        # Step 1: 读取文件内容
-        with open(js_file, "r", encoding="utf-8") as f:
-            content = f.read()
-
-        # Step 2: 查找当前的 @match 和 @version
-        match_line = re.search(r"// @match\s+(.*)", content)
-        version_line = re.search(r"// @version\s+([\d.]+)", content)
-
-        if not match_line or not version_line:
-            logger.error(f"在 {js_file} 中未找到 @match 或 @version 行，无法进行更新。")
-            return
-
-        current_url_with_wildcard = match_line.group(1).strip()
-        # 移除网址末尾的通配符 *
-        current_url_base = current_url_with_wildcard.rstrip('*')
-
-        # 如果URL没有变化，则直接返回
-        if current_url_base == new_url:
-            logger.info(f"网址没有变化，无需更新 {js_file}。")
-            return
-
-        logger.info(f"网址已更改，正在更新 {js_file}。")
-
-        # Step 3: 更新 @match 行
-        new_content = re.sub(
-            r"// @match\s+.*",
-            f"// @match        {new_url}*",
-            content,
-            count=1
-        )
-
-        # Step 4: 增加 @version 号
-        version_str = version_line.group(1)
-        parts = version_str.split('.')
-        try:
-            # 增加最后一个版本号
-            minor_version = int(parts[-1]) + 1
-            new_version_str = '.'.join(parts[:-1] + [str(minor_version)])
-        except (ValueError, IndexError):
-            logger.error(f"版本号格式不正确：{version_str}，无法自动递增。")
-            new_version_str = version_str # 保持原样
-
-        new_content_with_version = re.sub(
-            r"// @version\s+.*",
-            f"// @version      {new_version_str}",
-            new_content,
-            count=1
-        )
-
-        # Step 5: 写入新内容
-        with open(js_file, "w", encoding="utf-8") as f:
-            f.write(new_content_with_version)
-
-        logger.info(f"已成功更新 {js_file} 的 @match 为 {new_url}*，版本号已更新为 {new_version_str}。")
-
-    except FileNotFoundError:
-        logger.error(f"文件 {js_file} 未找到。")
-    except Exception as e:
-        logger.error(f"替换失败: {e}")
 
 def update_userlist_domain(file_path, new_url):
     """
@@ -150,34 +85,6 @@ def update_userlist_domain(file_path, new_url):
     except Exception as e:
         logger.error(f"更新 userlist.txt 失败: {e}")
 
-def update_ub_txt(file_path, new_url):
-    """
-    将 dwj/ub.txt 的第二行更新为:  <domain>##font.jammer
-    """
-    try:
-        parsed = urlparse(new_url)
-        domain = parsed.netloc or new_url.split('/')[2]
-        newline = f"{domain}##font.jammer\n"
-
-        with open(file_path, "r", encoding="utf-8") as f:
-            lines = f.readlines()
-
-        old_line = lines[1].strip() if len(lines) > 1 else "(无)"
-        logger.info(f"ub.txt 原第二行: {old_line}")
-
-        # 确保至少两行存在
-        if len(lines) < 2:
-            lines += ['\n'] * (2 - len(lines))
-
-        lines[1] = newline
-
-        with open(file_path, "w", encoding="utf-8") as f:
-            f.writelines(lines)
-
-        logger.info(f"ub.txt 第二行已更新为: {newline.strip()}")
-
-    except Exception as e:
-        logger.error(f"更新 ub.txt 失败: {e}")
 
 def update_ssb_url(file_path, new_url):
     """
@@ -232,10 +139,7 @@ if __name__ == '__main__':
         
         # 调用新的 replace_match_line 函数
         if url:
-            replace_match_line("djs/dis.js", url)
-            replace_match_line("ziti.js", url)
             update_userlist_domain("userlist.txt", url)
-            update_ssb_url("ssb_url.txt", url)
         else:
             logger.error("未能获取到有效URL，无法更新。")
     except Exception as e:
