@@ -33,7 +33,7 @@ jobs:
               echo "Updating $FILE"
               cp "$FILE" "${FILE}.bak"
               sed -i "5s|.*|// @match        *://$DOMAIN/*|" "$FILE"
-              sed -i "4s|.*|// @version     $(sed -n '4p' "$FILE" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | awk -F. -vOFS=. '{$NF=$NF+1; print}')|" "$FILE"
+              #sed -i "4s|.*|// @version     $(sed -n '4p' "$FILE" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | awk -F. -vOFS=. '{$NF=$NF+1; print}')|" "$FILE"
               if ! diff -q "$FILE" "${FILE}.bak" >/dev/null; then
                 CHANGED=true
               fi
