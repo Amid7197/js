@@ -1,0 +1,53 @@
+name: Auto Increment Version on JS File Update
+
+on:
+  push:
+    paths:
+      - 'djs/**/*.js'  # 监听 djs 文件夹下所有的 js 文件变化
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GIT_TOKEN }}
+
+      - name: Get the modified JS file
+        id: get-file
+        run: |
+          # 获取最近修改的 JS 文件
+          modified_file=$(git diff --name-only HEAD^ HEAD | grep '^djs/.*\.js$' || true)
+          echo "Modified file: $modified_file"
+          echo "modified_file=$modified_file" >> $GITHUB_ENV
+
+      - name: Increment version in the JS file
+        if: env.modified_file != ''  # 只有修改了 JS 文件才执行
+        run: |
+          # 设置目标 JS 文件
+          target_file="${{ env.modified_file }}"
+
+          # 获取当前的版本号，假设版本号是位于第四行的 // @version
+          current_version=$(sed -n '4p' "$target_file" | sed 's/.*@version[[:space:]]*\([0-9]*\.[0-9]*\.[0-9]*\).*/\1/')
+          
+          # 解析版本号并递增小版本号
+          IFS='.' read -r -a version_parts <<< "$current_version"
+          major=${version_parts[0]}
+          minor=${version_parts[1]}
+          patch=${version_parts[2]}
+          
+          # 增加小版本号
+          patch=$((patch + 1))
+          new_version="$major.$minor.$patch"
+
+          # 使用 sed 更新文件中的版本号
+          sed -i "4s@// @version[[:space:]]*.*@// @version      $new_version@" "$target_file"
+
+          # 提交更改
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add "$target_file"
+          git commit -m "Auto increment version to $new_version"
+          git push
