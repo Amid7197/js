@@ -8,6 +8,8 @@ on:
 
 jobs:
   update-version:
+    # 防止无限循环
+    if: "!contains(github.event.head_commit.message, 'chore: update version') && !contains(github.event.head_commit.message, 'chore: auto-update version') && !contains(github.event.head_commit.message, 'chore: bump version')"
     runs-on: ubuntu-latest
     permissions:
       contents: write
