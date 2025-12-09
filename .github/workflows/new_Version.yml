@@ -25,16 +25,12 @@ jobs:
           files: |
             djs/**/*.js
 
-      - name: Debug - List changed files
-        run: |
-          echo "Changed files: ${{ steps.changed-files.outputs.all_changed_files }}"
-          echo "Number of changed files: ${{ steps.changed-files.outputs.all_changed_files_count }}"
-
       - name: Update version in changed files
         if: steps.changed-files.outputs.all_changed_files_count != 0
         id: update-version
         run: |
           changed_files="${{ steps.changed-files.outputs.all_changed_files }}"
+          echo "Changed files: $changed_files"
           
           if [ -z "$changed_files" ]; then
             echo "No JS files changed"
@@ -43,76 +39,129 @@ jobs:
           
           # 初始化提交信息
           commit_message="chore: update version in:"
+          updated_files=()
           
           for file in $changed_files; do
             if [ -f "$file" ]; then
+              echo ""
               echo "Processing file: $file"
               
-              # 读取当前版本号
-              current_version_line=$(sed -n '4p' "$file")
-              echo "Line 4 content: $current_version_line"
+              # 读取第4行
+              line4=$(sed -n '4p' "$file")
+              echo "Line 4: $line4"
               
-              if [[ $current_version_line =~ //\s*@version\s+([0-9]+\.[0-9]+\.[0-9]+) ]]; then
+              # 提取版本号 - 更宽松的正则表达式
+              if [[ $line4 =~ @version[[:space:]]+([0-9]+\.[0-9]+\.[0-9]+) ]]; then
                 current_version="${BASH_REMATCH[1]}"
                 echo "Current version: $current_version"
                 
-                # 分割版本号
-                IFS='.' read -r major minor patch <<< "$current_version"
-                
                 # 递增修订版本号
+                IFS='.' read -r major minor patch <<< "$current_version"
                 new_patch=$((patch + 1))
                 new_version="$major.$minor.$new_patch"
                 echo "New version: $new_version"
                 
-                # 创建临时文件
-                temp_file=$(mktemp)
-                
-                # 替换第4行的版本号
-                awk -v new_version="$new_version" '
-                  NR == 4 {
-                    if (match($0, /\/\/\s*@version\s+[0-9]+\.[0-9]+\.[0-9]+/)) {
-                      print "// @version      " new_version
-                    } else {
-                      print $0
-                    }
-                  }
-                  NR != 4 { print $0 }
-                ' "$file" > "$temp_file"
-                
-                # 检查替换是否成功
-                new_version_line=$(sed -n '4p' "$temp_file")
-                if [[ "$new_version_line" == "// @version      $new_version" ]]; then
-                  # 替换原文件
-                  mv "$temp_file" "$file"
-                  echo "✓ Successfully updated $file to version $new_version"
-                  commit_message="$commit_message $(basename $file)"
+                # 替换版本号 - 使用更灵活的方法
+                # 创建新行，保持格式
+                if [[ $line4 =~ ^(.*@version[[:space:]]+)[0-9]+\.[0-9]+\.[0-9]+(.*)$ ]]; then
+                  new_line="${BASH_REMATCH[1]}${new_version}${BASH_REMATCH[2]}"
                 else
-                  echo "✗ Failed to update version in $file"
-                  rm "$temp_file"
+                  # 如果上面的模式不匹配，使用简单替换
+                  new_line=$(echo "$line4" | sed -E "s/(@version[[:space:]]+)[0-9]+\.[0-9]+\.[0-9]+/\1${new_version}/")
                 fi
+                
+                # 使用sed直接替换文件中的第4行
+                sed -i "4s#.*#$new_line#" "$file"
+                
+                echo "Updated line: $new_line"
+                updated_files+=("$file")
+                commit_message="$commit_message $(basename "$file")"
+                
+              elif [[ $line4 =~ [0-9]+\.[0-9]+\.[0-9]+ ]]; then
+                # 尝试匹配任何版本号模式
+                current_version=$(echo "$line4" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+                echo "Found version (alternative): $current_version"
+                
+                IFS='.' read -r major minor patch <<< "$current_version"
+                new_patch=$((patch + 1))
+                new_version="$major.$minor.$new_patch"
+                
+                # 替换版本号
+                new_line=$(echo "$line4" | sed -E "s/[0-9]+\.[0-9]+\.[0-9]+/${new_version}/")
+                sed -i "4s#.*#$new_line#" "$file"
+                
+                echo "Updated line: $new_line"
+                updated_files+=("$file")
+                commit_message="$commit_message $(basename "$file")"
+                
               else
-                echo "✗ Version pattern not found in line 4 of $file"
+                echo "✗ Version pattern not found in line 4"
+                echo "Line content: '$line4'"
               fi
             else
               echo "✗ File not found: $file"
             fi
           done
           
-          # 设置输出
-          echo "commit_message=${commit_message}" >> $GITHUB_OUTPUT
+          # 如果有文件被更新，输出信息
+          if [ ${#updated_files[@]} -gt 0 ]; then
+            echo ""
+            echo "Updated files:"
+            for f in "${updated_files[@]}"; do
+              echo "  - $f"
+            done
+            echo "commit_message=$commit_message" >> $GITHUB_OUTPUT
+          else
+            echo "No files were updated"
+            echo "No files updated" > commit_message.txt
+          fi
+
+      - name: Show git status
+        if: steps.changed-files.outputs.all_changed_files_count != 0
+        run: |
+          echo "=== Git status before commit ==="
+          git status
+          echo ""
+          echo "=== Changes in files ==="
+          git diff --name-only || echo "No changes"
+          echo ""
+          echo "=== Diff content ==="
+          git diff || echo "No diff"
 
       - name: Commit and push changes
         if: steps.changed-files.outputs.all_changed_files_count != 0
         run: |
+          # 配置git用户
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           
-          git add .
-          
-          if git diff --cached --quiet; then
+          # 检查是否有更改
+          if git diff --quiet; then
             echo "No changes to commit"
             exit 0
           fi
           
-          git commit -m "${{ steps.update-version.outputs.commit_message }}"
+          # 添加所有更改
+          git add .
+          
+          # 创建提交消息
+          changed_files="${{ steps.changed-files.outputs.all_changed_files }}"
+          file_list=""
+          for file in $changed_files; do
+            if git diff --name-only --cached | grep -q "^$(echo "$file" | sed 's/[\/&]/\\&/g')$"; then
+              file_list="$file_list $(basename "$file")"
+            fi
+          done
+          
+          if [ -z "$file_list" ]; then
+            commit_msg="chore: update version numbers"
+          else
+            commit_msg="chore: update version in:$file_list"
+          fi
+          
+          echo "Committing with message: $commit_msg"
+          git commit -m "$commit_msg"
+          
+          echo "Pushing changes..."
           git push
+          echo "Changes pushed successfully"
