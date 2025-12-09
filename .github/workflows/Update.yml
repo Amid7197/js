@@ -18,46 +18,41 @@ jobs:
         with:
           token: ${{ secrets.GIT_TOKEN }}  # 使用默认令牌或 secrets.PAT
 
-      - name: Read domain from userlist.txt line 3
-        id: vars
+        - name: Read URL & Domain
+        id: read_url
         run: |
-          DOMAIN=$(sed -n '3p' userlist.txt)
+          URL=$(sed -n '1p' ssb_url.txt)
+          DOMAIN=$(sed -n '2p' ssb_url.txt)
+          echo "url=$URL" >> $GITHUB_OUTPUT
           echo "domain=$DOMAIN" >> $GITHUB_OUTPUT
 
-      - name: Update match line in djs/dis.js
-        id: update_match
+      - name: Update xin_Discuz.js @match
         run: |
-          DOMAIN="${{ steps.vars.outputs.domain }}"
-          FILE="djs/dis.js"
-          cp "$FILE" "${FILE}.bak"
-          sed -i "5s|.*|// @match        *://$DOMAIN/*|" "$FILE"
-          if ! diff "$FILE" "${FILE}.bak" >/dev/null; then
-            echo "changed=true" >> $GITHUB_OUTPUT
-          else
-            echo "changed=false" >> $GITHUB_OUTPUT
+          sed -i "s|^// @match.*|// @match        ${URL}*|" xin_Discuz.js
+
+      - name: Update ziti.js @match
+        run: |
+          sed -i "s|^// @match.*|// @match        ${URL}*|" ziti.js
+
+      - name: Update userlist.txt (domain)
+        run: |
+          sed -i "3s|.*|||${DOMAIN}|" userlist.txt
+
+      - name: Update dwj/ub.txt (domain##font.jammer)
+        run: |
+          sed -i "2s|.*|${DOMAIN}##font.jammer|" dwj/ub.txt
+
+      - name: Commit & Push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add xin_Discuz.js ziti.js userlist.txt dwj/ub.txt
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
           fi
 
-      - name: Bump version number if changed
-        if: steps.update_match.outputs.changed == 'true'
-        run: |
-          FILE="djs/dis.js"
-          OLD_VER=$(sed -n '4p' "$FILE" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
-          MAJOR=$(echo $OLD_VER | cut -d. -f1)
-          MINOR=$(echo $OLD_VER | cut -d. -f2)
-          PATCH=$(echo $OLD_VER | cut -d. -f3)
-          NEW_PATCH=$((PATCH + 1))
-          NEW_VER="$MAJOR.$MINOR.$NEW_PATCH"
-          echo "Version: $OLD_VER → $NEW_VER"
-          sed -i "4s|.*|// @version     $NEW_VER|" "$FILE"
-
-      - name: Commit changes
-        if: steps.update_match.outputs.changed == 'true'
-        run: |
-          git config --local user.name "github-actions"
-          git config --local user.email "github-actions@github.com"
-          git add djs/dis.js
-          git commit -m "Update match domain & bump version" || echo "No changes to commit"
-
-      - name: Push changes
-        if: steps.update_match.outputs.changed == 'true'
-        run: git push
+          git commit -m "Auto update JS/TXT files based on ssb_url.txt"
+          git push
