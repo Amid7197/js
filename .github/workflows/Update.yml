@@ -1,4 +1,4 @@
-name: Update dis.js match and version
+name: Update js files match and version
 
 on:
   workflow_dispatch:
@@ -6,53 +6,70 @@ on:
     paths:
       - "userlist.txt"
 
+env:
+  JS_FILES: "djs/dis.js djs/zz.js"  # 可以在这里添加更多文件
+
 jobs:
   update:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write  # 明确授予写入权限
-    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GIT_TOKEN }}  # 使用默认令牌或 secrets.PAT
+          token: ${{ secrets.GIT_TOKEN }}
 
-        - name: Read URL & Domain
-        id: read_url
+      - name: Read domain from userlist.txt line 3
+        id: vars
         run: |
-          URL=$(sed -n '1p' ssb_url.txt)
-          DOMAIN=$(sed -n '2p' ssb_url.txt)
-          echo "url=$URL" >> $GITHUB_OUTPUT
+          DOMAIN=$(sed -n '3p' userlist.txt)
           echo "domain=$DOMAIN" >> $GITHUB_OUTPUT
 
-      - name: Update xin_Discuz.js @match
+      - name: Update multiple JS files
+        id: update_js
         run: |
-          sed -i "s|^// @match.*|// @match        ${URL}*|" xin_Discuz.js
+          DOMAIN="${{ steps.vars.outputs.domain }}"
+          CHANGED=false
+          
+          for FILE in ${{ env.JS_FILES }}; do
+            if [ -f "$FILE" ]; then
+              echo "Processing $FILE"
+              
+              # 备份原文件
+              cp "$FILE" "${FILE}.bak"
+              
+              # 更新match行（第5行）
+              sed -i "5s|.*|// @match        *://$DOMAIN/*|" "$FILE"
+              
+              # 更新版本号（第4行）
+              OLD_VER=$(sed -n '4p' "$FILE" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+              if [ -n "$OLD_VER" ]; then
+                MAJOR=$(echo $OLD_VER | cut -d. -f1)
+                MINOR=$(echo $OLD_VER | cut -d. -f2)
+                PATCH=$(echo $OLD_VER | cut -d. -f3)
+                NEW_PATCH=$((PATCH + 1))
+                NEW_VER="$MAJOR.$MINOR.$NEW_PATCH"
+                
+                sed -i "4s|.*|// @version     $NEW_VER|" "$FILE"
+                echo "  Updated: $OLD_VER → $NEW_VER"
+              fi
+              
+              # 检查是否有变化
+              if ! diff -q "$FILE" "${FILE}.bak" >/dev/null; then
+                CHANGED=true
+                echo "  ✓ Changes detected"
+              fi
+              
+              rm "${FILE}.bak"
+            fi
+          done
+          
+          echo "changed=$CHANGED" >> $GITHUB_OUTPUT
 
-      - name: Update ziti.js @match
+      - name: Commit and push if changed
+        if: steps.update_js.outputs.changed == 'true'
         run: |
-          sed -i "s|^// @match.*|// @match        ${URL}*|" ziti.js
-
-      - name: Update userlist.txt (domain)
-        run: |
-          sed -i "3s|.*|||${DOMAIN}|" userlist.txt
-
-      - name: Update dwj/ub.txt (domain##font.jammer)
-        run: |
-          sed -i "2s|.*|${DOMAIN}##font.jammer|" dwj/ub.txt
-
-      - name: Commit & Push changes
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          git add xin_Discuz.js ziti.js userlist.txt dwj/ub.txt
-
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-            exit 0
-          fi
-
-          git commit -m "Auto update JS/TXT files based on ssb_url.txt"
+          git config --local user.name "github-actions"
+          git config --local user.email "github-actions@github.com"
+          git add ${{ env.JS_FILES }}
+          git commit -m "Update match domain and version in multiple JS files"
           git push
