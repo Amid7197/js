@@ -6,8 +6,6 @@
 // @match        https://supn.nypfsdimhg.com/*
 // @grant        GM_addStyle
 // @run-at       document-start  // 提前执行，优先加载字体资源
-// @downloadURL  https://raw.githubusercontent.com/andadmadm/js/refs/heads/main/ziti.js
-// @updateURL    https://raw.githubusercontent.com/andadmadm/js/refs/heads/main/ziti.js
 // ==/UserScript==
 
 
