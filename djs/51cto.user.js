@@ -2,7 +2,7 @@
 // @name         51cto文章复制功能重写
 // @namespace    http://tampermonkey.net/
 // @version      1.1.1
-// @description  重写网页复制功能，解除复制限制1.1.1
+// @description  重写网页复制功能，解除复制限制 1.1.1
 // @author       You
 // @match        *://blog.51cto.com/*
 // @grant        none
