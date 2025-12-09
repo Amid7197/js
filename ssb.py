@@ -179,6 +179,48 @@ def update_ub_txt(file_path, new_url):
     except Exception as e:
         logger.error(f"更新 ub.txt 失败: {e}")
 
+def update_ssb_url(file_path, new_url):
+    """
+    将完整 URL 写入第 1 行，
+    将域名写入第 2 行。
+    """
+    try:
+        parsed = urlparse(new_url)
+        domain = parsed.netloc or new_url.split('/')[2]
+
+        with open(file_path, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+
+        # 保证至少两行
+        if len(lines) < 2:
+            lines += ['\n'] * (2 - len(lines))
+
+        old_url = lines[0].strip() if len(lines) > 0 else "(无)"
+        old_domain = lines[1].strip() if len(lines) > 1 else "(无)"
+        logger.info(f"ssb_url.txt 原第一行: {old_url}")
+        logger.info(f"ssb_url.txt 原第二行: {old_domain}")
+
+        # 写入新值
+        lines[0] = new_url + "\n"
+        lines[1] = domain + "\n"
+
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.writelines(lines)
+
+        logger.info(f"ssb_url.txt 第一行已更新为: {new_url}")
+        logger.info(f"ssb_url.txt 第二行已更新为: {domain}")
+
+    except FileNotFoundError:
+        # 如果文件不存在，自动创建
+        with open(file_path, "w", encoding="utf-8") as f:
+            parsed = urlparse(new_url)
+            domain = parsed.netloc or new_url.split('/')[2]
+            f.write(new_url + "\n")
+            f.write(domain + "\n")
+        logger.info(f"ssb_url.txt 不存在，已创建并写入内容。")
+    except Exception as e:
+        logger.error(f"更新 ssb_url.txt 失败: {e}")
+
 
 if __name__ == '__main__':
     try:
@@ -194,6 +236,7 @@ if __name__ == '__main__':
             replace_match_line("ziti.js", url)
             update_userlist_domain("userlist.txt", url)
             update_ub_txt("dwj/ub.txt", url)
+            update_ssb_url("ssb_url.txt", url)
         else:
             logger.error("未能获取到有效URL，无法更新。")
     except Exception as e:
