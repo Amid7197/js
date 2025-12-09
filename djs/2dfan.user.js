@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         2dfan跳转
 // @namespace    http://tampermonkey.net/
-// @version      1.0.2
+// @version      1.0.3
 // @description  多彩渐变搜索按钮1.0.2
 // @author       cuddly
 // @match        *://ddfan.*/*
