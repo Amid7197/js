@@ -7,7 +7,7 @@ on:
       - "userlist.txt"
 
 env:
-  JS_FILES: "djs/dis.js djs/zz.js"  # 可以在这里添加更多文件
+  JS_FILES: "djs/dis.js djs/ziti.js"  # 可以在这里添加更多文件
 
 jobs:
   update:
