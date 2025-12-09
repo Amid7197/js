@@ -7,11 +7,11 @@ on:
       - "userlist.txt"
 
 jobs:
-  update:
+  check-userlist-update:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v2
         with:
           token: ${{ secrets.GIT_TOKEN }}
 
@@ -28,7 +28,7 @@ jobs:
           CHANGED=false
           
           # 更新JS文件
-          for FILE in djs/dis.js djs/ziti.js; do
+          for FILE in djs/xin_Discuz.user.js djs/ziti.user.js; do
             if [ -f "$FILE" ]; then
               echo "Updating $FILE"
               cp "$FILE" "${FILE}.bak"
