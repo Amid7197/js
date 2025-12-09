@@ -1,0 +1,27 @@
+!删除文本干扰码
+##font.jammer
+
+! 2023-09-24 https://www.tsdm39.com 天使动漫去微博
+www.tsdm39.com###ts_sidebar_base
+
+! 2024年12月13日 https://github.com
+github.com##.flash-full.Banner--full.flash-warn.Banner--warning.flash.Banner.js-notice
+
+! 2024年12月13日 www.mpyit.com
+||renwai.ren/cdn/js/Iine.js$script,domain=www.mpyit.com
+
+! 2025年8月10日 https://404zu.net
+404zu.net##.pbn.cl.bm_c
+
+! 2025年8月10日 https://sxsy20.com
+sxsy20.com##.pbn.cl.bm_c
+
+! 2025年8月10日 https://www.south-plus.net
+www.south-plus.net###cate_thread
+
+! 2025年11月25日 https://www.bilibili.com
+www.bilibili.com##.adblock-tips
+
+! 2025年11月30日 https://yuanbao.tencent.com
+yuanbao.tencent.com##.index_pc_download_ads_card_banner__FillW
+
