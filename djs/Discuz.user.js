@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         新Discuz
 // @namespace    ai
-// @version     0.0.4
-// @match        *://supn.nypfsdimhg.com/*
+// @version     0.0.5
+// @match        *://111supn.nypfsdimhg.com/*
 // @match        https://supn.nypfsdimhg.com/*
 // @match        *://sxsy*.*/forum.php?mod=forumdisplay&fid=*
 // @match        *://sxsy*.*/search.php?mod=forum&searchid=*
