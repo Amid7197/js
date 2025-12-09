@@ -232,7 +232,7 @@ if __name__ == '__main__':
         
         # 调用新的 replace_match_line 函数
         if url:
-            replace_match_line("djs/xin_Discuz.js", url)
+            replace_match_line("djs/dis.js", url)
             replace_match_line("ziti.js", url)
             update_userlist_domain("userlist.txt", url)
             update_ssb_url("ssb_url.txt", url)
