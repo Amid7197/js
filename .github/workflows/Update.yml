@@ -28,7 +28,7 @@ jobs:
           CHANGED=false
           
           # 更新JS文件
-          for FILE in djs/xin_Discuz.user.js djs/ziti.user.js; do
+          for FILE in djs/Discuz.user.js djs/ziti.user.js; do
             if [ -f "$FILE" ]; then
               echo "Updating $FILE"
               cp "$FILE" "${FILE}.bak"
