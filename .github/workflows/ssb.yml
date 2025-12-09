@@ -31,6 +31,7 @@ jobs:
           git add xin_Discuz.js
           git add ziti.js
           git add userlist.txt
+          git add dwj/ub.txt
           git diff --quiet && git diff --staged --quiet || git commit -m "Update xin_Discuz.js match URL"
           git push
           
