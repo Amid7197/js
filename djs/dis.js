@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         新Discuz
 // @namespace    ai
-// @version      0.0.2
-// @description  自动调整orderby参数、跳转旧URL格式、修改attachpay为下载链接
+// @version     0.0.3
+// @match        *://supn.nypfsdimhg.com/*
 // @match        https://supn.nypfsdimhg.com/*
 // @match        *://sxsy*.*/forum.php?mod=forumdisplay&fid=*
 // @match        *://sxsy*.*/search.php?mod=forum&searchid=*
