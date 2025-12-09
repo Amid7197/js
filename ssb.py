@@ -123,12 +123,12 @@ def replace_match_line(js_file, new_url):
 
 def update_userlist_domain(file_path, new_url):
     """
-    ✅ 将 userlist.txt 第二行更新为新 URL 的域名，前面加上 '||'
+    ✅ 将 userlist.txt 第二行更新为新 URL 的域名
     """
     try:
         parsed = urlparse(new_url)
         domain = parsed.netloc or new_url.split('/')[2]
-        domain_line = f"||{domain}\n"   # ✅ 加上 '||'
+        domain_line = f"{domain}\n"   
 
         with open(file_path, "r", encoding="utf-8") as f:
             lines = f.readlines()
