@@ -4,7 +4,7 @@
 // @icon         https://github.githubassets.com/favicons/favicon.png
 // @grant        GM_setClipboard
 // @grant        GM_addStyle
-// @version      1.0.0
+// @version      1.0.1
 // @require      https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js
 // @run-at       document-end
 // @license      GPL-3.0
