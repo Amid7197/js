@@ -1,10 +1,10 @@
 // ==UserScript==
 // @namespace         https://www.github.com/Cat7373/remove-web-limits/
 // @name              网页限制解除（精简优化版）
+// @version           2.0.6
 // @description       解除大部分网站禁止复制、剪切、选择文本、右键菜单的限制。
 // @homepageURL       https://github.com/xinggsf/gm/
 // @author            xinggsf 半烟半雨溪桥畔
-// @version           2.0.6
 // @license           LGPLv3
 // @include           https://www.zhihu.com/*
 // @include           https://www.bilibili.com/read/*
