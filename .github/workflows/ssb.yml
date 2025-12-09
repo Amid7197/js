@@ -28,10 +28,7 @@ jobs:
           DOMAIN="||$(curl -s https://sxsy.org/ | grep -oP '(?<=尚香书苑：<a href=")https[^"]+' | sed 's#https://##')"
           sed -i "5c$DOMAIN" userlist.txt
           
-          git add djs/dis.js
-          git add ziti.js
           git add userlist.txt
-          git add ssb_url.txt
           git diff --quiet && git diff --staged --quiet || git commit -m "Update xin_Discuz.js match URL"
           git push
           
