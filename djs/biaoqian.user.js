@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         标签过滤器（黑名单标签+白名单标题）
-// @version      1.4
+// @version      1.5
 // @description  隐藏带黑名单标签的帖子，但标题含白名单关键词的除外，纯黑名单页面正常显示
 // @author       南竹
 // @match        https://sxsy*.*/forum.php?mod=forumdisplay&fid=*
@@ -8,7 +8,6 @@
 // @license      MIT
 // @grant        none
 // @run-at       document-start  // 提前执行，优先加载字体资源
-// @updateURL    https://raw.githubusercontent.com/Amid7197/js/refs/heads/main/djs/biaoqian.user.js
 // ==/UserScript==
 (function () {
     'use strict';
