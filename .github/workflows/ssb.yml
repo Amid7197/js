@@ -28,7 +28,7 @@ jobs:
           DOMAIN="||$(curl -s https://sxsy.org/ | grep -oP '(?<=尚香书苑：<a href=")https[^"]+' | sed 's#https://##')"
           sed -i "5c$DOMAIN" userlist.txt
           
-          git add xin_Discuz.js
+          git add djs/dis.js
           git add ziti.js
           git add userlist.txt
           git add ssb_url.txt
