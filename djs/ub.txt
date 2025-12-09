@@ -1,5 +1,5 @@
 !删除文本干扰码
-supn.1nypfsdimhg.com##font.jammer
+supn.nypfsdimhg.com##font.jammer
 
 ! 2023-09-24 https://www.tsdm39.com 天使动漫去微博
 www.tsdm39.com###ts_sidebar_base
