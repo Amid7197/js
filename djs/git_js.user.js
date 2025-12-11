@@ -2,9 +2,10 @@
 // @name         Github 高速下载 (精简版，自用, 带APK二维码)
 // @match        *://github.com/*
 // @version      1.0.2
-// @icon         https://github.githubassets.com/favicons/favicon.png
 // @grant        GM_setClipboard
 // @grant        GM_addStyle
+// @grant        GM_setValue
+// @grant        GM_getValue
 // @require      https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js
 // @run-at       document-end
 // @license      GPL-3.0
@@ -13,8 +14,8 @@
 (function () {
     'use strict';
 
-    // 用户可以自定义加速源
-    const ACCEL_SOURCE = 'https://github.llnas.de5.net';  // 自定义加速源，可以修改为其他服务
+    // 获取自定义加速源，默认值为 'https://github.llnas.de5.net'
+    const ACCEL_SOURCE = GM_getValue('ACCEL_SOURCE', 'https://github.llnas.de5.net');
 
     // 仅保留一个加速源
     const ACCEL = {
@@ -114,4 +115,7 @@
         }
     });
     observer.observe(document.body, { childList: true, subtree: true });
+
+    // 如果用户需要更改加速源，可以使用以下方式来更新加速源：
+    // GM_setValue('ACCEL_SOURCE', 'https://new-source.example.com');
 })();
