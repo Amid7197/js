@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Github 高速下载 (精简版，自用, 带APK二维码)
 // @match        *://github.com/*
-// @version      1.0.2
+// @version      1.0.3
 // @grant        GM_setClipboard
 // @grant        GM_addStyle
 // @grant        GM_setValue
