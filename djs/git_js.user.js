@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         Github 高速下载 (精简版，自用, 带APK二维码)
-// @icon         https://github.githubassets.com/favicons/favicon.png
-// @version      1.0.1
 // @match        *://github.com/*
+// @icon         https://github.githubassets.com/favicons/favicon.png
 // @grant        GM_setClipboard
 // @grant        GM_addStyle
+// @version      1.0.1
 // @require      https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js
 // @run-at       document-end
 // @license      GPL-3.0
@@ -13,10 +13,13 @@
 (function () {
     'use strict';
 
+    // 用户可以自定义加速源
+    const ACCEL_SOURCE = 'https://github.llnas.de5.net';  // 自定义加速源，可以修改为其他服务
+
     // 仅保留一个加速源
     const ACCEL = {
-        repo: ['https://github.llnas.de5.net/https://github.com', '加速'],
-        raw:  ['https://github.llnas.de5.net/https://raw.githubusercontent.com', '加速']
+        repo: [`${ACCEL_SOURCE}/https://github.com`, '加速'],
+        raw: [`${ACCEL_SOURCE}/https://raw.githubusercontent.com`, '加速']
     };
 
     // 为二维码弹出框添加样式
