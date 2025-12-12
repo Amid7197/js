@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name 繁简转换-站点精简
 // @namespace https://space.bilibili.com/482343
-// @version 2.11.1
+// @version 2.11.2
 // @description 网页上的繁体中文字转为简体。
 // @author 古海沉舟
 // @license 古海沉舟
