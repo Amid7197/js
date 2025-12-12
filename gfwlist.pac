@@ -1,4 +1,4 @@
-var proxy = 'SOCKS5 127.0.0.1:7890; SOCKS5 127.0.0.1:1080; DIRECT;';
+var proxy = 'SOCKS5 127.0.0.1:7890; SOCKS5 127.0.0.1:1080; SOCKS5 v4.llnas.de5.net:7890; DIRECT;';
 var rules = [
     [
         [],
@@ -63,6 +63,7 @@ var rules = [
             "xn--cp3a08l.com",
             "xn--mes358aby2apfg.com",
             "xn--mes358aby2apfg.site",
+            "ylimg.com",
             "yopmail.com"
         ]
     ],
