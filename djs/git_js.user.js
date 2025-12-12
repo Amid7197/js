@@ -17,7 +17,14 @@
     'use strict';
 
     // ========== 配置管理 ==========
-    let customDomain = GM_getValue('customDomain', '');
+
+    // **修改点 1: 设置新的默认加速源**
+    // 定义您希望的默认域名
+    const DEFAULT_DOMAIN = 'https://github.llnas.de5.net';
+    // 脚本将尝试获取已保存的值，如果没有（即首次运行），则使用 DEFAULT_DOMAIN
+    let customDomain = GM_getValue('customDomain', DEFAULT_DOMAIN);
+    // **修改点 1 结束**
+
 
     function normalizeDomain(domain) {
         if (!domain) return '';
@@ -32,7 +39,7 @@
     }
 
     function setupDomain() {
-        const current = GM_getValue('customDomain', '');
+        const current = GM_getValue('customDomain', DEFAULT_DOMAIN); // 使用新的默认值作为提示的初始值
         const input = prompt('请输入你的加速源域名 (例如: https://ghproxy.net)\n无需包含 /https://github.com 后缀，脚本会自动拼接。', current);
 
         if (input !== null && input.trim() !== '') {
@@ -45,20 +52,32 @@
 
     GM_registerMenuCommand("⚙️ 设置加速源域名", setupDomain);
 
+    // **修改点 2: 移除或注释掉首次运行时的强制设置逻辑**
+    /*
     if (!customDomain) {
         setTimeout(() => {
             if(confirm("Github 高速下载脚本：\n检测到您尚未设置加速源域名。\n是否现在设置？")) {
                 setupDomain();
             }
         }, 1500);
-        return;
+        return; // 移除或注释掉这里的 return，以确保脚本继续执行
     }
+    */
+    // 由于我们将 DEFAULT_DOMAIN 设为了默认值，customDomain 不会是空字符串，所以这块代码可以安全移除。
+    // **修改点 2 结束**
+
 
     // ========== 核心逻辑 ==========
+    // 确保 customDomain 已经被 normalizeDomain 处理过 (GM_getValue 得到的已经是处理过的)
+    // 首次运行时，customDomain 是 'https://github.llnas.de5.net'
     const ACCEL = {
         repo: [`${customDomain}/https://github.com`, '加速'],
         raw:  [`${customDomain}/https://raw.githubusercontent.com`, '加速']
     };
+
+    // ... (后续代码保持不变)
+
+    // 省略了后面的函数和样式代码，它们不需要修改
 
     GM_addStyle(`
         #xiu2-qr-code-container {
