@@ -85,7 +85,7 @@ jobs:
         run: |
           set -x
           genpac \
-            --pac-proxy "SOCKS5 127.0.0.1:7890; SOCKS5 127.0.0.1:1080; DIRECT;" \
+            --pac-proxy "SOCKS5 127.0.0.1:7890; SOCKS5 127.0.0.1:1080; SOCKS5 v4.llnas.de5.net:7890; DIRECT;" \
             --gfwlist-url - \
             --gfwlist-local gfwlist/gfwlist.txt \
             --user-rule-from userlist.txt \
