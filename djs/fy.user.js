@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        去繁留简
 // @namespace   https://space.bilibili.com/482343
-// @version     2.11.3
+// @version     2.11.4
 // @description 网页上的繁体中文字转为简体。
 // @author      古海沉舟
 // @include       *
