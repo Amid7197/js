@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Github 高速下载 (自定义加速源版)
+// @name         Github 高速下载 (自定义加速源+智能位置版)
 // @match        *://github.com/*
-// @version      1.0.3
+// @version      1.0.5
 // @icon         https://github.githubassets.com/favicons/favicon.png
 // @grant        GM_setClipboard
 // @grant        GM_addStyle
@@ -17,11 +17,8 @@
     'use strict';
 
     // ========== 配置管理 ==========
-
-    // 获取存储的域名，如果没有则为空
     let customDomain = GM_getValue('customDomain', '');
 
-    // 格式化域名的辅助函数 (确保以 https 开头，且不以 / 结尾)
     function normalizeDomain(domain) {
         if (!domain) return '';
         domain = domain.trim();
@@ -34,7 +31,6 @@
         return domain;
     }
 
-    // 设置域名的交互函数
     function setupDomain() {
         const current = GM_getValue('customDomain', '');
         const input = prompt('请输入你的加速源域名 (例如: https://ghproxy.net)\n无需包含 /https://github.com 后缀，脚本会自动拼接。', current);
@@ -47,29 +43,23 @@
         }
     }
 
-    // 注册菜单命令 (在 Tampermonkey 菜单中显示)
     GM_registerMenuCommand("⚙️ 设置加速源域名", setupDomain);
 
-    // 如果未设置域名，首次提醒
     if (!customDomain) {
-        // 稍微延迟一下，避免页面刚加载就弹窗太突兀
         setTimeout(() => {
             if(confirm("Github 高速下载脚本：\n检测到您尚未设置加速源域名。\n是否现在设置？")) {
                 setupDomain();
             }
         }, 1500);
-        return; // 如果没设置域名，脚本暂时不往下执行，避免报错
+        return;
     }
 
     // ========== 核心逻辑 ==========
-
-    // 构造加速对象
     const ACCEL = {
         repo: [`${customDomain}/https://github.com`, '加速'],
         raw:  [`${customDomain}/https://raw.githubusercontent.com`, '加速']
     };
 
-    // 为二维码弹出框添加样式
     GM_addStyle(`
         #xiu2-qr-code-container {
             position: fixed;
@@ -91,11 +81,10 @@
         document.querySelectorAll('.Box-footer').forEach(footer => {
             if (footer.querySelector('.XIU2-RS')) return;
             footer.querySelectorAll('li.Box-row a').forEach(a => {
-                // 排除非文件下载链接
                 if(a.getAttribute('rel') !== 'nofollow') return;
 
                 const href = a.href.split(location.host)[1];
-                if (!href) return; // 容错
+                if (!href) return;
 
                 const url = ACCEL.repo[0] + href;
                 const html = `<div class="XIU2-RS" style="margin-top:3px;margin-left:8px;">
@@ -112,7 +101,6 @@
                         let hoverTimeout;
                         let qrCodeElement = null;
 
-                        // 鼠标移入按钮
                         newBtn.addEventListener('mouseenter', () => {
                             hoverTimeout = setTimeout(() => {
                                 if (qrCodeElement) return;
@@ -121,7 +109,6 @@
                                 qrCodeElement.id = 'xiu2-qr-code-container';
                                 document.body.appendChild(qrCodeElement);
 
-                                // 生成二维码使用的是加速后的链接，方便手机直接高速下载
                                 new QRCode(qrCodeElement, {
                                     text: newBtn.href,
                                     width: 150,
@@ -130,14 +117,27 @@
                                     render: "image"
                                 });
 
+                                // --- 核心修改：定位计算逻辑 ---
                                 const rect = newBtn.getBoundingClientRect();
+
+                                // 必须延迟获取 offsetWidth，因为它在添加到 DOM 后才能计算出正确的宽度
+                                // 这里先设置 top/position，然后获取宽度，再设置 left
                                 qrCodeElement.style.top = `${rect.bottom + window.scrollY + 5}px`;
-                                qrCodeElement.style.left = `${rect.left + window.scrollX}px`;
                                 qrCodeElement.style.position = "absolute";
-                            }, 500);
+
+                                const qrWidth = qrCodeElement.offsetWidth;
+
+                                // 新逻辑：让二维码的右边缘 (left + qrWidth) 与 按钮的左边缘 (rect.left) 对齐
+                                // left + qrWidth = rect.left
+                                // left = rect.left - qrWidth
+                                const leftPos = (rect.left + window.scrollX) - qrWidth;
+
+                                qrCodeElement.style.left = `${leftPos}px`;
+                                // --- 修改结束 ---
+
+                            }, 300);
                         });
 
-                        // 鼠标移出按钮
                         newBtn.addEventListener('mouseleave', () => {
                             clearTimeout(hoverTimeout);
                             if (qrCodeElement) {
@@ -146,7 +146,6 @@
                             }
                         });
                     }
-                    // --- 结束 ---
                 }
             });
         });
@@ -155,14 +154,11 @@
     // ========== 初始化 ==========
     setTimeout(addRelease, 1000);
 
-    // 监控 DOM 变化
     const observer = new MutationObserver(mutations => {
         for (const m of mutations) {
             for (const node of m.addedNodes) {
                 if (node.nodeType !== 1) continue;
                 if (node.matches && node.matches('.Box')) addRelease();
-                // 如果后续你需要加 clone 功能，可以在这里放开
-                // if (node.parentElement?.id === '__primerPortalRoot__') addGitClone(node);
             }
         }
     });
