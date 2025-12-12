@@ -94,7 +94,7 @@
         }
     `);
 
-    // ========== Release 加速 ==========
+// ========== Release 加速 (只修改 QR 码部分) ==========
     function addRelease() {
         if (!location.pathname.includes('/releases')) return;
         document.querySelectorAll('.Box-footer').forEach(footer => {
@@ -122,38 +122,50 @@
 
                         newBtn.addEventListener('mouseenter', () => {
                             hoverTimeout = setTimeout(() => {
+                                // 检查 QRCode 对象是否已加载
+                                if (typeof QRCode === 'undefined') {
+                                    console.error("[Github 高速下载脚本] 错误：QRCode 库未加载。请检查 @require 配置和网络连接。");
+                                    return;
+                                }
+
                                 if (qrCodeElement) return;
 
                                 qrCodeElement = document.createElement('div');
                                 qrCodeElement.id = 'xiu2-qr-code-container';
                                 document.body.appendChild(qrCodeElement);
 
-                                new QRCode(qrCodeElement, {
-                                    text: newBtn.href,
-                                    width: 150,
-                                    height: 150,
-                                    correctLevel: QRCode.CorrectLevel.M,
-                                    render: "image"
-                                });
+                                try {
+                                    new QRCode(qrCodeElement, {
+                                        text: newBtn.href,
+                                        width: 150,
+                                        height: 150,
+                                        correctLevel: QRCode.CorrectLevel.M,
+                                        render: "image"
+                                    });
 
-                                // --- 核心修改：定位计算逻辑 ---
-                                const rect = newBtn.getBoundingClientRect();
+                                    // --- 定位计算逻辑 ---
+                                    const rect = newBtn.getBoundingClientRect();
 
-                                // 必须延迟获取 offsetWidth，因为它在添加到 DOM 后才能计算出正确的宽度
-                                // 这里先设置 top/position，然后获取宽度，再设置 left
-                                qrCodeElement.style.top = `${rect.bottom + window.scrollY + 5}px`;
-                                qrCodeElement.style.position = "absolute";
+                                    // 延迟 50 毫秒确保 QRCode 库已将内容写入 DOM 并计算出正确的宽度
+                                    setTimeout(() => {
+                                        const qrWidth = qrCodeElement.offsetWidth;
 
-                                const qrWidth = qrCodeElement.offsetWidth;
+                                        // 计算位置：右边缘与按钮左边缘对齐
+                                        const leftPos = (rect.left + window.scrollX) - qrWidth;
 
-                                // 新逻辑：让二维码的右边缘 (left + qrWidth) 与 按钮的左边缘 (rect.left) 对齐
-                                // left + qrWidth = rect.left
-                                // left = rect.left - qrWidth
-                                const leftPos = (rect.left + window.scrollX) - qrWidth;
+                                        qrCodeElement.style.top = `${rect.bottom + window.scrollY + 5}px`;
+                                        qrCodeElement.style.position = "absolute";
+                                        qrCodeElement.style.left = `${leftPos}px`;
+                                    }, 50);
 
-                                qrCodeElement.style.left = `${leftPos}px`;
-                                // --- 修改结束 ---
-
+                                } catch (e) {
+                                    console.error("[Github 高速下载脚本] 二维码生成失败：", e);
+                                    // 移除失败的容器
+                                    if (qrCodeElement) {
+                                        qrCodeElement.remove();
+                                        qrCodeElement = null;
+                                    }
+                                }
                             }, 300);
                         });
 
