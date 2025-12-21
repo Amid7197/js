@@ -2,7 +2,7 @@
 // @name         新Discuz
 // @namespace    ai
 // @version      0.0.15
-// @match        *://supn.nypfsdimhg.com/*
+// @match        *://upn2.fwevasmpet.com/*
 // @match        *://sxsy*.*/forum.php?mod=forumdisplay&fid=*
 // @match        *://sxsy*.*/search.php?mod=forum&searchid=*
 // @match        *://sxsy*.*/forum.php?mod=viewthread&tid=*
