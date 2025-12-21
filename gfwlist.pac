@@ -4007,6 +4007,7 @@ var rules = [
             "pmates.com",
             "po2b.com",
             "pobieramy.top",
+            "pocketcasts.com",
             "podbean.com",
             "podcast.co",
             "podictionary.com",
