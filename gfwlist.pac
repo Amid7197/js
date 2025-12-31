@@ -4,6 +4,7 @@ var rules = [
         [],
         [
             "101kanshu.com",
+            "101kks.com",
             "10minutemail.net",
             "23img.com",
             "2dfan.com",
