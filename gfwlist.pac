@@ -54,6 +54,7 @@ var rules = [
             "tensor.art",
             "tongrenquan.org",
             "tongrenshe.cc",
+            "trueimages.ru",
             "trxs.cc",
             "trxs.me",
             "uaa.com",
