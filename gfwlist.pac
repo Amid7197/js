@@ -23,7 +23,6 @@ var rules = [
             "bachashuku.cc",
             "bgm.tv",
             "blacktealab.com",
-            "cdn1.vip",
             "cdnshu.com",
             "chunman4.com",
             "cloudflare.com",
