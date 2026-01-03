@@ -46,6 +46,7 @@ var rules = [
             "mikanani.me",
             "novel543.com",
             "oaistatic.com",
+            "pixhost.to",
             "pqjc.site",
             "qbtr.org",
             "sayhanabi.net",
