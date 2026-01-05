@@ -16,6 +16,7 @@ alicesw.org
 ||hlib.cc
 xbookcn.org
 xbookcn.net
+sxsy.org
 ####
 
 ## 图床
