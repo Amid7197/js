@@ -54,7 +54,7 @@ var rules = [
             "seaart.ai",
             "seaart.me",
             "sxsy.org",
-            "sxsy87.com",
+            "sxsy66.com",
             "tensor.art",
             "tongrenquan.org",
             "tongrenshe.cc",
