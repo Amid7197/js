@@ -46,8 +46,7 @@
 // @include           *://yuedu.163.com/*
 
 // @include           *://*2dfan.*/topics/*
-// @include           *://*sis001.*/*viewthread.php?tid=*
-// @include           *://*sis001.*/*thread*html*
+// @include           *://*sis001.*/*
 // @include           *://*.sayhanabi.*/thread-*.html
 // @include           *://*.uaa*.com/novel/chapter*
 // @grant             GM_addStyle
