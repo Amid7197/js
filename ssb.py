@@ -33,37 +33,41 @@ def get_domain_from_userlist(file_path, line_number):
         return None
 
 def get_refresh_url(current_url: str):
-    """
-    排查专用：提取 meta refresh 跳转，并打印页面关键信息
-    """
     try:
-        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'}
-        logger.info(f"正在请求页面: {current_url}")
-        
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+            'Referer': current_url
+        }
         resp = requests.get(current_url, verify=False, timeout=15, headers=headers)
-        resp.encoding = 'utf-8' # 强制编码，防止中文乱码
-        
-        # 调试信息：打印页面标题
-        soup = BeautifulSoup(resp.text, 'html.parser')
-        title = soup.title.string if soup.title else "无标题"
-        logger.debug(f"当前页面标题: {title}")
+        resp.encoding = 'utf-8'
+        html_content = resp.text
 
-        # 寻找跳转标签
-        meta = soup.find('meta', attrs={'http-equiv': lambda x: x and x.lower() == 'refresh'})
-        if meta:
-            content = meta.get('content', '')
-            logger.debug(f"发现 meta refresh 内容: {content}")
-            if 'url=' in content.lower():
-                raw_url = re.split('url=', content, flags=re.IGNORECASE)[1].strip()
-                # 核心修复：处理相对路径
-                full_url = urljoin(current_url, raw_url)
-                return full_url
+        # 方案 A: 暴力正则匹配 meta refresh (不区分大小写，支持单双引号或无引号)
+        # 匹配 <meta ... url=XXXX >
+        refresh_pattern = re.compile(r'content=["\']?\d+;\s*url=(.*?)["\']?[\s>]', re.IGNORECASE)
+        match = refresh_pattern.search(html_content)
         
-        # 调试信息：如果没有发现跳转，打印前200个字符看看页面是什么
-        logger.warning(f"页面未发现跳转标签。页面内容片段: {resp.text[:200].replace(chr(10), '')}")
+        if match:
+            raw_url = match.group(1).strip().strip('"').strip("'")
+            full_url = urljoin(current_url, raw_url)
+            logger.info(f"正则提取成功: {full_url}")
+            return full_url
+
+        # 方案 B: 兼容性检查 - 是否是 JS 跳转?
+        # 匹配 window.location.href = "xxx"
+        js_pattern = re.compile(r'location\.href\s*=\s*["\'](.*?)["\']', re.IGNORECASE)
+        js_match = js_pattern.search(html_content)
+        if js_match:
+            raw_url = js_match.group(1).strip()
+            full_url = urljoin(current_url, raw_url)
+            logger.info(f"JS跳转提取成功: {full_url}")
+            return full_url
+
+        # 如果还是没找到，打印出该页面的完整源码供排查 (Action 日志中查看)
+        logger.warning(f"无法识别跳转。当前页面完整源码预览: \n{html_content[:500]}")
         return None
     except Exception as e:
-        logger.error(f"解析过程发生错误: {e}")
+        logger.error(f"提取报错: {e}")
         return None
 
 # ... (check_connection, get_final_link_from_page, update_userlist 保持不变) ...
