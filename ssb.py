@@ -35,39 +35,40 @@ def get_domain_from_userlist(file_path, line_number):
 def get_refresh_url(current_url: str):
     try:
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-            'Referer': current_url
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
         }
+        logger.info(f"正在请求: {current_url}")
         resp = requests.get(current_url, verify=False, timeout=15, headers=headers)
         resp.encoding = 'utf-8'
         html_content = resp.text
 
-        # 方案 A: 暴力正则匹配 meta refresh (不区分大小写，支持单双引号或无引号)
-        # 匹配 <meta ... url=XXXX >
-        refresh_pattern = re.compile(r'content=["\']?\d+;\s*url=(.*?)["\']?[\s>]', re.IGNORECASE)
+        # 方案 A: 极其强悍的正则匹配
+        # 解释：匹配 content 属性，忽略前面的秒数(如0.1)，直接抓取 url= 之后的内容
+        # 能够处理：content="0.1;url=/sou/go.html" 或 content='url=...' 等各种情况
+        refresh_pattern = re.compile(r'content=["\']?[\d.]*;\s*url=(.*?)["\']?[\s>]', re.IGNORECASE)
         match = refresh_pattern.search(html_content)
         
         if match:
-            raw_url = match.group(1).strip().strip('"').strip("'")
+            raw_url = match.group(1).strip().strip('"').strip("'").strip(';')
             full_url = urljoin(current_url, raw_url)
-            logger.info(f"正则提取成功: {full_url}")
+            logger.info(f"✨ 正则提取成功: {full_url}")
             return full_url
 
-        # 方案 B: 兼容性检查 - 是否是 JS 跳转?
-        # 匹配 window.location.href = "xxx"
-        js_pattern = re.compile(r'location\.href\s*=\s*["\'](.*?)["\']', re.IGNORECASE)
-        js_match = js_pattern.search(html_content)
-        if js_match:
-            raw_url = js_match.group(1).strip()
-            full_url = urljoin(current_url, raw_url)
-            logger.info(f"JS跳转提取成功: {full_url}")
-            return full_url
+        # 方案 B: 兜底逻辑 - 如果正则没抓到，尝试搜索简单的 url= 字符串
+        if 'url=' in html_content.lower():
+            try:
+                # 暴力切分字符串提取
+                raw_url = html_content.lower().split('url=')[1].split('"')[0].split("'")[0].split('>')[0].strip()
+                full_url = urljoin(current_url, raw_url)
+                logger.info(f"📝 暴力切分成功: {full_url}")
+                return full_url
+            except:
+                pass
 
-        # 如果还是没找到，打印出该页面的完整源码供排查 (Action 日志中查看)
-        logger.warning(f"无法识别跳转。当前页面完整源码预览: \n{html_content[:500]}")
+        logger.warning(f"❌ 还是没找到跳转。源码片段: {html_content[:100]}")
         return None
     except Exception as e:
-        logger.error(f"提取报错: {e}")
+        logger.error(f"提取过程崩溃: {e}")
         return None
 
 # ... (check_connection, get_final_link_from_page, update_userlist 保持不变) ...
