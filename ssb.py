@@ -143,33 +143,28 @@ def update_ssb_url(file_path, new_url):
         logger.error(f"更新 ssb_url.txt 失败: {e}")
 
 
-if __name__ == '__main__':
     try:
         domain = get_domain_from_userlist('userlist.txt', 3)
-        if not domain:
-            logger.error("无法从 userlist.txt 获取域名")
-            sys.exit(1)
 
-        start_url = 'http://' + domain
-        final_url = get_refresh_url(start_url)
+        if domain:
+            final_url = get_refresh_url('https://' + domain)
+        else:
+            final_url = get_refresh_url('http://soushu2025.com')
 
         if not final_url:
-            logger.error("无法获取最终访问地址")
+            logger.error("无法获取最终访问页面")
             sys.exit(1)
 
-        logger.info(f"最终访问地址: {final_url}")
+        logger.info(f"最终访问页面为: {final_url}")
 
         url = get_url(final_url)
-        if url:
-            update_userlist_domain("userlist.txt", url)
-        else:
-            logger.error("页面中未找到「搜书吧」链接")
+        logger.info(f'获取到的最终网址为: {url}')
 
-        # 调用新的 replace_match_line 函数
         if url:
             update_userlist_domain("userlist.txt", url)
         else:
-            logger.error("未能获取到有效URL，无法更新。")
+            logger.error("页面中未找到「搜书吧」链接，未更新。")
+
     except Exception as e:
         logger.error(e)
         sys.exit(1)
