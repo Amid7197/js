@@ -32,43 +32,26 @@ def get_domain_from_userlist(file_path, line_number):
         logger.error(f"读取文件失败: {e}")
         return None
 
-def get_refresh_url(current_url: str):
+def get_refresh_url(url: str):
     try:
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
-        }
-        logger.info(f"正在请求: {current_url}")
-        resp = requests.get(current_url, verify=False, timeout=15, headers=headers)
-        resp.encoding = 'utf-8'
-        html_content = resp.text
+        response = requests.get(url, verify=False)
+        if response.status_code != 403:
+            response.raise_for_status()
 
-        # 方案 A: 极其强悍的正则匹配
-        # 解释：匹配 content 属性，忽略前面的秒数(如0.1)，直接抓取 url= 之后的内容
-        # 能够处理：content="0.1;url=/sou/go.html" 或 content='url=...' 等各种情况
-        refresh_pattern = re.compile(r'content=["\']?[\d.]*;\s*url=(.*?)["\']?[\s>]', re.IGNORECASE)
-        match = refresh_pattern.search(html_content)
-        
-        if match:
-            raw_url = match.group(1).strip().strip('"').strip("'").strip(';')
-            full_url = urljoin(current_url, raw_url)
-            logger.info(f"✨ 正则提取成功: {full_url}")
-            return full_url
+        soup = BeautifulSoup(response.text, 'html.parser')
+        meta_tags = soup.find_all('meta', {'http-equiv': 'refresh'})
 
-        # 方案 B: 兜底逻辑 - 如果正则没抓到，尝试搜索简单的 url= 字符串
-        if 'url=' in html_content.lower():
-            try:
-                # 暴力切分字符串提取
-                raw_url = html_content.lower().split('url=')[1].split('"')[0].split("'")[0].split('>')[0].strip()
-                full_url = urljoin(current_url, raw_url)
-                logger.info(f"📝 暴力切分成功: {full_url}")
-                return full_url
-            except:
-                pass
-
-        logger.warning(f"❌ 还是没找到跳转。源码片段: {html_content[:100]}")
-        return None
+        if meta_tags:
+            content = meta_tags[0].get('content', '')
+            if 'url=' in content:
+                redirect_url = content.split('url=')[1].strip()
+                print(f"Redirecting to: {redirect_url}")
+                return redirect_url
+        else:
+            print("No meta refresh tag found.")
+            return None
     except Exception as e:
-        logger.error(f"提取过程崩溃: {e}")
+        print(f'An unexpected error occurred: {e}')
         return None
 
 # ... (check_connection, get_final_link_from_page, update_userlist 保持不变) ...
