@@ -131,7 +131,7 @@ def update_ssb_url(file_path, new_url):
 
 if __name__ == '__main__':
     try:
-        redirect_url = get_refresh_url('http://' + os.environ.get('www.soushu2030.com', 'www.soushu2025.com'))
+        redirect_url = get_refresh_url('http://' + os.environ.get('www.soushu2030.com', 'soushu2025.com'))
         time.sleep(2)
         redirect_url2 = get_refresh_url(redirect_url)
         url = get_url(redirect_url2)
