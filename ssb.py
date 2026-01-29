@@ -23,6 +23,20 @@ ch.setLevel(logging.INFO)
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 
+def get_domain_from_userlist(path='userlist.txt', line_no=3):
+    """
+    从 userlist.txt 读取指定行的域名（默认第3行）
+    """
+    try:
+        with open(path, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+        domain = lines[line_no - 1].strip()
+        return domain.lstrip('|')  # 去掉 || 前缀
+    except Exception as e:
+        logger.error(f"读取 userlist.txt 第{line_no}行失败: {e}")
+        return None
+
+
 def get_refresh_url(url: str):
     try:
         response = requests.get(url, verify=False)
@@ -131,7 +145,11 @@ def update_ssb_url(file_path, new_url):
 
 if __name__ == '__main__':
     try:
-        redirect_url = get_refresh_url('http://' + os.environ.get('www.soushu2030.com', 'soushu2025.com'))
+        domain = get_domain_from_userlist('userlist.txt', 3)
+        if domain:
+            redirect_url = get_refresh_url('http://' + domain)
+        else:
+            redirect_url = get_refresh_url('http://soushu2025.com')
         time.sleep(2)
         redirect_url2 = get_refresh_url(redirect_url)
         url = get_url(redirect_url2)
