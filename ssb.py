@@ -63,7 +63,7 @@ if __name__ == '__main__':
         sys.exit(1)
 
     # 统一使用 https
-    current_step_url = domain if domain.startswith('http') else 'https://' + domain
+    current_step_url = domain if domain.startswith('http') else 'https://' + domain + '/'
     
     # 连续尝试三次跳转
     for i in range(1, 4):
