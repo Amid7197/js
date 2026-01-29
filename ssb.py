@@ -14,6 +14,7 @@ import xml.etree.ElementTree as ET
 import time
 import logging
 
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -23,18 +24,37 @@ ch.setLevel(logging.INFO)
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 
-def get_domain_from_userlist(path='userlist.txt', line_no=3):
+def get_domain_from_userlist(file_path, line_number):
     """
-    从 userlist.txt 读取指定行的域名（默认第3行）
+    从 userlist.txt 获取指定行的域名
     """
     try:
-        with open(path, 'r', encoding='utf-8') as f:
+        if not os.path.exists(file_path):
+            return None
+        with open(file_path, "r", encoding="utf-8") as f:
             lines = f.readlines()
-        domain = lines[line_no - 1].strip()
-        return domain.lstrip('|')  # 去掉 || 前缀
+            if len(lines) >= line_number:
+                return lines[line_number - 1].strip()
     except Exception as e:
-        logger.error(f"读取 userlist.txt 第{line_no}行失败: {e}")
-        return None
+        logger.error(f"读取 {file_path} 出错: {e}")
+    return None
+
+def check_connection(url):
+    """
+    模拟 curl -v 检查连接。
+    如果返回连接重置或无法访问，则返回 False。
+    """
+    try:
+        # 使用较短的 timeout，verify=False 跳过 SSL 验证
+        response = requests.get(url, verify=False, timeout=10)
+        logger.info(f"连接测试成功: {url} (状态码: {response.status_code})")
+        return True
+    except requests.exceptions.ConnectionError:
+        logger.error(f"连接失败: {url} 被重置 (Connection Reset) 或无法解析。")
+        return False
+    except Exception as e:
+        logger.error(f"连接测试发生异常: {e}")
+        return False
 
 
 def get_refresh_url(url: str):
@@ -143,28 +163,36 @@ def update_ssb_url(file_path, new_url):
         logger.error(f"更新 ssb_url.txt 失败: {e}")
 
 
+if __name__ == '__main__':
     try:
+        # 1. 从 userlist.txt 第 3 行读取域名
         domain = get_domain_from_userlist('userlist.txt', 3)
-
+        
         if domain:
-            final_url = get_refresh_url('https://' + domain)
+            target_url = 'https://' + domain
+            logger.info(f"准备测试连接: {target_url}")
+
+            # 2. 检查是否可以直连 (无 Connection Reset)
+            if check_connection(target_url):
+                # 3. 如果可以直连，执行原有的重定向获取逻辑
+                redirect_url = get_refresh_url(target_url)
+                
+                if redirect_url:
+                    time.sleep(2)
+                    redirect_url2 = get_refresh_url(redirect_url)
+                    url = get_url(redirect_url2)
+                    
+                    logger.info(f'获取到的最终网址为: {url}')
+                    
+                    if url:
+                        update_userlist_domain("userlist.txt", url)
+                    else:
+                        logger.error("未能获取到有效URL，无法更新。")
+            else:
+                logger.error(f"跳过后续操作，因为无法直连域名: {domain}")
         else:
-            final_url = get_refresh_url('http://soushu2025.com')
-
-        if not final_url:
-            logger.error("无法获取最终访问页面")
-            sys.exit(1)
-
-        logger.info(f"最终访问页面为: {final_url}")
-
-        url = get_url(final_url)
-        logger.info(f'获取到的最终网址为: {url}')
-
-        if url:
-            update_userlist_domain("userlist.txt", url)
-        else:
-            logger.error("页面中未找到「搜书吧」链接，未更新。")
-
+            logger.error("在 userlist.txt 第 3 行未找到域名。")
+            
     except Exception as e:
-        logger.error(e)
+        logger.error(f"主程序运行失败: {e}")
         sys.exit(1)
