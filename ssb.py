@@ -147,7 +147,7 @@ if __name__ == '__main__':
     try:
         domain = get_domain_from_userlist('userlist.txt', 3)
         if domain:
-            redirect_url = get_refresh_url('http://' + domain)
+            redirect_url = get_refresh_url('https://' + domain)
         else:
             redirect_url = get_refresh_url('http://soushu2025.com')
         time.sleep(2)
