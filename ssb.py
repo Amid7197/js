@@ -1,36 +1,27 @@
 # -*- coding: utf-8 -*-
+"""
+实现搜书吧论坛登入和发布空间动态
+"""
 import os
+import re
 import sys
+from copy import copy
+
 import requests
+from bs4 import BeautifulSoup
+from urllib.parse import urlparse
+import xml.etree.ElementTree as ET
 import time
 import logging
-import urllib3
-import re
-from bs4 import BeautifulSoup
-from urllib.parse import urlparse, urljoin
 
-# 屏蔽 SSL 警告
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-# 配置日志：将级别设为 DEBUG 以看到更多细节
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG) 
-formatter = logging.Formatter("%(asctime)s - [%(levelname)s] - %(message)s")
-ch = logging.StreamHandler(sys.stdout)
+logger.setLevel(logging.DEBUG)
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+
+ch = logging.StreamHandler(stream=sys.stdout)
+ch.setLevel(logging.INFO)
 ch.setFormatter(formatter)
 logger.addHandler(ch)
-
-def get_domain_from_userlist(file_path, line_number):
-    try:
-        if not os.path.exists(file_path):
-            logger.error(f"文件不存在: {file_path}")
-            return None
-        with open(file_path, "r", encoding="utf-8") as f:
-            lines = f.readlines()
-            return lines[line_number - 1].strip() if len(lines) >= line_number else None
-    except Exception as e:
-        logger.error(f"读取文件失败: {e}")
-        return None
 
 def get_refresh_url(url: str):
     try:
@@ -54,27 +45,103 @@ def get_refresh_url(url: str):
         print(f'An unexpected error occurred: {e}')
         return None
 
-# ... (check_connection, get_final_link_from_page, update_userlist 保持不变) ...
+def get_url(url: str):
+    resp = requests.get(url, verify=False)
+    soup = BeautifulSoup(resp.content, 'html.parser')
+    
+    links = soup.find_all('a', href=True)
+    for link in links:
+        if link.text == "搜书吧":
+            return link['href']
+    return None
+
+
+def update_userlist_domain(file_path, new_url):
+    """
+    ✅ 将 userlist.txt 第二行更新为新 URL 的域名
+    """
+    try:
+        parsed = urlparse(new_url)
+        domain = parsed.netloc or new_url.split('/')[2]
+        domain_line = f"{domain}\n"   
+
+        with open(file_path, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+
+        old_line = lines[1].strip() if len(lines) > 1 else "(无)"
+        logger.info(f"userlist.txt 原第二行: {old_line}")
+
+        # 确保至少有两行
+        if len(lines) < 3:
+            lines += ['\n'] * (3 - len(lines))
+
+        # 更新第二行
+        lines[2] = domain_line
+
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.writelines(lines)
+
+        logger.info(f"userlist.txt 第二行已更新为: {domain_line.strip()}")
+    except Exception as e:
+        logger.error(f"更新 userlist.txt 失败: {e}")
+
+
+def update_ssb_url(file_path, new_url):
+    """
+    将完整 URL 写入第 1 行，
+    将域名写入第 2 行。
+    """
+    try:
+        parsed = urlparse(new_url)
+        domain = parsed.netloc or new_url.split('/')[2]
+
+        with open(file_path, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+
+        # 保证至少两行
+        if len(lines) < 2:
+            lines += ['\n'] * (2 - len(lines))
+
+        old_url = lines[0].strip() if len(lines) > 0 else "(无)"
+        old_domain = lines[1].strip() if len(lines) > 1 else "(无)"
+        logger.info(f"ssb_url.txt 原第一行: {old_url}")
+        logger.info(f"ssb_url.txt 原第二行: {old_domain}")
+
+        # 写入新值
+        lines[0] = new_url + "\n"
+        lines[1] = domain + "\n"
+
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.writelines(lines)
+
+        logger.info(f"ssb_url.txt 第一行已更新为: {new_url}")
+        logger.info(f"ssb_url.txt 第二行已更新为: {domain}")
+
+    except FileNotFoundError:
+        # 如果文件不存在，自动创建
+        with open(file_path, "w", encoding="utf-8") as f:
+            parsed = urlparse(new_url)
+            domain = parsed.netloc or new_url.split('/')[2]
+            f.write(new_url + "\n")
+            f.write(domain + "\n")
+        logger.info(f"ssb_url.txt 不存在，已创建并写入内容。")
+    except Exception as e:
+        logger.error(f"更新 ssb_url.txt 失败: {e}")
+
 
 if __name__ == '__main__':
-    domain = get_domain_from_userlist('userlist.txt', 3)
-    if not domain:
-        logger.critical("无法从 userlist.txt 获取域名，请检查文件格式！")
-        sys.exit(1)
-
-    # 统一使用 https
-    current_step_url = domain if domain.startswith('http') else 'https://' + domain + '/'
-    
-    # 连续尝试三次跳转
-    for i in range(1, 4):
-        logger.info(f"--- 尝试第 {i} 次跳转解析 ---")
-        next_url = get_refresh_url(current_step_url)
-        if next_url:
-            current_step_url = next_url
-            time.sleep(2) # 增加延迟，模拟真实浏览器
+    try:
+        redirect_url = get_refresh_url('http://' + os.environ.get('www.soushu2030.com', 'soushu2025.com'))
+        time.sleep(2)
+        redirect_url2 = get_refresh_url(redirect_url)
+        url = get_url(redirect_url2)
+        logger.info(f'获取到的最终网址为: {url}')
+        
+        # 调用新的 replace_match_line 函数
+        if url:
+            update_userlist_domain("userlist.txt", url)
         else:
-            break
-    
-    # 最终结果
-    logger.info(f"跳转流程结束，最终停留在: {current_step_url}")
-    # 这里调用寻找按钮的函数...
+            logger.error("未能获取到有效URL，无法更新。")
+    except Exception as e:
+        logger.error(e)
+        sys.exit(1)
