@@ -47,13 +47,13 @@ proxy-groups:
     filter: '(?i).*0\.(1|01).*'
 
   # --- 辅助隐藏组：正则直接展示 ---
-  - name: 台湾-故障转移
+  - name: 亚洲-故障转移
     type: fallback
     url: 'https://www.google.com/generate_204'
     interval: 100
     use: [main, prepare]
     include-all: true
-    filter: '(?i)(🇹🇼|台湾|台|TW|taiwan|taipei)'
+    filter: '(?i)(🇹🇼|台湾|台|tw|🇯🇵|日本|日|jp|🇸🇬|新加坡|狮城|新|sg)'
     hidden: true
 
   - name: 美国-故障转移
@@ -62,7 +62,7 @@ proxy-groups:
     interval: 300
     use: [main, prepare]
     include-all: true
-    filter: '(?i)(🇺🇸|美国|美|US)'
+    filter: '(?i)(🇺🇸|美国)'
     hidden: true
 
   - name: 机场gemini
