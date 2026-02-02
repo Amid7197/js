@@ -28,7 +28,7 @@ proxy-groups:
     interval: 300
     proxies:
       - 机场gemini
-      - 台湾-故障转移
+      - 亚洲-故障转移
       - 美国-故障转移
       - 🚀手动选择
 
