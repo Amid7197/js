@@ -1,0 +1,114 @@
+# 行为锚点（定义 MRS 格式，不影响逻辑直观性）
+BehaviorDN: &BehaviorDN { type: http, interval: 86400, format: mrs, behavior: domain }
+BehaviorIP: &BehaviorIP { type: http, interval: 86400, format: mrs, behavior: ipcidr }
+
+# 代理组配置
+proxy-groups:
+  - name: 🚀手动选择
+    type: select
+    proxies:
+      - 🌏亚洲节点
+      - 📥低倍率节点
+      - 🎯直连
+    use: [main, prepare]
+    include-all: true # 保留：此组下方会列出所有单个节点
+
+  - name: 🌏亚洲节点
+    type: url-test
+    url: 'https://www.google.com/generate_204'
+    interval: 300
+    tolerance: 50 # 减少频繁切换造成的断连
+    use: [main, prepare]
+    filter: '(?i)(🇭🇰|香港|港|hk|🇹🇼|台湾|台|tw|🇯🇵|日本|日|jp|🇸🇬|新加坡|狮城|新|sg)(?!.*(🇰🇷|韩国|韩|kr))'
+    include-all: true 
+
+  - name: 🤖Gemini
+    type: fallback
+    url: 'https://www.google.com/generate_204'
+    interval: 300
+    proxies:
+      - 机场gemini
+      - 台湾-故障转移
+      - 美国-故障转移
+      - 🚀手动选择
+
+  - name: 📲Telegram
+    type: select
+    proxies:
+      - 🚀手动选择
+      - 📥低倍率节点
+
+  - name: 📥低倍率节点
+    type: fallback
+    url: 'https://www.google.com/generate_204'
+    interval: 300
+    use: [main, prepare]
+    include-all: true
+    filter: '(?i).*0\.(1|01).*'
+
+  # --- 辅助隐藏组：正则直接展示 ---
+  - name: 台湾-故障转移
+    type: fallback
+    url: 'https://www.google.com/generate_204'
+    interval: 100
+    use: [main, prepare]
+    include-all: true
+    filter: '(?i)(🇹🇼|台湾|台|TW|taiwan|taipei)'
+    hidden: true
+
+  - name: 美国-故障转移
+    type: fallback
+    url: 'https://www.google.com/generate_204'
+    interval: 300
+    use: [main, prepare]
+    include-all: true
+    filter: '(?i)(🇺🇸|美国|美|US)'
+    hidden: true
+
+  - name: 机场gemini
+    type: fallback
+    url: 'https://www.google.com/generate_204'
+    interval: 100
+    use: [main, prepare]
+    include-all: true
+    filter: '(?i)emini'
+    hidden: true
+
+  - name: 🎯直连
+    type: select
+    proxies: [ DIRECT, REJECT ]
+    hidden: true
+
+# 规则集配置
+rule-providers:
+  China:          { <<: *BehaviorDN, url: https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/cn.mrs }
+  Gemini:         { <<: *BehaviorDN, url: https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/google-gemini.mrs }
+  Telegram:       { <<: *BehaviorDN, url: https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/telegram.mrs }
+  Lan:            { <<: *BehaviorDN, url: https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/private.mrs }
+  
+  ChinaIP:        { <<: *BehaviorIP, url: https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/cn.mrs }
+  TelegramIP:     { <<: *BehaviorIP, url: https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/telegram.mrs }
+  LanIP:          { <<: *BehaviorIP, url: https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/private.mrs }
+
+# 规则逻辑（按优先级排序）
+rules:
+  # 1. 特殊检测/局域网
+  - DOMAIN-SUFFIX,browserleaks.com,🚀手动选择
+  - DOMAIN,api.groq.com,🤖Gemini
+  - RULE-SET,Lan,🎯直连
+  - RULE-SET,LanIP,🎯直连,no-resolve
+
+  # 2. 协议优化：拒绝非中 UDP 443 (QUIC)
+  - AND,((DST-PORT,443),(NETWORK,UDP),(NOT,((RULE-SET,ChinaIP)))),REJECT
+  
+  # 3. 核心分流
+  - RULE-SET,Gemini,🤖Gemini
+  - RULE-SET,Telegram,📲Telegram
+  - RULE-SET,TelegramIP,📲Telegram,no-resolve
+  
+  # 4. 国内直连
+  - RULE-SET,China,🎯直连
+  - RULE-SET,ChinaIP,🎯直连,no-resolve
+  
+  # 5. 最终匹配
+  - MATCH,🚀手动选择
