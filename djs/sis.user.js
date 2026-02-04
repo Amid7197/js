@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sis001-精简版 (无图预览)
 // @namespace    ai
-// @version      1.3.6
+// @version      1.3.7
 // @description  sis001第一会所综合社区：仅保留板块收纳、搜索优化、磁力链转换与去广告，去除图片预览功能。
 // @match        https://sis001.com/*
 // @match        https://*.sis001.com/*
