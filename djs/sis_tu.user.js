@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sis001-图片预览
 // @namespace    ai
-// @version      1.1.2
+// @version      1.1.3
 // @namespace    https://sleazyfork.org/zh-CN/users/1461640
 // @author       Gemini_Modified
 // @description  sis001图片预览：修复了图片少时被拉伸变形的问题，支持自动翻页并排除附件图标。
