@@ -2392,6 +2392,7 @@ var rules = [
             "greenvpn.org",
             "grindr.com",
             "grok.com",
+            "grokipedia.com",
             "ground.news",
             "gs-discuss.com",
             "gsearch.media",
