@@ -38,7 +38,8 @@
         "ggbase": { url: "https://ggbases.dlgal.com/search.so?p=0&title=", name: "ggbase", color: "linear-gradient(to right, #6c5ce7, #341f97)" },
         "moyu":   { url: "https://www.moyu.moe/search?q=", name: "moyu",   color: "linear-gradient(to right, #00b894, #009874)" },
         "ai2moe": { url: "https://www.ai2.moe/search/?q=", name: "ai2moe", color: "linear-gradient(to right, #3498db, #1a5276)" },
-        "hitomi": { url: "https://hitomi.la/search.html?", name: "hitomi", color: "linear-gradient(to right, #e84393, #d63031)" }
+        "hitomi": { url: "https://hitomi.la/search.html?", name: "hitomi", color: "linear-gradient(to right, #e84393, #d63031)" },
+        "vndb":   { url: "https://vndb.org/v?q=", name: "VNDB", color: "linear-gradient(to right, #2980b9, #2c3e50)" }
     };
 
     function createButton(engine, queryText) {
@@ -123,11 +124,11 @@
         const host = location.host;
         if (host.includes("2dfan.com")) {
             const h3 = document.querySelector('div.navbar.navbar-inner.block-header.no-border h3');
-            insertButtonsAfter(h3, ["hitomi","moyu", "ai2moe", "ggbase"]);
+            insertButtonsAfter(h3, ["hitomi","moyu", "ai2moe", "ggbase", "vndb"]);
 
         } else if (host.includes("moyu.moe")) {
             document.querySelectorAll("h1").forEach(h1 => {
-                insertButtonsAfter(h1, ["hitomi","2dfan", "ai2moe", "ggbase"]);
+                insertButtonsAfter(h1, ["hitomi","2dfan", "ai2moe", "ggbase", "vndb"]);
             });
 
         }
