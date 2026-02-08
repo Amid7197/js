@@ -44,6 +44,7 @@ var rules = [
             "laowang.vip",
             "mhh1.com",
             "mikanani.me",
+            "nhentai.xxx",
             "novel543.com",
             "oaistatic.com",
             "pixhost.to",
