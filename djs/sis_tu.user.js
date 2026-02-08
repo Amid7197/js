@@ -51,24 +51,6 @@
         const link = row.querySelector('a[href*="thread-"], a[href*="viewthread.php"]');
         if (!link) return;
 
-        let colSpan = 0;
-        row.querySelectorAll("td, th").forEach(c => colSpan += (parseInt(c.getAttribute("colspan") || "1")));
-
-        const newRow = document.createElement("tr");
-        newRow.className = "sis-preview-row";
-        const cell = document.createElement("td");
-        cell.colSpan = colSpan;
-        cell.style.cssText = "padding: 10px 20px; background: #fbfbfb;";
-
-        const container = document.createElement("div");
-        // 设置容器为 Flex 布局，左对齐
-        container.style.cssText = "min-height:30px; display:flex; gap:10px; color:#999; font-size:12px; justify-content: flex-start;";
-        container.textContent = "正在加载预览...";
-
-        cell.appendChild(container);
-        newRow.appendChild(cell);
-        row.after(newRow);
-
         const url = link.href;
         let imgUrls = Cache.get(url);
 
@@ -77,13 +59,48 @@
                 const res = await fetch(url);
                 const text = await res.text();
                 const doc = new DOMParser().parseFromString(text, "text/html");
-                imgUrls = ImageExtractor.extract(doc).map(img => new URL(img.getAttribute("src") || img.src, url).href);
-                Cache.set(url, imgUrls);
-            } catch (e) { container.textContent = "预览加载失败"; return; }
+
+                imgUrls = ImageExtractor
+                    .extract(doc)
+                    .map(img => new URL(img.getAttribute("src") || img.src, url).href);
+
+                // ✅ 只有成功提取到图片才缓存
+                if (imgUrls.length > 0) {
+                    Cache.set(url, imgUrls);
+                }
+            } catch (e) {
+                return; // 出错不占位、不缓存
+            }
         }
+
+        // ✅ 没有图片就彻底什么都不做
+        if (!imgUrls || imgUrls.length === 0) return;
+
+        // ---------- 创建 DOM ----------
+        let colSpan = 0;
+        row.querySelectorAll("td, th").forEach(c => {
+            colSpan += parseInt(c.getAttribute("colspan") || "1");
+        });
+
+        const newRow = document.createElement("tr");
+        newRow.className = "sis-preview-row";
+
+        const cell = document.createElement("td");
+        cell.colSpan = colSpan;
+        cell.style.cssText = "padding:10px 20px;background:#fbfbfb;";
+
+        const container = document.createElement("div");
+        container.style.cssText =
+            "min-height:30px;display:flex;gap:10px;justify-content:flex-start;";
+
+        cell.appendChild(container);
+        newRow.appendChild(cell);
+        row.after(newRow);
 
         render(container, imgUrls);
     }
+
+
 
     function render(container, urls) {
         container.innerHTML = "";
