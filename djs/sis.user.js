@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         sis001-精简版 (无图预览)
+// @name         sis001-精简版
 // @namespace    ai
 // @version      1.3.7
-// @description  sis001第一会所综合社区：仅保留板块收纳、搜索优化、磁力链转换与去广告，去除图片预览功能。
+// @description  sis001第一会所综合社区，帖子图片预览，板块收纳，搜索优化
 // @match        https://sis001.com/*
 // @match        https://*.sis001.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=sis001.com
@@ -416,6 +416,128 @@
         }
     }
 
+    // --- 功能5：帖子图片预览 --
+    const ImagePreview = (() => {
+
+        const CONFIG = { MAX_IMAGES: 4 };
+
+        const Cache = {
+            data: new Map(),
+            get(k) { return this.data.get(k); },
+            set(k, v) {
+                if (this.data.size > 500) {
+                    this.data.delete(this.data.keys().next().value);
+                }
+                this.data.set(k, v);
+            }
+        };
+
+        class ImageExtractor {
+            static extract(doc) {
+                const content = doc.querySelector(".t_msgfont") || doc.querySelector(".postmessage");
+                if (!content) return [];
+
+                return Array.from(content.querySelectorAll("img")).filter(img => {
+                    const src = img.getAttribute("src") || img.src || "";
+                    if (!src || src.includes("data:")) return false;
+                    if (src.includes("smilies/") ||
+                        src.includes("images/common/") ||
+                        src.includes("images/attachicons/")) return false;
+                    if (/\/(zip|rar|txt|pdf|7z|torrent|attachimg|agree)\.gif/i.test(src)) return false;
+                    return /\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(src);
+                });
+            }
+        }
+
+        async function processRow(row) {
+            if (row.dataset.previewProcessed) return;
+            row.dataset.previewProcessed = "1";
+
+            const link = row.querySelector('a[href*="thread-"], a[href*="viewthread.php"]');
+            if (!link) return;
+
+            const url = link.href;
+            let imgs = Cache.get(url);
+
+            if (!imgs) {
+                try {
+                    const res = await fetch(url);
+                    const html = await res.text();
+                    const doc = new DOMParser().parseFromString(html, "text/html");
+
+                    imgs = ImageExtractor.extract(doc)
+                        .map(img => new URL(img.src || img.getAttribute("src"), url).href);
+
+                    if (imgs.length > 0) Cache.set(url, imgs);
+                } catch {
+                    return;
+                }
+            }
+
+            if (!imgs || imgs.length === 0) return;
+
+            let colSpan = 0;
+            row.querySelectorAll("td, th").forEach(c => {
+                colSpan += parseInt(c.getAttribute("colspan") || "1");
+            });
+
+            const tr = document.createElement("tr");
+            const td = document.createElement("td");
+            td.colSpan = colSpan;
+            td.style.cssText = "padding:10px 20px;background:#fbfbfb;";
+
+            const box = document.createElement("div");
+            box.style.cssText = "display:flex;gap:10px;";
+
+            td.appendChild(box);
+            tr.appendChild(td);
+            row.after(tr);
+
+            render(box, imgs);
+        }
+
+        function render(container, urls) {
+            container.innerHTML = "";
+            urls.slice(0, CONFIG.MAX_IMAGES).forEach(u => {
+                const wrap = document.createElement("div");
+                wrap.style.cssText =
+                    "width:200px;height:180px;flex-shrink:0;" +
+                    "background:#f5f5f5;border:1px solid #ddd;" +
+                    "display:flex;align-items:center;justify-content:center;" +
+                    "border-radius:4px;cursor:pointer;overflow:hidden;";
+
+                const img = document.createElement("img");
+                img.src = u;
+                img.style.cssText = "max-width:100%;max-height:100%;object-fit:contain;";
+
+                wrap.onclick = () => window.open(u);
+                wrap.appendChild(img);
+                container.appendChild(wrap);
+            });
+        }
+
+        function scan() {
+            document.querySelectorAll(
+                'tbody[id^="normalthread_"] tr, .maintable tbody tr'
+            ).forEach(tr => {
+                if (tr.querySelector('a[href*="thread-"]')) {
+                    processRow(tr);
+                }
+            });
+        }
+
+        function observe() {
+            new MutationObserver(scan)
+                .observe(document.body, { childList: true, subtree: true });
+        }
+
+        return {
+            init() {
+                scan();
+                observe();
+            }
+        };
+    })();
     // --- 启动逻辑 ---
     (async function() {
         await c.waitForDOMContentLoaded();
@@ -424,6 +546,6 @@
         AdRemover.init();        // 去广告
         BoardManager.init();     // 板块管理
         SearchOptimizer.init();  // 搜索优化
-        // ImagePreview.init() 已移除
+        ImagePreview.init()      // 图片预览
     })();
 })();
