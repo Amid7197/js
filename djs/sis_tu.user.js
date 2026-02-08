@@ -36,7 +36,7 @@
                 if (!src || src.length < 10 || src.includes("data:")) return false;
                 // 排除表情、系统图标和常见的附件图标
                 if (src.includes("smilies/") || src.includes("images/common/") || src.includes("images/attachicons/")) return false;
-                if (/\/(zip|rar|txt|pdf|7z|torrent)\.gif/i.test(src)) return false;
+                if (/\/(zip|rar|txt|pdf|7z|torrent|attachimg|agree)\.gif/i.test(src)) return false;
                 // 仅保留有效图片后缀
                 return /\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(src);
             });
