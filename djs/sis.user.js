@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sis001-精简版
 // @namespace    ai
-// @version      1.3.8
+// @version      1.3.9
 // @description  sis001第一会所综合社区，帖子图片预览，板块收纳，搜索优化
 // @match        https://sis001.com/*
 // @match        https://*.sis001.com/*
