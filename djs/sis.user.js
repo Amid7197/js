@@ -443,7 +443,7 @@
                     if (src.includes("smilies/") ||
                         src.includes("images/common/") ||
                         src.includes("images/attachicons/")) return false;
-                    if (/\/(zip|rar|txt|pdf|7z|torrent|attachimg|agree)\.gif/i.test(src)) return false;
+                    if (/\/(zip|rar|txt|pdf|7z|torrent|attachimg|agree|thanks)\.gif/i.test(src)) return false;
                     return /\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(src);
                 });
             }
