@@ -3211,6 +3211,7 @@ var rules = [
             "sowers.org.hk",
             "soylent.com",
             "soylentnews.org",
+            "spacex.com",
             "spankbang.com",
             "sparkpool.com",
             "spatial.io",
