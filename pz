@@ -1,10 +1,11 @@
+# 源自: https://github.com/wanswu/my-backup
 geodata-mode: true
 
 geo-auto-update: true
 geo-update-interval: 48 
 
 geox-url:
-  geoip: "https://github.llnas.de5.net/https://raw.githubusercontent.com/Loyalsoldier/geoip/release/geoip-only-cn-private.dat"
+  geoip: "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/geoip-only-cn-private.dat"
 
 proxy-groups:  
 
@@ -23,7 +24,7 @@ proxy-groups:
     interval: 300
     tolerance: 50 # 减少频繁切换造成的断连
     use: [main, prepare]
-    filter: '(?i)(🇭🇰|香港|hk|🇹🇼|台湾|tw|🇯🇵|日本|jp|🇸🇬|狮城|新|sg)(?!.*(🇰🇷|韩|kr))'
+    filter: '(?i)(🇭🇰|香港|hk|🇹🇼|台湾|tw|🇯🇵|日本|jp|🇸🇬|狮城|新新加坡|sg)(?!.*(🇰🇷|韩|kr))'
     include-all: true 
 
   - name: 🤖Gemini
@@ -57,7 +58,7 @@ proxy-groups:
     interval: 300
     use: [main, prepare]
     include-all: true
-    filter: '(?i)(🇹🇼|台湾|台|tw|🇯🇵|日本|日|jp|🇸🇬|新加坡|狮城|新|sg)'
+    filter: '(?i)(🇹🇼|台湾|🇯🇵|日本|jp|🇸🇬|新加坡|狮城|sg)'
     hidden: true
 
   - name: 美国-故障转移
@@ -84,29 +85,46 @@ proxy-groups:
     hidden: true
 
 rule-providers:
-  直连域名:
+  China:
     type: http
     behavior: domain
-    url: "https://github.llnas.de5.net/https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/direct.txt"
-    path: ./ruleset/直连.yaml
+    format: mrs
+    url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/cn.mrs"
+    path: ./ruleset/cn.mrs
     interval: 86400
 
-  telegramcidr:
+  Gemini:
+    type: http
+    behavior: domain
+    format: mrs
+    url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/google-gemini.mrs"
+    path: ./ruleset/google-gemini.mrs
+    interval: 86400
+
+  Telegram:
+    type: http
+    behavior: domain
+    format: mrs
+    url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/telegram.mrs"
+    path: ./ruleset/telegram.mrs
+    interval: 86400
+
+  TelegramIP:
     type: http
     behavior: ipcidr
-    url: "https://github.llnas.de5.net/https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/telegramcidr.txt"
-    path: ./ruleset/telegramcidr.yaml
+    format: mrs
+    url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/telegram.mrs"
+    path: ./ruleset/telegramIP.mrs
     interval: 86400
 
-
-
 rules:
-  - RULE-SET,telegramcidr,📲Telegram
-  - DOMAIN-SUFFIX,googleapis.com,🤖Gemini
+  - RULE-SET,Telegram,📲Telegram
+  - RULE-SET,TelegramIP,📲Telegram,no-resolve
+  - DOMAIN-SUFFIX,Gemini,🤖Gemini
   - DOMAIN-SUFFIX,local,🎯直连,no-resolve
   - DOMAIN-SUFFIX,cn,🎯直连
   - DOMAIN-KEYWORD,-cn,🎯直连
   - GEOIP,private,🎯直连,no-resolve
   - GEOIP,CN,🎯直连
-  - RULE-SET,直连域名,🎯直连
+  - RULE-SET,China,🎯直连
   - MATCH,🚀手动选择
