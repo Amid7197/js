@@ -62,6 +62,7 @@ var rules = [
             "trueimages.ru",
             "trxs.cc",
             "trxs.me",
+            "twkan.com",
             "uaa.com",
             "xbookcn.net",
             "xbookcn.org",
