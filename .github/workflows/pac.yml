@@ -7,96 +7,88 @@ on:
   push:
     paths:
       - "userlist.txt"
+
 jobs:
   update:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
-      - name: Install packages
-        run: |
-          sudo apt-get install -y openssh-client python3-setuptools
-
       - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GIT_TOKEN }}
 
-      - uses: actions/checkout@v4
-        with:
-          repository: JinnLynn/genpac
-          ref: v2.0.1
-          path: genpac
-
-      - uses: actions/checkout@v4
-        with:
-          repository: gfwlist/gfwlist
-          path: gfwlist
-
-      - uses: petronny/git-config-user@master
-        with:
-          path: .
-
-      - run: |
-          cd genpac
-          sed 's/from collections import Callable/from collections.abc import Callable/g' -i $(grep 'from collections import Callable' . -rIl)
-          sudo python3 setup.py install
-
-      - name: Prepare userlist
+      - name: Checkout GenPAC & GFWList
         run: |
-          echo "处理 userlist：支持中文域名、保留注释行、自动加 ||"
-          cp userlist.txt userlist.raw.txt
+          git clone --depth 1 -b v2.0.1 https://github.com/JinnLynn/genpac genpac
+          git clone --depth 1 https://github.com/gfwlist/gfwlist gfwlist
 
-          awk '
-            function puny(s, cmd, out) {
-              cmd = "python3 - <<EOF\nimport idna; print(idna.encode(\"" s "\").decode())\nEOF"
-              cmd | getline out
-              close(cmd)
-              return out
-            }
+      - name: Patch and Install GenPAC
+        run: |
+          cd genpac
+          # 修复 Python 3.10+ 兼容性问题
+          grep -rl "from collections import Callable" . | xargs sed -i 's/from collections import Callable/from collections.abc import Callable/g'
+          # 使用 pip 安装，适配新版 Ubuntu 的系统包限制
+          pip3 install . --break-system-packages || pip3 install .
 
-            # 空行跳过
-            /^\s*$/ { next }
+      - name: Process Userlist (High Efficiency)
+        run: |
+          python3 - <<EOF
+          import idna
+          import os
 
-            # 注释行直接输出
-            /^\s*#/ {
-              print
-              next
-            }
+          input_file = 'userlist.txt'
+          output_file = 'userlist.processed.txt'
+          
+          if not os.path.exists(input_file):
+              open(output_file, 'w').close()
+              exit()
 
-            {
-              # 去掉前后空白
-              gsub(/^[ \t]+|[ \t]+$/, "", $0)
+          with open(input_file, 'r', encoding='utf-8') as f:
+              lines = f.readlines()
 
-              domain=$0
+          results = []
+          for line in lines:
+              line = line.strip()
+              # 保持空行和注释原样
+              if not line or line.startswith('#') or line.startswith('!'):
+                  results.append(line)
+                  continue
+              
+              # 处理中文域名 (Punycode)
+              try:
+                  # 如果已经是 ASCII 则 idna 不变，如果是中文则转为 xn--
+                  domain = idna.encode(line).decode('ascii')
+              except:
+                  domain = line
+              
+              # 统一加上 || 前缀（如果原本没有）
+              prefix = "" if domain.startswith("||") else "||"
+              results.append(f"{prefix}{domain}")
 
-              # 如果包含中文（非 ASCII），自动 punycode 转换
-              if (domain ~ /[^\x00-\x7F]/) {
-                domain = puny(domain)
-              }
-
-              print "||" domain
-            }
-          ' userlist.raw.txt > userlist.txt
-
-          echo "转换后 userlist.txt 内容:"
-          cat userlist.txt
-
+          with open(output_file, 'w', encoding='utf-8') as f:
+              f.write('\n'.join(results))
+          EOF
+          # 替换原文件
+          mv userlist.processed.txt userlist.txt
 
       - name: Generate gfwlist.pac
         run: |
-          set -x
           genpac \
-            --pac-proxy "SOCKS5 127.0.0.1:7890; SOCKS5 127.0.0.1:10808; SOCKS5 v4.llnas.de5.net:7890; DIRECT;" \
+            --pac-proxy "SOCKS5 127.0.0.1:7890; SOCKS5 127.0.0.1:10808; http v4.llnas.de5.net:7890; DIRECT;" \
             --gfwlist-url - \
             --gfwlist-local gfwlist/gfwlist.txt \
             --user-rule-from userlist.txt \
             -o gfwlist.pac
+          
+          # 删除前 7 行
+          sed -i '1,7d' gfwlist.pac
 
-          # 删除前 7 行无关信息
-          sed '1,7d' -i gfwlist.pac
-
-      - name: Commit and push
+      - name: Commit and Push
         run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add gfwlist.pac
-          git commit -m "[$(LANG=C date)] auto update" || exit 0
-          [ -n "${{ secrets.READ_ONLY }}" ] && git show && exit 0
+          git commit -m "[$(date -u +'%Y-%m-%d %H:%M:%S')] auto update" || exit 0
           git push origin main
