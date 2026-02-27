@@ -1,102 +1,65 @@
-name: pac
+name: Update all files for domain
 
 on:
-  schedule:
-    - cron: '37 0 * * *'
   workflow_dispatch:
   push:
     paths:
       - "userlist.txt"
+
 jobs:
-  update:
+  check-userlist-update:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install packages
-        run: |
-          sudo apt-get install -y openssh-client python3-setuptools
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GIT_TOKEN }}
 
-      - uses: actions/checkout@v4
-        with:
-          repository: JinnLynn/genpac
-          ref: v2.0.1
-          path: genpac
-
-      - uses: actions/checkout@v4
-        with:
-          repository: gfwlist/gfwlist
-          path: gfwlist
-
-      - uses: petronny/git-config-user@master
-        with:
-          path: .
-
-      - run: |
-          cd genpac
-          sed 's/from collections import Callable/from collections.abc import Callable/g' -i $(grep 'from collections import Callable' . -rIl)
-          sudo python3 setup.py install
-
-      - name: Prepare userlist
+      - name: Read domain
+        id: vars
         run: |
-          echo "处理 userlist：支持中文域名、保留注释行、自动加 ||"
-          cp userlist.txt userlist.raw.txt
+          DOMAIN=$(sed -n '3p' userlist.txt)
+          echo "domain=$DOMAIN" >> $GITHUB_OUTPUT
 
-          awk '
-            function puny(s, cmd, out) {
-              cmd = "python3 - <<EOF\nimport idna; print(idna.encode(\"" s "\").decode())\nEOF"
-              cmd | getline out
-              close(cmd)
-              return out
-            }
-
-            # 空行跳过
-            /^\s*$/ { next }
-
-            # 注释行直接输出
-            /^\s*#/ {
-              print
-              next
-            }
-
-            {
-              # 去掉前后空白
-              gsub(/^[ \t]+|[ \t]+$/, "", $0)
-
-              domain=$0
-
-              # 如果包含中文（非 ASCII），自动 punycode 转换
-              if (domain ~ /[^\x00-\x7F]/) {
-                domain = puny(domain)
-              }
-
-              print "||" domain
-            }
-          ' userlist.raw.txt > userlist.txt
-
-          echo "转换后 userlist.txt 内容:"
-          cat userlist.txt
-
-
-      - name: Generate gfwlist.pac
+      - name: Update files
+        id: update
         run: |
-          set -x
-          genpac \
-            --pac-proxy "SOCKS5 127.0.0.1:7890; SOCKS5 127.0.0.1:10808; http v4.llnas.de5.net:7890; DIRECT;" \
-            --gfwlist-url - \
-            --gfwlist-local gfwlist/gfwlist.txt \
-            --user-rule-from userlist.txt \
-            -o gfwlist.pac
-
-          # 删除前 7 行无关信息
-          sed '1,7d' -i gfwlist.pac
+          DOMAIN="${{ steps.vars.outputs.domain }}"
+          CHANGED=false
+          
+          # 更新JS文件
+          for FILE in djs/Discuz.user.js djs/ziti.user.js; do
+            if [ -f "$FILE" ]; then
+              echo "Updating $FILE"
+              cp "$FILE" "${FILE}.bak"
+              sed -i "5s|.*|// @match        *://$DOMAIN/*|" "$FILE"
+              # sed -i "4s|.*|// @version     $(sed -n '4p' "$FILE" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | awk -F. -vOFS=. '{$NF=$NF+1; print}')|" "$FILE"
+              if ! diff -q "$FILE" "${FILE}.bak" >/dev/null; then
+                CHANGED=true
+              fi
+              rm "${FILE}.bak"
+            fi
+          done
+          
+          # 更新ub.txt
+          if [ -f "djs/ub.txt" ]; then
+            cp djs/ub.txt djs/ub.txt.bak
+            sed -i "2s|.*|$DOMAIN##font.jammer|" djs/ub.txt
+            if ! diff -q djs/ub.txt djs/ub.txt.bak >/dev/null; then
+              CHANGED=true
+            fi
+            rm djs/ub.txt.bak
+          fi
+          
+          echo "changed=$CHANGED" >> $GITHUB_OUTPUT
 
       - name: Commit and push
+        if: steps.update.outputs.changed == 'true'
         run: |
-          git add gfwlist.pac
-          git commit -m "[$(LANG=C date)] auto update" || exit 0
-          [ -n "${{ secrets.READ_ONLY }}" ] && git show && exit 0
-          git push origin main
+          git config --local user.name "github-actions"
+          git config --local user.email "github-actions@github.com"
+          git add djs/
+          git commit -m "Update files for domain: ${{ steps.vars.outputs.domain }}"
+          git push
