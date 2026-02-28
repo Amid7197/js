@@ -1,36 +1,36 @@
 # 自定义规则（本地增强列表）
 ## 搜书吧
-pvew5.pver549cn.com
+||pvew5.pver549cn.com
 ## 尚香
 ||sxsy66.com
 
 ## 色
 ||bachashuku.cc
 ||alicesw.com
-alicesw.org
+||alicesw.org
 ||321cdn.com
 ||uaa.com
 ||66story.com
 ||404zu.net
 ||404zu.org
 ||hlib.cc
-xbookcn.org
-xbookcn.net
-sxsy.org
-xchina.fit
-111bz.cc
+||xbookcn.org
+||xbookcn.net
+||sxsy.org
+||xchina.fit
+||111bz.cc
 ####
 
 ## 图床
 ||acg.lol
 ||inari.site
 ||23img.com
-aikanhanman.top
-ylimg.com
-imagetwist.com
-trueimages.ru
-pixhost.to
-image.acg.lol
+||aikanhanman.top
+||ylimg.com
+||imagetwist.com
+||trueimages.ru
+||pixhost.to
+||image.acg.lol
 ####
 
 ## 小说
@@ -44,48 +44,48 @@ image.acg.lol
 ||ffxs8.top
 ||69shuba.com
 ||69shuba.cx
-cdnshu.com
-69shuba.tw
-101kks.com
+||cdnshu.com
+||69shuba.tw
+||101kks.com
 ||novel543.com
-twkan.com
+||twkan.com
 ####
 
 ## 机场
-赔钱机场.site
-赔钱机场.com
-pqjc.site 
-赔钱.com
+||赔钱机场.site
+||赔钱机场.com
+||pqjc.site 
+||赔钱.com
 ####
 
 ## Ai
-seaart.ai
-seaart.me
-tensor.art
+||seaart.ai
+||seaart.me
+||tensor.art
 ####
 
-hjd2048.com
-laowang.vip
-oaistatic.com
-mhh1.com
-hmoe.link
-2dfan.com
-ddfan.org
-sayhanabi.net
-inf.li
-mikanani.me
-bgm.tv 
-10minutemail.net
-yopmail.com 
-blacktealab.com
-aicomic.org
-googletagmanager.com
-gstatic.com
-cloudflare.com
-dzmm.ai
-xchina.co
-chunman4.com
-groq.com
-ibbs.pro
-cloudflare.com
-nhentai.xxx
+||hjd2048.com
+||laowang.vip
+||oaistatic.com
+||mhh1.com
+||hmoe.link
+||2dfan.com
+||ddfan.org
+||sayhanabi.net
+||inf.li
+||mikanani.me
+||bgm.tv 
+||10minutemail.net
+||yopmail.com 
+||blacktealab.com
+||aicomic.org
+||googletagmanager.com
+||gstatic.com
+||cloudflare.com
+||dzmm.ai
+||xchina.co
+||chunman4.com
+||groq.com
+||ibbs.pro
+||cloudflare.com
+||nhentai.xxx
