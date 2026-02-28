@@ -53,10 +53,24 @@ jobs:
           results = []
           for line in lines:
               line = line.strip()
-              if not line or line.startswith(('#', '!', '@@')):
+              
+              # 1. 处理空行
+              if not line:
+                  results.append("")
+                  continue
+              
+              # 2. 如果是 # 开头，自动转换为 ! 注释（重点改进）
+              if line.startswith('#'):
+                  # 将 # 替换为 ! 后存入，确保生成的 gfwlist 格式标准
+                  results.append(f"!{line[1:].strip()}")
+                  continue
+
+              # 3. 如果原本就是 ! 或 @@ 开头，原样保留
+              if line.startswith(('!', '@@')):
                   results.append(line)
                   continue
               
+              # 4. 正常处理域名 (Punycode + || 前缀)
               try:
                   raw_domain = line.replace('||', '')
                   encoded_domain = idna.encode(raw_domain).decode('ascii')
