@@ -1,0 +1,105 @@
+name: Sync and Generate GFWList
+
+on:
+  push:
+    paths:
+      - 'userlist.txt'
+  schedule:
+    - cron: '37 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  convert-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          pip install idna
+          sudo apt-get update
+          sudo apt-get install -y file git openssl perl curl
+
+      - name: Process Userlist (Domain Encoding & Normalization)
+        run: |
+          python3 - <<EOF
+          import idna
+          import os
+
+          input_file = 'userlist.txt'
+          output_file = 'userlist.processed.txt'
+          
+          if not os.path.exists(input_file):
+              open(output_file, 'w').close()
+              exit()
+
+          with open(input_file, 'r', encoding='utf-8') as f:
+              lines = f.readlines()
+
+          results = []
+          for line in lines:
+              line = line.strip()
+              # 保持空行、注释、以及原本就带 || 或 @@ 的规则原样
+              if not line or line.startswith(('#', '!', '@@')):
+                  results.append(line)
+                  continue
+              
+              # 去除末尾可能存在的空格
+              clean_line = line.split()[0] if line.split() else line
+              
+              # 处理中文域名 (Punycode)
+              try:
+                  # 先移除可能已有的 || 方便转换，再转码
+                  raw_domain = clean_line.replace('||', '')
+                  encoded_domain = idna.encode(raw_domain).decode('ascii')
+                  
+                  # 统一加上 || 前缀
+                  results.append(f"||{encoded_domain}")
+              except Exception as e:
+                  # 如果转码失败（如包含非法字符），保留原样供后续排查
+                  results.append(line)
+
+          with open(output_file, 'w', encoding='utf-8') as f:
+              f.write('\n'.join(results))
+          EOF
+
+      - name: Fetch Official List and Merge
+        run: |
+          # 1. 下载官方最新的 list.txt (注意是 raw 链接)
+          curl -sS https://raw.githubusercontent.com/gfwlist/gfwlist/master/list.txt -o official_list.txt
+          
+          # 2. 合并：官方在前，你的规则在后
+          # 先放官方内容，确保结尾有换行
+          cat official_list.txt > final_list.txt
+          echo -e "\n! ---------- My Enhanced Rules ----------" >> final_list.txt
+          cat userlist.processed.txt >> final_list.txt
+          
+          # 3. 记录当前日期供 Commit 使用
+          echo "DATE=$(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
+
+      - name: Sanity check (ASCII only)
+        run: |
+          # 检查合并后的文件是否为纯 ASCII（因为已经过了 Punycode 处理，这里不应报错）
+          if [ "$(file -b final_list.txt | grep -o "ASCII text")" != "ASCII text" ]; then
+            echo "Error: non-ASCII characters detected! Check your userlist.txt encoding."
+            # 如果你确实想保留中文注释，可以注释掉下面这一行 exit 1
+            exit 1
+          fi
+
+      - name: Convert to gfwlist.txt (Base64)
+        run: |
+          # 使用 -A 确保输出为单行长字符串，这是标准 gfwlist 的做法
+          openssl base64 -in final_list.txt -A | tr -d '\r' > gfwlist.txt
+
+      - name: Save changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Auto-sync GFWList: ${{ env.DATE }}"
+          file_pattern: 'gfwlist.txt'
