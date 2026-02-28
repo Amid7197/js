@@ -19,6 +19,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          # 使用你自定义的 Token 替代默认的 GITHUB_TOKEN
+          token: ${{ secrets.GIT_TOKEN }}
           persist-credentials: true
 
       - name: Set up Python
@@ -51,13 +53,11 @@ jobs:
           results = []
           for line in lines:
               line = line.strip()
-              # 保持空行、注释、白名单原样
               if not line or line.startswith(('#', '!', '@@')):
                   results.append(line)
                   continue
               
               try:
-                  # 处理可能带 || 的中文域名
                   raw_domain = line.replace('||', '')
                   encoded_domain = idna.encode(raw_domain).decode('ascii')
                   results.append(f"||{encoded_domain}")
@@ -70,28 +70,25 @@ jobs:
 
       - name: Fetch and Merge
         run: |
-          # 下载官方 list.txt
           curl -sS https://raw.githubusercontent.com/gfwlist/gfwlist/master/list.txt -o official_list.txt
-          
-          # 合并：官方在前，用户自定义在后
           cat official_list.txt > final_list.txt
           echo -e "\n! ---------- My Custom Rules ----------" >> final_list.txt
           cat userlist.processed.txt >> final_list.txt
 
-      - name: Convert to gfwlist.txt (Standard Base64)
+      - name: Convert to gfwlist.txt
         run: |
-          # 使用 -A 生成不换行的单行 Base64 字符串
           openssl base64 -in final_list.txt -A | tr -d '\r' > gfwlist.txt
 
-      - name: Commit and Push to Main
+      - name: Commit and Push
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           
           git add gfwlist.txt
           if git diff --cached --quiet; then
-            echo "No changes, skipping push."
+            echo "No changes, skipping."
           else
-            git commit -m "[$(date -u +'%Y-%m-%d %H:%M:%S')] auto sync gfwlist"
+            git commit -m "[$(date -u +'%Y-%m-%d %H:%M:%S')] auto sync"
+            # 因为 checkout 时用了你的 Token，这里直接 push 即可
             git push origin main
           fi
