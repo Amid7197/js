@@ -101,5 +101,5 @@ jobs:
       - name: Save changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "Auto-sync GFWList: ${{ env.DATE }}"
+          commit_message: "Auto-sync GFWList: ${{ secrets.GIT_TOKEN }}"
           file_pattern: 'gfwlist.txt'
