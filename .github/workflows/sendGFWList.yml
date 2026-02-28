@@ -1,20 +1,25 @@
-name: Sync and Generate GFWList
+name: GFWList Auto Sync (Main Branch)
 
 on:
   push:
     paths:
       - 'userlist.txt'
   schedule:
-    - cron: '37 0 * * *'
-  workflow_dispatch:
+    - cron: '0 0 * * *'  # 每天北京时间上午8点自动同步
+  workflow_dispatch:      # 支持手动触发
 
 jobs:
-  convert-and-push:
+  build:
     runs-on: ubuntu-latest
+    # 必须开启写权限，解决 403 错误
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -25,9 +30,9 @@ jobs:
         run: |
           pip install idna
           sudo apt-get update
-          sudo apt-get install -y file git openssl perl curl
+          sudo apt-get install -y openssl curl
 
-      - name: Process Userlist (Domain Encoding & Normalization)
+      - name: Process Userlist (Punycode & Normalization)
         run: |
           python3 - <<EOF
           import idna
@@ -46,60 +51,47 @@ jobs:
           results = []
           for line in lines:
               line = line.strip()
-              # 保持空行、注释、以及原本就带 || 或 @@ 的规则原样
+              # 保持空行、注释、白名单原样
               if not line or line.startswith(('#', '!', '@@')):
                   results.append(line)
                   continue
               
-              # 去除末尾可能存在的空格
-              clean_line = line.split()[0] if line.split() else line
-              
-              # 处理中文域名 (Punycode)
               try:
-                  # 先移除可能已有的 || 方便转换，再转码
-                  raw_domain = clean_line.replace('||', '')
+                  # 处理可能带 || 的中文域名
+                  raw_domain = line.replace('||', '')
                   encoded_domain = idna.encode(raw_domain).decode('ascii')
-                  
-                  # 统一加上 || 前缀
                   results.append(f"||{encoded_domain}")
-              except Exception as e:
-                  # 如果转码失败（如包含非法字符），保留原样供后续排查
+              except:
                   results.append(line)
 
           with open(output_file, 'w', encoding='utf-8') as f:
               f.write('\n'.join(results))
           EOF
 
-      - name: Fetch Official List and Merge
+      - name: Fetch and Merge
         run: |
-          # 1. 下载官方最新的 list.txt (注意是 raw 链接)
+          # 下载官方 list.txt
           curl -sS https://raw.githubusercontent.com/gfwlist/gfwlist/master/list.txt -o official_list.txt
           
-          # 2. 合并：官方在前，你的规则在后
-          # 先放官方内容，确保结尾有换行
+          # 合并：官方在前，用户自定义在后
           cat official_list.txt > final_list.txt
-          echo -e "\n! ---------- My Enhanced Rules ----------" >> final_list.txt
+          echo -e "\n! ---------- My Custom Rules ----------" >> final_list.txt
           cat userlist.processed.txt >> final_list.txt
-          
-          # 3. 记录当前日期供 Commit 使用
-          echo "DATE=$(date '+%Y-%m-%d %H:%M:%S')" >> $GITHUB_ENV
 
-      - name: Sanity check (ASCII only)
+      - name: Convert to gfwlist.txt (Standard Base64)
         run: |
-          # 检查合并后的文件是否为纯 ASCII（因为已经过了 Punycode 处理，这里不应报错）
-          if [ "$(file -b final_list.txt | grep -o "ASCII text")" != "ASCII text" ]; then
-            echo "Error: non-ASCII characters detected! Check your userlist.txt encoding."
-            # 如果你确实想保留中文注释，可以注释掉下面这一行 exit 1
-            exit 1
-          fi
-
-      - name: Convert to gfwlist.txt (Base64)
-        run: |
-          # 使用 -A 确保输出为单行长字符串，这是标准 gfwlist 的做法
+          # 使用 -A 生成不换行的单行 Base64 字符串
           openssl base64 -in final_list.txt -A | tr -d '\r' > gfwlist.txt
 
-      - name: Save changes
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "Auto-sync GFWList: ${{ secrets.GIT_TOKEN }}"
-          file_pattern: 'gfwlist.txt'
+      - name: Commit and Push to Main
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add gfwlist.txt
+          if git diff --cached --quiet; then
+            echo "No changes, skipping push."
+          else
+            git commit -m "[$(date -u +'%Y-%m-%d %H:%M:%S')] auto sync gfwlist"
+            git push origin main
+          fi
