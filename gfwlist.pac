@@ -68,11 +68,11 @@ var rules = [
             "xbookcn.org",
             "xchina.co",
             "xchina.fit",
-            "xn--cp3a08l.com",
-            "xn--mes358aby2apfg.com",
-            "xn--mes358aby2apfg.site",
             "ylimg.com",
-            "yopmail.com"
+            "yopmail.com",
+            "\u8d54\u94b1.com",
+            "\u8d54\u94b1\u673a\u573a.com",
+            "\u8d54\u94b1\u673a\u573a.site"
         ]
     ],
     [
