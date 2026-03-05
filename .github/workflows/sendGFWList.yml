@@ -16,12 +16,11 @@ jobs:
       contents: write
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
-          # 使用你自定义的 Token 替代默认的 GITHUB_TOKEN
-          token: ${{ secrets.GIT_TOKEN }}
           persist-credentials: true
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
