@@ -87,10 +87,11 @@ jobs:
           # 删除前 7 行
           sed -i '1,7d' gfwlist.pac
 
-      - name: Commit and Push
+
+      - name: Commit and push
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git add gfwlist.pac
-          git commit -m "[$(date -u +'%Y-%m-%d %H:%M:%S')] auto update" || exit 0
-          git push origin main
+          git commit -m "[$(date -u +'%Y-%m-%d %H:%M:%S')] auto sync"
+          git push
