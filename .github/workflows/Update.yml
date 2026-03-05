@@ -6,16 +6,19 @@ on:
     paths:
       - "userlist.txt"
 
+permissions:
+  contents: write
+
 jobs:
   check-userlist-update:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
-
+        uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GIT_TOKEN }}
+          persist-credentials: true
+          fetch-depth: 0
 
       - name: Read domain
         id: vars
