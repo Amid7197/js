@@ -1,0 +1,131 @@
+name: Update Version on JS File Change
+
+on:
+  push:
+    paths:
+      - 'djs/**/*.js'
+    branches: [ main, master ]
+
+permissions:
+  contents: write
+
+jobs:
+  update-version:
+    # 防止无限循环的过滤器
+    if: |
+      !contains(github.event.head_commit.message, 'chore: update version') &&
+      !contains(github.event.head_commit.message, 'chore: auto-update version') &&
+      !contains(github.event.head_commit.message, 'chore: bump version') &&
+      !contains(github.event.head_commit.message, 'Update files for domain:')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+          # 使用当前工作流的token，避免无限循环
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get changed JS files
+        id: changed-files
+        uses: tj-actions/changed-files@v44
+        with:
+          files: |
+            djs/**/*.js
+
+      - name: Update version in changed files
+        if: steps.changed-files.outputs.all_changed_files_count != 0
+        id: update-version
+        run: |
+          changed_files="${{ steps.changed-files.outputs.all_changed_files }}"
+          echo "Changed files: $changed_files"
+          
+          if [ -z "$changed_files" ]; then
+            echo "No JS files changed"
+            echo "updated=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          updated_count=0
+          commit_message="chore: auto-update version in:"
+          
+          for file in $changed_files; do
+            if [ -f "$file" ]; then
+              echo ""
+              echo "Processing file: $file"
+              
+              # 读取第4行
+              line4=$(sed -n '4p' "$file")
+              echo "Line 4: $line4"
+              
+              # 提取版本号
+              if [[ $line4 =~ @version[[:space:]]+([0-9]+\.[0-9]+\.[0-9]+) ]]; then
+                current_version="${BASH_REMATCH[1]}"
+                echo "Current version: $current_version"
+                
+                # 递增修订版本号
+                IFS='.' read -r major minor patch <<< "$current_version"
+                new_patch=$((patch + 1))
+                new_version="$major.$minor.$new_patch"
+                echo "New version: $new_version"
+                
+                # 替换版本号
+                sed -i "4s#// @version[[:space:]]*$current_version#// @version     $new_version#" "$file"
+                
+                if grep -q "// @version     $new_version" "$file"; then
+                  echo "✓ Successfully updated to version $new_version"
+                  updated_count=$((updated_count + 1))
+                  commit_message="$commit_message $(basename "$file")"
+                else
+                  echo "✗ Failed to update version in $file"
+                fi
+              else
+                echo "✗ Version pattern not found in line 4"
+                echo "Line content: '$line4'"
+              fi
+            else
+              echo "✗ File not found: $file"
+            fi
+          done
+          
+          echo "updated_files=$updated_count" >> $GITHUB_OUTPUT
+          echo "commit_msg=$commit_message" >> $GITHUB_OUTPUT
+
+      - name: Show git status
+        if: steps.changed-files.outputs.all_changed_files_count != 0 && steps.update-version.outputs.updated_files > 0
+        run: |
+          echo "=== Git status before commit ==="
+          git status
+          echo ""
+          echo "=== Changes in files ==="
+          git diff --name-only || echo "No changes"
+
+      - name: Configure Git
+        if: steps.changed-files.outputs.all_changed_files_count != 0 && steps.update-version.outputs.updated_files > 0
+        run: |
+          git config --local user.name 'github-actions[bot]'
+          git config --local user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Commit and push changes
+        if: steps.changed-files.outputs.all_changed_files_count != 0 && steps.update-version.outputs.updated_files > 0
+        run: |
+          # 检查是否有更改
+          if git diff --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          
+          # 添加更改的文件
+          git add djs/
+          
+          # 提交
+          git commit -m "${{ steps.update-version.outputs.commit_msg }}"
+          
+          # 推送
+          echo "Pushing changes..."
+          git push
+          echo "✓ Changes pushed successfully"
