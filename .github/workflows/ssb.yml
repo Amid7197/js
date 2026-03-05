@@ -5,15 +5,20 @@ on:
   schedule:
     - cron: '0 21 * * *'
 
+permissions:
+  contents: write
+
 jobs:
-  run:
+  check-userlist-update:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out repository code
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GIT_TOKEN }}
+          # 使用默认的 GITHUB_TOKEN，已通过 permissions 获得写入权限
+          persist-credentials: true
+          fetch-depth: 0
         
       - name: 安装依赖并运行脚本
         run: |
