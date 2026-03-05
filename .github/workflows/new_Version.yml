@@ -6,6 +6,9 @@ on:
       - 'djs/**/*.js'
     branches: [ main, master ]
 
+permissions:
+  contents: write
+
 jobs:
   update-version:
     # 防止无限循环
@@ -13,12 +16,13 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
+          persist-credentials: true
           fetch-depth: 0
-          token: ${{ secrets.GIT_TOKEN }}
 
       - name: Get changed JS files
         id: changed-files
