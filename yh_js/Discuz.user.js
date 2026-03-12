@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         新Discuz
 // @author      Amid7197
-// @version     0.0.21
+// @version     0.0.22
 // @match        *://pvew5.pver549cn.com/*
 // @match        *://sxsy*.*/forum.php?mod=forumdisplay&fid=*
 // @match        *://sxsy*.*/search.php?mod=forum&searchid=*

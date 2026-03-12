@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         sis001图片预览，板块收纳，搜索优化
+// @name         sis001-图片预览，板块收纳，搜索优化
 // @namespace    ai
-// @version     1.3.10
+// @version     1.3.11
 // @description  sis001第一会所综合社区，帖子图片预览，板块收纳，搜索优化
 // @author       Amid7197
 // @match        https://sis001.com/*
