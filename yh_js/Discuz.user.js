@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         新Discuz
-// @namespace    ai
+// @author      Amid7197
 // @version     0.0.21
 // @match        *://pvew5.pver549cn.com/*
 // @match        *://sxsy*.*/forum.php?mod=forumdisplay&fid=*
