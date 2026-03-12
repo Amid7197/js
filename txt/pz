@@ -1,0 +1,130 @@
+# 源自: https://github.com/wanswu/my-backup
+geodata-mode: true
+
+geo-auto-update: true
+geo-update-interval: 48 
+
+geox-url:
+  geoip: "https://cdn.jsdelivr.net/gh/Loyalsoldier/geoip@release/geoip-only-cn-private.dat"
+
+proxy-groups:  
+
+  - name: 🚀手动选择
+    type: select
+    proxies:
+    - 🌏亚洲节点
+    - 📥低倍率节点
+    - 🎯直连
+    use: [main, prepare]
+    include-all: true # 保留：此组下方会列出所有单个节点
+
+  - name: 🌏亚洲节点
+    type: url-test
+    url: 'https://www.google.com/generate_204'
+    interval: 300
+    tolerance: 50 # 减少频繁切换造成的断连
+    use: [main, prepare]
+    filter: '(?i)(🇭🇰|香港|hk|🇹🇼|台湾|tw|🇯🇵|日本|jp|🇸🇬|狮城|新加坡|sg)(?!.*(🇰🇷|韩|kr))'
+    include-all: true 
+
+  - name: 🤖Gemini
+    type: fallback
+    url: 'https://www.google.com/generate_204'
+    interval: 300
+    proxies:
+    - 机场gemini
+    - 亚洲-故障转移
+    - 美国-故障转移
+    - 🚀手动选择
+
+  - name: 📲Telegram
+    type: select
+    proxies:
+    - 🚀手动选择
+    - 📥低倍率节点
+
+  - name: 📥低倍率节点
+    type: fallback
+    url: 'https://www.google.com/generate_204'
+    interval: 300
+    use: [main, prepare]
+    include-all: true
+    filter: '(?i).*0\.(1|01).*'
+
+  # --- 辅助隐藏组：正则直接展示 ---
+  - name: 亚洲-故障转移
+    type: fallback
+    url: 'https://www.google.com/generate_204'
+    interval: 300
+    use: [main, prepare]
+    include-all: true
+    filter: '(?i)(🇹🇼|台湾|🇯🇵|日本|jp|🇸🇬|新加坡|狮城|sg)'
+    hidden: true
+
+  - name: 美国-故障转移
+    type: fallback
+    url: 'https://www.google.com/generate_204'
+    interval: 300
+    use: [main, prepare]
+    include-all: true
+    filter: '(?i)(🇺🇸|美国)'
+    hidden: true
+
+  - name: 机场gemini
+    type: fallback
+    url: 'https://www.google.com/generate_204'
+    interval: 300
+    use: [main, prepare]
+    include-all: true
+    filter: '(?i)emini'
+    hidden: true
+
+  - name: 🎯直连
+    type: select
+    proxies: [ DIRECT ]
+    hidden: true
+
+rule-providers:
+  China:
+    type: http
+    behavior: domain
+    format: mrs
+    url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/cn.mrs"
+    path: ./ruleset/cn.mrs
+    interval: 86400
+
+  Gemini:
+    type: http
+    behavior: domain
+    format: mrs
+    url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/google-gemini.mrs"
+    path: ./ruleset/google-gemini.mrs
+    interval: 86400
+
+  Telegram:
+    type: http
+    behavior: domain
+    format: mrs
+    url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/telegram.mrs"
+    path: ./ruleset/telegram.mrs
+    interval: 86400
+
+  TelegramIP:
+    type: http
+    behavior: ipcidr
+    format: mrs
+    url: "https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/telegram.mrs"
+    path: ./ruleset/telegramIP.mrs
+    interval: 86400
+
+rules:
+  - RULE-SET,Telegram,📲Telegram
+  - RULE-SET,TelegramIP,📲Telegram,no-resolve
+  - DOMAIN-SUFFIX,Gemini,🤖Gemini
+  - DOMAIN-SUFFIX,local,🎯直连,no-resolve
+  - DOMAIN-SUFFIX,cn,🎯直连
+  - DOMAIN-KEYWORD,-cn,🎯直连
+  - GEOIP,private,🎯直连,no-resolve
+  - GEOIP,CN,🎯直连
+  - RULE-SET,China,🎯直连
+  - MATCH,🚀手动选择

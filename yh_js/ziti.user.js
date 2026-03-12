@@ -15,7 +15,12 @@
     const fontStyle = `
         @font-face {
             font-family: '霞鹜文楷';
-            src: url('https://github.com/lxgw/LxgwWenKai-Lite/releases/download/v1.520/LXGWWenKaiMonoLite-Regular.ttf') format('truetype');
+            /* 优先查找本地安装的各种可能名称，最后才下载在线资源 */
+            src: local('LXGW WenKai'), 
+                 local('LXGW WenKai Lite'), 
+                 local('霞鹜文楷'), 
+                 local('霞鹜文楷 Screen'),
+                 url('https://github.com/lxgw/LxgwWenKai-Lite/releases/download/v1.520/LXGWWenKaiMonoLite-Regular.ttf') format('truetype');
             font-display: swap;
         }
 
@@ -96,26 +101,18 @@
     GM_addStyle(fontStyle);
 
     // 备用方案：如果GM_addStyle不工作，使用DOM方式插入样式
-    if (typeof GM_addStyle === 'undefined') {
+    if (typeof GM_addStyle !== 'undefined') {
+        GM_addStyle(fontStyle);
+    } else {
         const style = document.createElement('style');
         style.textContent = fontStyle;
         document.head.appendChild(style);
     }
 
-    // 监听字体加载状态
-    document.fonts.ready.then(() => {
-        console.log('霞鹜文楷字体加载完成');
-    }).catch((error) => {
-        console.warn('字体加载失败:', error);
-    });
-
-    // 添加字体加载检测
-    const checkFont = new FontFace('霞鹜文楷', 'url(https://github.com/lxgw/LxgwWenKai-Lite/releases/download/v1.520/LXGWWenKaiMonoLite-Regular.ttf)');
-
-    checkFont.load().then((loadedFont) => {
-        document.fonts.add(loadedFont);
-        console.log('霞鹜文楷字体成功加载');
-    }).catch((error) => {
-        console.warn('霞鹜文楷字体加载失败:', error);
+    // 仅做状态监控，不再手动 new FontFace 强制下载
+    document.fonts.ready.then((fontFaceSet) => {
+        if (document.fonts.check('12px "霞鹜文楷"')) {
+            console.log('Successfully using LXGW WenKai (Local or Remote)');
+        }
     });
 })();
