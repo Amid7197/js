@@ -3,6 +3,7 @@
 // @namespace    ai
 // @version     1.3.10
 // @description  sis001第一会所综合社区，帖子图片预览，板块收纳，搜索优化
+// @author       Amid7197
 // @match        https://sis001.com/*
 // @match        https://*.sis001.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=sis001.com
