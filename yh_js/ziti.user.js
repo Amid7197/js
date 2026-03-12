@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Discuz! 依赖式加载霞鹜文楷（精简检测版）
 // @description  仅通过文本检测Discuz!网站，以依赖形式加载霞鹜文楷字体
-// @version     1.0.16
-// @match        *://pvew5.pver549cn.com/*
+// @version     1.0.17
+// @match        *://pvew5.pver.com/*
 // @grant        GM_addStyle
 // @run-at       document-start  // 提前执行，优先加载字体资源
 // ==/UserScript==
