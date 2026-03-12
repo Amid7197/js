@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         新Discuz
 // @namespace    ai
-// @version     0.0.19
+// @version     0.0.20
 // @match        *://pvew5.pver.com/*
 // @match        *://sxsy*.*/forum.php?mod=forumdisplay&fid=*
 // @match        *://sxsy*.*/search.php?mod=forum&searchid=*
