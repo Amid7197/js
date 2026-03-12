@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         sis001-精简版
+// @name         sis001图片预览，板块收纳，搜索优化
 // @namespace    ai
 // @version     1.3.10
 // @description  sis001第一会所综合社区，帖子图片预览，板块收纳，搜索优化
