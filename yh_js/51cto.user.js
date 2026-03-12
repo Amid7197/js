@@ -3,7 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version     1.1.10
 // @description  重写网页复制功能，解除复制限制 1.1.1
-// @author       You
+// @author       Amid7197
 // @match        *://blog.51cto.com/*
 // @grant        none
 // @run-at       document-start
