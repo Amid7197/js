@@ -2,6 +2,7 @@
 // @name         南+图片链接转图片标签（仅处理纯文本图片链接）
 // @description  仅将那种“链接文本就是 https://...jpg/png/... ”的 <a> 替换为 <img>，已有<img>或包含其它子节点的链接保持不变。
 // @version     1.4.2
+// @author       Amid7197
 // @match        https://www.south-plus.net/*
 // @grant        none
 // ==/UserScript==
