@@ -3,6 +3,7 @@
 // @match        *://github.com/*
 // @version     1.0.9
 // @icon         https://github.githubassets.com/favicons/favicon.png
+// @author       Amid7197
 // @grant        GM_setClipboard
 // @grant        GM_addStyle
 // @grant        GM_setValue
