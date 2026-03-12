@@ -3,7 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version     1.0.5
 // @description  多彩渐变搜索按钮1.0.2
-// @author       cuddly,Amid7197
+// @author       cuddly Amid7197
 // @match        *://ddfan.*/*
 // @match        *://2dfan.*/*
 // @match        *://*2dfan.com/*
