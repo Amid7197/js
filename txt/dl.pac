@@ -3530,6 +3530,7 @@ var rules = [
             "trxs.cc",
             "trxs.me",
             "tryheart.jp",
+            "tsdm39.com",
             "tt1069.com",
             "tttan.com",
             "ttv.com.tw",
