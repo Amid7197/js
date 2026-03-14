@@ -2,7 +2,7 @@
 pvew5.pver549cn.com##font.jammer
 
 ! 天使动漫去微博
-www.tsdm39.com###ts_sidebar_base
+tsdm39.com###ts_sidebar_base
 
 ! 令我不适的
 www.sis001.com###forum577
