@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         南加/北加论坛 - 快捷搜索 + 购买回复免刷新
-// @description  在论坛顶部主菜单添加快捷搜索栏，并支持购买附件/内容免刷新、回复免刷新自动加载新楼层。提取自“南加北加论坛强化脚本(凛+)https://www.south-plus.net/read.php?tid-2086932.html”。
-// @version      95
+// @namespace    在论坛顶部主菜单添加快捷搜索栏，并支持购买附件/内容免刷新、回复免刷新自动加载新楼层。
+// @version      94
 // @author       遠坂凛 gemini deepseek Amid7197
 // @match        *://*.south-plus.net/*
 // @match        *://south-plus.net/*
+// @description  提取自“南加北加论坛强化脚本(凛+)https://www.south-plus.net/read.php?tid-2086932.html”。更新链接https://update.greasyfork.org/scripts/454120/%E5%8D%97%E5%8A%A0%E5%8C%97%E5%8A%A0%E8%AE%BA%E5%9D%9B%E5%BC%BA%E5%8C%96%E8%84%9A%E6%9C%AC%28%E5%87%9B%2B%29.user.js
 // @grant        unsafeWindow
 // @run-at       document-end
 // ==/UserScript==
