@@ -2,6 +2,7 @@
 // @name         2048下载文件重命名为标题前缀（保留扩展名）
 // @namespace    http://tampermonkey.net/
 // @version      1.3
+// @author       Amid7197
 // @description  下载文件用网页标题“|”前的部分命名，保留原扩展名
 // @match        https://hjd2048.com/2048/read.php?tid=*
 // @grant        none
