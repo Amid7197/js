@@ -3977,6 +3977,7 @@ var rules = [
             "xchina.co",
             "xchina.fit",
             "xcity.jp",
+            "xdaforums.com",
             "xerotica.com",
             "xfinity.com",
             "xfxssr.me",
