@@ -3530,6 +3530,7 @@ var rules = [
             "truthsocial.com",
             "trxs.cc",
             "trxs.me",
+            "trxs.org",
             "tryheart.jp",
             "tsdm39.com",
             "tt1069.com",
