@@ -1014,6 +1014,7 @@ www.aolnews.com
 ||tg.dev
 ||telega.one
 ||cdn-telegram.org
+||sxsy.org
 ||comments.app
 ||graph.org
 ||legra.ph
@@ -1024,11 +1025,11 @@ www.aolnews.com
 ||telegram.me
 ||telegram.org
 ||telegram.space
+pvew5.pver549cn.com
 ||telegramdownload.com
 ||telegra.ph
 ||telesco.pe
 !!!---IP---
-||groq.com
 !!---Tiktok---
 ||tiktok.com
 ||tiktokv.com
@@ -1071,6 +1072,7 @@ www.aolnews.com
 ||solarsystem.nasa.gov
 iipdigital.usembassy.gov
 ||uscg.mil
+||trxs.cc
 ||usfk.mil
 |http://tarr.uspto.gov/
 ||tsdr.uspto.gov
@@ -1081,10 +1083,10 @@ iipdigital.usembassy.gov
 ||voachineseblog.com
 ||voacantonese.com
 ||voachinese.com
-||xbookcn.org
 ||voaindonesia.com
 ||voanews.com
 ||voatibetan.com
+||xbookcn.org
 ||voatibetanenglish.com
 !!---Wikia---
 ||zh.ecdm.wikia.com
@@ -1108,12 +1110,12 @@ iipdigital.usembassy.gov
 !------7------
 ||wikinews.org
 !------8------
-||sayhanabi.net
 ||wikivoyage.org
 !------9------
 ||wiktionary.org
 !----Main-----
 ||wikipedia.org
+||ddfan.org
 ||wmfusercontent.org
 !!---Yahoo---
 ||shopping.yahoo.co.jp
@@ -1123,7 +1125,6 @@ iipdigital.usembassy.gov
 ||yahoo.com.hk
 ||yahoo.com
 !------------------Numerics---------------------
-||xchina.co
 ||996.icu
 ||ipfs.4everland.io
 ||91dasai.com
@@ -1132,7 +1133,9 @@ iipdigital.usembassy.gov
 ||2047.one
 ||69shuba.cx
 ||2049bbs.xyz
+||sxsy18.com
 ||611study.com
+||groq.com
 ||18comic.org
 ||000webhost.com
 |http://0rz.tw
@@ -1153,6 +1156,7 @@ iipdigital.usembassy.gov
 ||1991way.com
 ||1point3acres.com
 ||1pondo.tv
+||69shuba.tw
 ||2008xianzhang.info
 ||2021hkcharter.com
 ||2047.name
@@ -1162,7 +1166,6 @@ iipdigital.usembassy.gov
 ||36rain.com
 ||404museum.com
 ||4bluestones.biz
-||mhh1.com
 ||4everproxy.com
 ||4rbtv.com
 ||4shared.com
@@ -1173,18 +1176,16 @@ iipdigital.usembassy.gov
 ||611study.icu
 ||63i.com
 ||6do.news
+||qbtr.org
+||xbookcn.net
 ||6do.world
-pvew5.pver549cn.com
-||bachashuku.cc
 ||6park.com
 ||6parkbbs.com
 ||6parker.com
 ||6parknews.com
 ||7capture.com
-||404zu.net
 |http://8-d.com
 |http://85cc.us
-||tongrenshe.cc
 ||881903.com
 ||89-64.org
 ||8964museum.com
@@ -1213,6 +1214,7 @@ pvew5.pver549cn.com
 ||abplive.com
 ||cdn.arstechnica.net
 ||aomedia.org
+||mhh1.com
 ||aljazeera.com
 ||akinator.com
 ||annas-archive.org
@@ -1234,7 +1236,6 @@ pvew5.pver549cn.com
 ||acgbox.org
 ||acgkj.com
 ||acgnx.se
-||ddfan.org
 ||activpn.com
 ||aculo.us
 ||addictedtocoffee.de
@@ -1248,14 +1249,11 @@ pvew5.pver549cn.com
 ||af.mil
 |http://afantibbs.com
 ||afr.com
-||ibbs.pro
 ||aiosearch.com
 ||aiph.net
 ||airconsole.com
 |http://download.aircrack-ng.org
-||twkan.com
 ||airvpn.org
-||trxs.me
 ||ait.org.tw
 ||aiweiweiblog.com
 ||www.ajsands.com
@@ -1311,14 +1309,13 @@ pvew5.pver549cn.com
 |http://aofriend.com
 ||aomiwang.com
 ||apat1989.org
+||alicesw.com
 ||apiary.io
 ||apigee.com
 ||apk.support
 ||apkcombo.com
-||赔钱机场.site
 ||apkmonk.com
 ||apkplz.com
-||alicesw.org
 ||apkpure.com
 ||apkpure.net
 ||appadvice.com
@@ -1336,9 +1333,11 @@ pvew5.pver549cn.com
 ||archive.li
 ||archive.md
 ||archive.org
+||googletagmanager.com
 ||archive.ph
 ||archive.today
 ||archiveofourown.com
+||twkan.com
 ||archiveofourown.org
 ||arctosia.com
 ||areca-backup.org
@@ -1365,7 +1364,6 @@ pvew5.pver549cn.com
 ||av.movie
 ||avaaz.org
 ||avdb.in
-||hlib.cc
 ||avdb.tv
 ||avg.com
 ||avgle.com
@@ -1394,6 +1392,7 @@ pvew5.pver549cn.com
 ||betaclouds.net
 ||blocktempo.com
 ||blockcast.it
+||66story.com
 ||www.bing.com
 ||bangumi.moe
 ||b-ok.cc
@@ -1414,7 +1413,6 @@ pvew5.pver549cn.com
 |http://bangchen.net
 ||bangkokpost.com
 ||bangyoulater.com
-||66story.com
 ||bannedbook.org
 |http://baramangaonline.com
 ||barnabu.co.uk
@@ -1483,24 +1481,20 @@ pvew5.pver549cn.com
 ||bnext.com.tw
 ||bnrmetal.com
 ||boardreader.com
-||101kanshu.com
 ||bod.asia
 ||bolehvpn.net
 ||boobstagram.com
 ||book.com.tw
 ||bookdepository.com
 ||books.com.tw
-||tensor.art
 ||bookwalker.com.tw
 ||borgenmagazine.com
 ||botanwang.com
 ||bowenpress.com
 ||app.box.com
 ||dl.box.net
-||gstatic.com
 ||boxpn.com
 ||boxun.com
-||mikanani.me
 ||boxun.tv
 ||br.st
 ||braumeister.org
@@ -1519,7 +1513,6 @@ pvew5.pver549cn.com
 ||brutaltgp.com
 ||bsky.app
 ||bsky.network
-||cloudflare.com
 ||bsky.social
 ||bt95.com
 ||btdig.com
@@ -1536,6 +1529,7 @@ pvew5.pver549cn.com
 |http://busayari.com
 ||business-humanrights.org
 ||businesstoday.com.tw
+||image.acg.lol
 |http://busu.org/news
 ||buzzorange.com
 ||buzzsprout.com
@@ -1576,6 +1570,8 @@ pvew5.pver549cn.com
 |http://cacnw.com
 ||cactusvpn.com
 ||calendarz.com
+||tensor.art
+||bgm.tv
 ||camfrog.com
 ||campaignforuyghurs.org
 ||cams.com
@@ -1587,7 +1583,6 @@ pvew5.pver549cn.com
 ||caoporn.us
 ||posts.careerengine.us
 ||carrd.co
-||404zu.org
 ||cartoonmovement.com
 |http://casatibet.org.mx
 ||cari.com.my
@@ -1602,13 +1597,11 @@ pvew5.pver549cn.com
 ||caus.com
 ||cbc.ca
 ||southpark.cc.com
-||hjd2048.com
 ||cccat.cc
 ||cccat.co
 ||ccfd.org.tw
 ||cchere.com
 ||cclife.org
-||69shuba.tw
 ||cclifefl.org
 ||ccthere.com
 ||ccthere.net
@@ -1620,11 +1613,13 @@ pvew5.pver549cn.com
 ||cdp1998.org
 ||cdp2006.org
 ||cdpeu.org
+||pqjc.site
 ||cdpuk.co.uk
 ||cdpweb.org
 ||cdpwu.org
 ||cdw.com
 ||cecc.gov
+||tongrenshe.cc
 ||cellulo.info
 ||cenews.eu
 ||centerforhumanreprod.com
@@ -1638,9 +1633,11 @@ pvew5.pver549cn.com
 ||chaos.social
 ||character.ai
 ||chatgpt.com
+||按量计费.com
 ||chaturbate.com
 ||checkgfw.com
 ||chengmingmag.com
+||seaart.me
 ||chenguangcheng.com
 ||chenpokong.com
 ||chenpokongvip.com
@@ -1663,6 +1660,7 @@ pvew5.pver549cn.com
 ||chinadigitaltimes.net
 ||chinaelections.org
 ||chinafile.com
+||23img.com
 ||chinafreepress.org
 ||chinagfw.org
 ||chinahorizon.org
@@ -1672,12 +1670,10 @@ pvew5.pver549cn.com
 |http://china-review.com.ua
 ||chinasocialdemocraticparty.com
 ||chinasoul.org
-||tsdm39.com
 ||chinatopsex.com
 ||chinaworker.info
 ||chinese-memorial.org
 ||chinesedailynews.com
-||aicomic.org
 ||chinesedemocracy.com
 ||chinesegay.org
 ||chinesen.de
@@ -1694,7 +1690,6 @@ pvew5.pver549cn.com
 ||chrlawyers.hk
 ||cirosantilli.com
 ||citizencn.com
-||uaa.com
 ||citizenlab.ca
 ||citizenlab.org
 |http://city365.ca
@@ -1707,6 +1702,7 @@ pvew5.pver549cn.com
 ||classicalguitarblog.net
 ||clinica-tibet.ru
 ||app.cloudcone.com
+||inf.li
 ||cloudflare-ipfs.com
 ||club1069.com
 ||clubhouseapi.com
@@ -1715,11 +1711,13 @@ pvew5.pver549cn.com
 |http://www.cmoinc.org
 ||cmule.com
 ||cms.gov
+||tsdm39.com
 |http://vpn.cmu.edu
 |http://vpn.sv.cmu.edu
 ||cna.com.tw
 ||cnd.org
 ||cnpolitics.org
+||cloudflare.com
 |http://cn-proxy.com
 ||coat.co.jp
 ||cochina.org
@@ -1748,6 +1746,7 @@ pvew5.pver549cn.com
 ||crackle.com
 ||crazyshit.com
 ||crchina.org
+||ffxs8.top
 ||creaders.net
 ||cristyli.com
 ||croxyproxy.com
@@ -1758,11 +1757,8 @@ pvew5.pver549cn.com
 ||csdparty.com
 ||csis.org
 ||csmonitor.com
-||image.acg.lol
 ||csuchen.de
-||101kks.com
 ||csw.org.uk
-||321cdn.com
 ||ct.org.tw
 ||ctitv.com.tw
 ||ctowc.org
@@ -1811,7 +1807,6 @@ pvew5.pver549cn.com
 |http://dalailama.mn
 ||dalailama.ru
 |http://dalailamacenter.org
-||赔钱机场.com
 ||dalailamaworld.com
 ||dalianmeng.org
 ||daliulian.org
@@ -1831,6 +1826,7 @@ pvew5.pver549cn.com
 ||delcamp.net
 ||demosisto.hk
 ||desc.se
+||inari.site
 ||dessci.com
 ||deutsche-welle.de
 ||deviantart.com
@@ -1862,6 +1858,7 @@ pvew5.pver549cn.com
 ||dongtaiwang.com
 ||dongtaiwang.net
 ||danbooru.donmai.us
+||赔钱机场.site
 ||doosho.com
 ||doourbest.org
 ||dotplane.com
@@ -1893,12 +1890,12 @@ pvew5.pver549cn.com
 ||duyaoss.com
 ||dvorak.org
 ||dw.com
-||69shuba.cx
 ||dw.de
 ||dw-world.com
 |http://dw-world.de
 ||dwnews.com
 ||dwnews.net
+||pixhost.to
 ||dynawebinc.com
 ||dysfz.cc
 !--------------------EE-------------------------
@@ -1910,6 +1907,7 @@ pvew5.pver549cn.com
 ||etherscan.com
 ||elconfidencial.com
 ||e-classical.com.tw
+||oaistatic.com
 ||e-gold.com
 ||e-hentai.org
 |http://e-hentaidb.com
@@ -1919,10 +1917,10 @@ pvew5.pver549cn.com
 ||earthvpn.com
 ||eastasiaforum.org
 |http://www.eastturkistan.net/
+||trxs.me
 ||eastturkistangovernmentinexile.us
 ||fnc.ebc.net.tw
 ||news.ebc.net.tw
-||alicesw.com
 ||ecfa.org.tw
 ||ecimg.tw
 ||edgecastcdn.net
@@ -1946,7 +1944,6 @@ pvew5.pver549cn.com
 ||epochtimes-romania.com
 ||epochtimes.co.il
 ||epochtimes.co.kr
-||oaistatic.com
 ||epochtimes.com
 ||epochtimes.de
 ||epochtimes.fr
@@ -1957,10 +1954,8 @@ pvew5.pver549cn.com
 ||epochtimestr.com
 ||epochweek.com
 ||epochweekly.com
-||blacktealab.com
 ||eporner.com
 ||erights.net
-||trxs.cc
 ||ernestmandel.org
 ||erodaizensyu.com
 ||erodoujinlog.com
@@ -1970,7 +1965,6 @@ pvew5.pver549cn.com
 |http://eromon.net
 ||eslite.com
 ||etizer.org
-||111bz.cc
 ||etokki.com
 ||etsy.com
 ||eurekavpt.com
@@ -1990,7 +1984,6 @@ pvew5.pver549cn.com
 !--------------------FF-------------------------
 ||freedom.gov
 ||hyperbeam.com
-||cdnshu.com
 ||flowgpt.com
 ||forefront.ai
 ||flexclip.com
@@ -2003,6 +1996,8 @@ pvew5.pver549cn.com
 ||forbes.com
 ||financialexpress.com
 ||fast.com
+||ylimg.com
+||acg.lol
 ||factchecklab.org
 ||ft.com
 ||fuchsia.dev
@@ -2015,6 +2010,7 @@ pvew5.pver549cn.com
 ||f-droid.org
 ||facebookquotes4u.com
 ||faceless.me
+||69shuba.cx
 |http://facesoftibetanselfimmolators.info
 ||facesofnyfw.com
 ||factpedia.org
@@ -2022,7 +2018,7 @@ pvew5.pver549cn.com
 ||faiththedog.info
 ||fallenark.com
 ||falsefire.com
-||tongrenquan.org
+||trxs.org
 ||falunasia.info
 |http://falunau.org
 ||falundafa-florida.org
@@ -2034,6 +2030,7 @@ pvew5.pver549cn.com
 ||fangong.org
 ||fanhaolou.com
 ||fanqianghou.com
+||404zu.org
 ||fanqiangzhe.com
 ||fantv.hk
 ||famunion.com
@@ -2043,7 +2040,6 @@ pvew5.pver549cn.com
 ||en.favotter.net
 ||global.ssl.fastly.net
 ||freetls.fastly.net
-||trueimages.ru
 ||nytimes.map.fastly.net
 ||fast.wistia.com
 ||fastestvpn.com
@@ -2052,7 +2048,6 @@ pvew5.pver549cn.com
 ||favstar.fm
 ||faz.net
 ||fc2cn.com
-||inf.li
 |http://uygur.fc2web.com/
 ||feeder.co
 ||feelssh.com
@@ -2062,6 +2057,7 @@ pvew5.pver549cn.com
 ||fengzhenghu.com
 ||fengzhenghu.net
 |http://ff.im
+||bachashuku.cc
 |http://fhreports.net
 ||figprayer.com
 ||fileflyer.com
@@ -2086,10 +2082,13 @@ pvew5.pver549cn.com
 ||flog.tw
 ||flowhongkong.net
 ||flyvpn.com
+||gstatic.com
 |http://cn.fmnnow.com
 |https://ss*.4sqi.net
 |http://foxgay.com
 ||fringenetwork.com
+||cdnshu.com
+||jpxs123.com
 ||flecheinthepeche.fr
 ||fochk.org
 ||focustaiwan.tw
@@ -2097,6 +2096,8 @@ pvew5.pver549cn.com
 ||fooooo.com
 ||foreignaffairs.com
 ||fountmedia.io
+||aicomic.org
+||404zu.net
 ||fourthinternational.org
 ||foxsub.com
 |http://fpmt.org
@@ -2133,6 +2134,7 @@ pvew5.pver549cn.com
 ||frommel.net
 ||frontlinedefenders.org
 ||frootvpn.com
+||赔钱.com
 ||fscked.org
 ||ftv.com.tw
 ||ftvnews.com.tw
@@ -2149,6 +2151,7 @@ pvew5.pver549cn.com
 ||gfwbao.com
 ||greatfirevpn.com
 ||garudalinux.org
+||2dfan.com
 ||about.gitlab.com
 ||gitlab.net
 |http://gmp4.com
@@ -2165,6 +2168,7 @@ pvew5.pver549cn.com
 ||galenwu.com
 ||game735.com
 |http://wiki.gamerp.jp
+||trueimages.ru
 ||gamer.com.tw
 ||gamez.com.tw
 ||gaoming.net
@@ -2174,10 +2178,8 @@ pvew5.pver549cn.com
 ||gartlive.com
 ||gather.com
 ||gaymap.cc
-||seaart.me
 ||images-gaytube.com
 |http://gaywatch.com
-||xbookcn.net
 ||gazotube.com
 ||gcc.org.hk
 ||gclubs.com
@@ -2200,8 +2202,6 @@ pvew5.pver549cn.com
 ||gettr.com
 ||gfsale.com
 ||gfw.press
-||yopmail.com
-||googletagmanager.com
 ||gfw.report
 ||ggssl.com
 ||ghostpath.com
@@ -2218,6 +2218,7 @@ pvew5.pver549cn.com
 ||githubcopilot.com
 ||github.io
 ||githubusercontent.com
+||xchina.co
 ||githubassets.com
 ||gizlen.net
 ||gjczz.com
@@ -2232,6 +2233,7 @@ pvew5.pver549cn.com
 ||suche.gmx.net
 ||gnci.org.hk
 ||gnews.org
+||nhentai.xxx
 ||goagent.biz
 ||godaddy.com
 ||godfootsteps.org
@@ -2253,6 +2255,7 @@ pvew5.pver549cn.com
 ||goreforum.com
 ||gotquestions.org
 ||gotrusted.com
+||hlib.cc
 ||gotw.ca
 ||grammaly.com
 ||graphis.ne.jp
@@ -2260,7 +2263,6 @@ pvew5.pver549cn.com
 ||gravatar.com
 ||greatfirewallofchina.org
 ||greenpeace.org
-||pqjc.site
 ||greasyfork.org
 ||greenvpn.net
 ||grindr.com
@@ -2287,8 +2289,10 @@ pvew5.pver549cn.com
 ||v2.hysteria.network
 ||hembed.com
 ||www.hoyolab.com
+||69shuba.com
 ||hbomax.com
 ||hicairo.com
+||ibbs.pro
 ||herominers.com
 ||hinet.net
 ||hindustantimes.com
@@ -2299,6 +2303,7 @@ pvew5.pver549cn.com
 ||hoy.tv
 ||h-china.org
 |http://h-moe.com
+||dzmm.ai
 ||hackmd.io
 ||hackthatphone.net
 ||haijiao.com
@@ -2310,6 +2315,7 @@ pvew5.pver549cn.com
 |http://hdzog.com
 ||ordns.he.net
 ||heartyit.com
+||mikanani.me
 |http://hec.su
 ||hecaitou.net
 ||hechaji.com
@@ -2320,7 +2326,6 @@ pvew5.pver549cn.com
 ||helloqueer.com
 ||helpeachpeople.com
 ||helpster.de
-||aikanhanman.top
 ||id.heroku.com
 ||herokuapp.com
 ||heqinglian.net
@@ -2342,6 +2347,7 @@ pvew5.pver549cn.com
 ||hikinggfw.org
 ||himalayan-foundation.org
 ||himemix.com
+||blacktealab.com
 |http://hitomi.la
 |http://hk-pub.com
 ||hk01.com
@@ -2351,13 +2357,13 @@ pvew5.pver549cn.com
 ||hkchronicles.com
 ||hkcnews.com
 ||hkcoc.com
+||101kks.com
 ||hkdc.us
 ||hket.com
 ||hkfaa.com
 |https://m.hkgalden.com
 ||hkgpao.com
 ||hklts.org.hk
-||chunman4.com
 ||hkmap.live
 ||hkopentv.com
 ||hkpeanut.com
@@ -2371,7 +2377,6 @@ pvew5.pver549cn.com
 |http://old.honeynet.org/scans/scan31/sub/doug_eric/spam_translation.html
 ||hongkongfp.com
 ||hongzhi.li
-||qbtr.org
 ||honven.xyz
 ||hootsuite.com
 ||hoover.org
@@ -2380,7 +2385,6 @@ pvew5.pver549cn.com
 ||hostloc.com
 ||hotair.com
 ||hotspotshield.com
-||10minutemail.net
 ||hottg.com
 ||hotvpn.com
 ||howtoforge.com
@@ -2410,7 +2414,6 @@ pvew5.pver549cn.com
 ||huhangfei.com
 ||humanparty.me
 ||humanrightspressawards.org
-||inari.site
 ||hung-ya.com
 ||huping.net
 ||hutianyi.net
@@ -2433,7 +2436,6 @@ pvew5.pver549cn.com
 ||arvanstorage.ir
 ||irangov.ir
 ||india.com
-||bgm.tv
 ||indiatoday.in
 ||invidio.us
 ||improd.works
@@ -2448,7 +2450,6 @@ pvew5.pver549cn.com
 ||icij.org
 ||icl-fi.org
 ||icoco.com
-||nhentai.xxx
 ||furbo.org
 ||iconpaper.org
 ||icu-project.org
@@ -2459,6 +2460,7 @@ pvew5.pver549cn.com
 ||ift.tt
 ||ifcss.org
 |http://ift.tt
+||aikanhanman.top
 ||ifreewares.com
 ||igcd.net
 ||igfw.net
@@ -2481,7 +2483,6 @@ pvew5.pver549cn.com
 ||imgasd.com
 ||imgur.com
 ||imkev.com
-||hmoe.link
 ||incloak.com
 ||incredibox.fr
 ||independent.co.uk
@@ -2509,7 +2510,6 @@ pvew5.pver549cn.com
 ||internetpopculture.com
 ||inthenameofconfuciusmovie.com
 ||inxian.com
-||trxs.org
 ||ipdefenseforum.com
 ||ipfire.org
 ||iphone4hongkong.com
@@ -2522,11 +2522,9 @@ pvew5.pver549cn.com
 ||ipredator.se
 ||iptvbin.com
 ||ipvanish.com
-||ylimg.com
 ||ironpython.net
 ||ironsocket.com
 ||ishr.ch
-||imagetwist.com
 |http://islam.org.hk
 ||islamhouse.com
 ||isaacmao.com
@@ -2595,7 +2593,6 @@ pvew5.pver549cn.com
 |http://juoaa.com
 ||justhost.ru
 ||justmysocks1.net
-||pixhost.to
 ||juziyue.com
 ||cdn.jwplayer.com
 !--------------------KK-------------------------
@@ -2639,6 +2636,7 @@ pvew5.pver549cn.com
 ||koornk.com
 ||koranmandarin.com
 ||kqes.net
+||novel543.com
 |http://gojet.krtco.com.tw
 ||ktzhk.com
 ||kuaichedao.co
@@ -2649,9 +2647,9 @@ pvew5.pver549cn.com
 ||kxsw.life
 ||kzaobao.com
 ||kzeng.info
+||321cdn.com
 !--------------------LL-------------------------
 ||lovart.ai
-||novel543.com
 ||library-access.sk
 ||linux.do
 ||lmarena.ai
@@ -2659,6 +2657,7 @@ pvew5.pver549cn.com
 ||luckymobile.ca
 ||ludepress.com
 ||lingualeo.com
+||hjd2048.com
 ||ldplayer.tw
 ||ldplayer.net
 ||ltn.com.tw
@@ -2669,6 +2668,7 @@ pvew5.pver549cn.com
 ||lagranepoca.com
 ||lala.im
 ||lama.com.tw
+||tongrenquan.org
 ||lamayeshe.com
 ||lamnia.co.uk
 ||landofhope.tv
@@ -2678,9 +2678,10 @@ pvew5.pver549cn.com
 ||larsgeorge.com
 |http://lastcombat.com
 ||lastfm.es
+||seaart.ai
 ||lausan.hk
-||赔钱.com
 ||le-vpn.com
+||xchina.fit
 ||leafyvpn.net
 ||ledger.com
 ||left21.hk
@@ -2711,7 +2712,6 @@ pvew5.pver549cn.com
 ||liuxiaobo.net
 ||liuxiaotong.com
 ||liveleak.com
-||laowang.vip
 ||livemint.com
 ||livestream.com
 ||livingstream.com
@@ -2727,6 +2727,7 @@ pvew5.pver549cn.com
 ||lrip.org
 ||lsd.org.hk
 ||lsm.org
+||101kanshu.com
 ||lsmchinese.org
 ||lsmkorean.org
 ||luckydesigner.space
@@ -2741,7 +2742,6 @@ pvew5.pver549cn.com
 ||manus.im
 ||meee.com.tw
 ||mosavi.io
-||acg.lol
 ||dcs-spotify.megaphone.fm
 ||mij.rip
 ||mji.rip
@@ -2751,11 +2751,12 @@ pvew5.pver549cn.com
 ||missav.ws
 ||news.mt.co.kr
 ||musixmatch.com
-||seaart.ai
 ||mergersandinquisitions.com
+||imagetwist.com
 ||m.moegirl.org
 ||myjs.tw
 ||mercari.com
+||laowang.vip
 ||mercari.jp
 ||mirror.xyz
 ||mywife.cc
@@ -2764,7 +2765,6 @@ pvew5.pver549cn.com
 ||madou.club
 ||mahjongsoul.com
 ||mangabz.com
-||69shuba.com
 ||mad-ar.ch
 ||madrau.com
 ||madthumbs.com
@@ -2801,8 +2801,8 @@ pvew5.pver549cn.com
 ||memes.tw
 ||mercdn.net
 ||mercyprophet.org
-||dzmm.ai
 ||meridian-trust.org
+||10minutemail.net
 ||meripet.com
 ||merit-times.com.tw
 ||wiki.metacubex.one
@@ -2833,6 +2833,7 @@ pvew5.pver549cn.com
 ||mingpaomonthly.com
 ||mingpaonews.com
 |http://mingpaony.com
+||hmoe.link
 |http://mingpaosf.com
 ||mingshengbao.com
 ||minhhue.net
@@ -2847,7 +2848,6 @@ pvew5.pver549cn.com
 ||mixero.com
 ||mixi.jp
 ||mixx.com
-||xchina.fit
 ||mizzmona.com
 ||mlc.ai
 ||mlzs.work
@@ -2859,6 +2859,7 @@ pvew5.pver549cn.com
 ||mod.io
 ||modernchinastudies.org
 ||moeerolibrary.com
+||yopmail.com
 ||moeshare.cc
 ||mog.com
 ||mohu.rocks
@@ -2878,6 +2879,7 @@ pvew5.pver549cn.com
 ||movements.org
 ||moviefap.com
 ||www.moztw.org
+||chunman4.com
 ||mpettis.com
 ||mpfinance.com
 ||mpinews.com
@@ -2892,10 +2894,8 @@ pvew5.pver549cn.com
 ||mx981.com
 ||my-private-network.co.uk
 ||myaudiocast.com
-||sxsy.org
 ||bbs.mychat.to
 ||mychinanews.com
-||23img.com
 ||mycnnews.com
 ||mykomica.org
 ||myeclipseide.com
@@ -2927,7 +2927,6 @@ pvew5.pver549cn.com
 ||naitik.net
 ||nakido.com
 ||nalandabodhi.org
-||sxsy18.com
 ||nalandawest.org
 ||nanyang.com
 ||nanyangpost.com
@@ -2941,10 +2940,10 @@ pvew5.pver549cn.com
 ||navyreserve.navy.mil
 ||usno.navy.mil
 ||nbcnews.com
-||ffxs8.top
 |http://nbtvpn.com
-||按量计费.com
+||uaa.com
 ||nchrd.org
+||alicesw.org
 ||ncn.org
 ||etools.ncol.com
 ||ndi.org
@@ -2960,12 +2959,14 @@ pvew5.pver549cn.com
 ||newmitbbs.com
 ||news1.kr
 ||newsancai.com
+||sayhanabi.net
 ||newsblur.com
 ||newsmax.com
 ||newstamago.com
 ||newstapa.org
 ||newstatesman.com
 ||newsweek.com
+||111bz.cc
 ||newtalk.tw
 ||newyorker.com
 ||nexon.com
@@ -2983,7 +2984,6 @@ pvew5.pver549cn.com
 ||nmsl.website
 ||nnews.eu
 ||gotdns.ch
-||2dfan.com
 |http://dynupdate.no-ip.com/
 ||nobel.se
 ||nodeseek.com
@@ -3014,10 +3014,10 @@ pvew5.pver549cn.com
 ||nypost.com
 !--------------------OO-------------------------
 ||opencritic.com
+||赔钱机场.com
 ||ooni.io
 ||ooni.org
 ||files.oaiusercontent.com
-||jpxs123.com
 ||octocaptcha.com
 ||oojj.de
 ||onevps.com
