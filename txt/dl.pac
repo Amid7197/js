@@ -1142,6 +1142,7 @@ var rules = [
             "fengzhenghu.com",
             "fengzhenghu.net",
             "ff.im",
+            "ffxs8.com",
             "ffxs8.top",
             "fhreports.net",
             "figprayer.com",
