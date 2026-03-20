@@ -491,6 +491,7 @@ var rules = [
             "brizzly.com",
             "broadpressinc.com",
             "brookings.edu",
+            "brs5d7fw.com",
             "brutaltgp.com",
             "bsky.app",
             "bsky.network",

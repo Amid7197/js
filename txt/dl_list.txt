@@ -1027,7 +1027,7 @@ www.aolnews.com
 ||telegramdownload.com
 ||telegra.ph
 ||telesco.pe
-||2dfan.com
+||69shuba.tw
 !!!---IP---
 !!---Tiktok---
 ||tiktok.com
@@ -1036,12 +1036,10 @@ www.aolnews.com
 ||tiktokcdn-us.com
 ||tiktokcdn.com
 ||tiktokcdn-eu.com
-||bgm.tv
 !!---Twitch---
 ||jtvnw.net
 ||ttvnw.net
 ||twitch.tv
-||hjd2048.com
 ||twitchcdn.net
 !!---Twitter/X---
 ||periscope.tv
@@ -1054,13 +1052,11 @@ www.aolnews.com
 ||twitter.jp
 ||vine.co
 ||x.com
-||aicomic.org
 !!---Taiwan---
 ||twgov.tw
 ||gov.tw
 @@||www.gov.tw
 ||gov.taipei
-||tongrenshe.cc
 ||li.taipei
 ||teco-hk.org
 ||teco-mo.org
@@ -1096,6 +1092,7 @@ iipdigital.usembassy.gov
 !!Emergency need only(IP/Port block usage)!!
 !------0------
 ||mediawiki.org
+||bgm.tv
 !------1------
 ||wikidata.org
 !------2------
@@ -1142,11 +1139,11 @@ iipdigital.usembassy.gov
 ||10beasts.net
 ||10musume.com
 ||12bet.com
-||69shuba.tw
 ||12vpn.com
 ||12vpn.net
-||sayhanabi.net
 ||1337x.to
+||赔钱机场.com
+||nhentai.xxx
 ||141jj.com
 ||1688.com.au
 ||173ng.com
@@ -1186,6 +1183,7 @@ iipdigital.usembassy.gov
 ||881903.com
 ||89-64.org
 ||8964museum.com
+||sxsy18.com
 ||8z1.net
 ||91porn.com
 ||91porny.com
@@ -1202,17 +1200,18 @@ iipdigital.usembassy.gov
 ||arena.ai
 ||akile.io
 ||aljazeera.net
+||赔钱.com
 ||anuneko.com
 ||ai.dev
 ||adguard-vpn.com
 ||aoxvpn.com
+||xchina.co
 ||asianfanfics.com
 ||amuletmc.com
 ||abplive.com
 ||cdn.arstechnica.net
 ||aomedia.org
 ||aljazeera.com
-||trxs.cc
 ||akinator.com
 ||annas-archive.org
 ||annas-archive.in
@@ -1239,6 +1238,7 @@ iipdigital.usembassy.gov
 ||addyoutube.com
 |http://adpl.org.hk
 ||adult-sex-games.com
+||xbookcn.org
 ||advanscene.com
 ||advertfan.com
 ||aei.org
@@ -1274,7 +1274,6 @@ iipdigital.usembassy.gov
 ||allmovie.com
 ||alternate-tools.com
 ||alwaysdata.com
-b
 ||alwaysdata.net
 ||alwaysvpn.com
 ||am730.com.hk
@@ -1290,6 +1289,7 @@ b
 ||anchorfree.com
 !--GHS
 ||ancsconf.org
+||tsdm39.com
 ||andfaraway.net
 ||android-x86.org
 ||androidapksfree.com
@@ -1314,7 +1314,6 @@ b
 ||apkmonk.com
 ||apkplz.com
 ||apkpure.com
-||trxs.org
 ||apkpure.net
 ||appadvice.com
 ||appbrain.com
@@ -1323,7 +1322,6 @@ b
 |http://appshopper.com
 ||appsocks.net
 ||appsto.re
-||赔钱机场.com
 ||aptoide.com
 ||archives.gov
 ||archive.fo
@@ -1371,7 +1369,6 @@ b
 ||azirevpn.com
 !--boxun.azurewebsites.net doesn't exist.
 ||boxun*.azurewebsites.net
-||69shuba.com
 !--------------------BB-------------------------
 ||bittorrent.com
 ||help.byspotify.com
@@ -1392,10 +1389,12 @@ b
 ||blockcast.it
 ||www.bing.com
 ||bangumi.moe
+||qbtr.org
 ||b-ok.cc
 ||babylonbee.com
 ||backchina.com
 ||bad.news
+||321cdn.com
 ||badiucao.com
 |http://*2.bahamut.com.tw
 ||baidu.jp
@@ -1414,8 +1413,6 @@ b
 |http://baramangaonline.com
 ||barnabu.co.uk
 ||barton.de
-||23img.com
-||chunman4.com
 ||bastillepost.com
 ||bayvoice.net
 ||bbchat.tv
@@ -1439,7 +1436,6 @@ b
 ||bettervpn.com
 ||bettween.com
 ||betvictor.com
-||twkan.com
 ||bfnn.org
 ||bfsh.hk
 ||bgvpn.com
@@ -1469,14 +1465,15 @@ b
 |http://blog.jp
 ||blogcatalog.com
 ||blogcity.me
+||inari.site
 ||blogger.com
 ||bloglines.com
-||trxs.me
 ||bloglovin.com
 |http://blogtd.org
 ||bloodshed.net
 ||bootstrapcdn.com
 ||bloomfortune.com
+||googletagmanager.com
 ||blubrry.com
 ||bmdru.com
 ||bnext.com.tw
@@ -1488,12 +1485,18 @@ b
 ||book.com.tw
 ||bookdepository.com
 ||books.com.tw
+||trxs.org
 ||bookwalker.com.tw
 ||borgenmagazine.com
+||inf.li
+||69shuba.cx
 ||botanwang.com
 ||bowenpress.com
 ||app.box.com
+||blacktealab.com
 ||dl.box.net
+||cloudflare.com
+||groq.com
 ||boxpn.com
 ||boxun.com
 ||boxun.tv
@@ -1506,6 +1509,7 @@ b
 ||break.com
 ||breakgfw.com
 ||breakingtweets.com
+||seaart.me
 ||breakwall.net
 ||brill.com
 ||brizzly.com
@@ -1526,6 +1530,7 @@ b
 ||bullog.org
 ||bullogger.com
 ||bumingbai.net
+||66story.com
 ||bunbunhk.com
 |http://busayari.com
 ||business-humanrights.org
@@ -1536,7 +1541,6 @@ b
 ||bvpn.com
 ||bwh1.net
 ||bypasscensorship.org
-||nhentai.xxx
 !--------------------CC-------------------------
 ||cia.gov
 ||claude.com
@@ -1552,6 +1556,7 @@ b
 ||cpu-monkey.com
 ||coffeemanga.to
 ||ctinews.com
+||10minutemail.net
 ||cachefly.com
 ||cachefly.net
 ||cutout.pro
@@ -1576,8 +1581,8 @@ b
 ||campaignforuyghurs.org
 ||cams.com
 |http://bbs.cantonese.asia/
+||xbookcn.net
 ||canyu.org
-||ibbs.pro
 ||caobian.info
 ||caochangqing.com
 ||cap.org.hk
@@ -1595,7 +1600,6 @@ b
 ||catholic.org.tw
 ||cato.org
 ||cattt.com
-||sxsy.org
 ||caus.com
 ||cbc.ca
 ||southpark.cc.com
@@ -1614,7 +1618,9 @@ b
 ||cdjp.org
 ||cdp1998.org
 ||cdp2006.org
+||trueimages.ru
 ||cdpeu.org
+||dzmm.ai
 ||cdpuk.co.uk
 ||cdpweb.org
 ||cdpwu.org
@@ -1629,6 +1635,7 @@ b
 ||change.org
 ||changp.com
 ||channelnewsasia.com
+||tongrenshe.cc
 ||chanworld.org
 ||chaos.social
 ||character.ai
@@ -1640,9 +1647,11 @@ b
 ||chenpokong.com
 ||chenpokongvip.com
 ||cherrysave.com
+||tongrenquan.org
 ||chhongbi.org
 ||china-week.com
 ||china101.com
+||imagetwist.com
 ||china18.org
 ||china21.com
 ||china21.org
@@ -1653,6 +1662,7 @@ b
 ||chinaaid.net
 ||chinachange.org
 ||chinachannel.hk
+||mhh1.com
 ||chinademocrats.org
 ||chinadialogue.net
 ||chinadigitaltimes.net
@@ -1665,13 +1675,13 @@ b
 |https://chinanewscenter.com
 ||chinapress.com.my
 |http://china-review.com.ua
-||赔钱.com
 ||chinasocialdemocraticparty.com
 ||chinasoul.org
 ||chinatopsex.com
 ||chinaworker.info
 ||chinese-memorial.org
 ||chinesedailynews.com
+||pixhost.to
 ||chinesedemocracy.com
 ||chinesegay.org
 ||chinesen.de
@@ -1688,7 +1698,6 @@ b
 ||chrlawyers.hk
 ||cirosantilli.com
 ||citizencn.com
-||yopmail.com
 ||citizenlab.ca
 ||citizenlab.org
 |http://city365.ca
@@ -1706,7 +1715,6 @@ b
 ||clubhouseapi.com
 ||cmegroup.com
 ||cmi.org.tw
-||seaart.ai
 |http://www.cmoinc.org
 ||cmule.com
 ||cms.gov
@@ -1715,7 +1723,6 @@ b
 ||cna.com.tw
 ||cnd.org
 ||cnpolitics.org
-||sxsy18.com
 |http://cn-proxy.com
 ||coat.co.jp
 ||cochina.org
@@ -1735,6 +1742,7 @@ b
 ||coolder.com
 ||coolloud.org.tw
 ||coolstuffinc.com
+||aikanhanman.top
 |http://cos-moe.com
 |http://cosplayjav.pl
 ||cotweet.com
@@ -1747,14 +1755,13 @@ b
 ||creaders.net
 ||cristyli.com
 ||croxyproxy.com
+||laowang.vip
 |http://crocotube.com
 ||crossvpn.net
 ||crucial.com
 ||blog.cryptographyengineering.com
 ||csdparty.com
 ||csis.org
-||xbookcn.org
-||321cdn.com
 ||csmonitor.com
 ||csuchen.de
 ||csw.org.uk
@@ -1775,7 +1782,6 @@ b
 |http://forum.cyberctm.com
 ||cyberghostvpn.com
 ||cynscribe.com
-||pqjc.site
 ||ifan.cz.cc
 ||mike.cz.cc
 ||nic.cz.cc
@@ -1786,16 +1792,12 @@ b
 ||dockerstatus.com
 ||doom9.org
 ||dweb.link
-||bachashuku.cc
 ||docker.io
 ||disneyplus.com
 ||ddex.io
 ||d.cash
-||seaart.me
 ||doubiyunbackup.com
 ||cloud.dify.ai
-||blacktealab.com
-||dzmm.ai
 |http://d-fukyu.com
 ||d100.net
 |http://d2bay.com
@@ -1803,7 +1805,6 @@ b
 ||dabr.mobi
 ||dabr.me
 ||dadazim.com
-||xbookcn.net
 |http://daidostup.ru
 ||dailymail.co.uk
 ||dailymotion.com
@@ -1835,14 +1836,15 @@ b
 ||deutsche-welle.de
 ||deviantart.com
 ||deviantart.net
+||pqjc.site
 ||devio.us
 ||devpn.com
 ||devv.ai
 ||diaoyuislands.org
 |http://digiland.tw/
 ||diigo.com
+||69shuba.com
 ||directcreative.com
-||groq.com
 ||discuss.com.hk
 ||disp.cc
 ||disqus.com
@@ -1853,7 +1855,6 @@ b
 ||dlive.tv
 ||dlsite.com
 ||dlyoutube.com
-||xchina.co
 ||dmc.nico
 ||dmcdn.net
 ||dnscrypt.org
@@ -1874,12 +1875,10 @@ b
 ||dougscripts.com
 ||doujincafe.com
 |https://bartender.dowjones.com
-||alicesw.com
 ||dpp.org.tw
 ||dpr.info
 ||dragonsprings.org
 ||drgan.net
-||trueimages.ru
 ||dropbooks.tv
 ||dropbox.com
 ||dropboxapi.com
@@ -1898,10 +1897,10 @@ b
 ||dvorak.org
 ||dw.com
 ||dw.de
+||mikanani.me
 ||dw-world.com
 |http://dw-world.de
 ||dwnews.com
-||imagetwist.com
 ||dwnews.net
 ||dynawebinc.com
 ||dysfz.cc
@@ -1910,7 +1909,6 @@ b
 ||e621.net
 ||edx-cdn.org
 ||everipedia.org
-||66story.com
 ||epochtimes.com.tw
 ||etherscan.com
 ||elconfidencial.com
@@ -1948,6 +1946,7 @@ b
 ||epochhk.com
 ||epochtimes-bg.com
 ||epochtimes-romania.com
+||404zu.org
 ||epochtimes.co.il
 ||epochtimes.co.kr
 ||epochtimes.com
@@ -1971,15 +1970,14 @@ b
 |http://eromon.net
 ||eslite.com
 ||etizer.org
-||tongrenquan.org
 ||etokki.com
-||novel543.com
 ||etsy.com
 ||eurekavpt.com
 ||euronews.com
 ||apps.evozi.com
 ||evschool.net
 ||exchristian.hk
+||404zu.net
 |http://blog.excite.co.jp
 ||exhentai.org
 ||exmormon.org
@@ -1988,7 +1986,6 @@ b
 ||exploader.net
 ||expressvpn.com
 ||eyevio.jp
-||cdnshu.com
 ||eyny.com
 !--------------------FF-------------------------
 ||freedom.gov
@@ -2013,7 +2010,7 @@ b
 ||free.com.tw
 ||froth.zone
 ||fanbox.cc
-||googletagmanager.com
+||trxs.me
 ||free.bg
 ||f-droid.org
 ||facebookquotes4u.com
@@ -2048,7 +2045,6 @@ b
 ||nytimes.map.fastly.net
 ||fast.wistia.com
 ||fastestvpn.com
-||cloudflare.com
 ||fastssh.com
 ||faststone.org
 ||favstar.fm
@@ -2057,7 +2053,6 @@ b
 |http://uygur.fc2web.com/
 ||feeder.co
 ||feelssh.com
-||111bz.cc
 |http://feitianacademy.org
 ||feixiaohao.com
 ||feministteacher.com
@@ -2066,7 +2061,6 @@ b
 |http://ff.im
 |http://fhreports.net
 ||figprayer.com
-||aikanhanman.top
 ||fileflyer.com
 |http://feeds.fileforum.com
 ||finchvpn.com
@@ -2103,7 +2097,6 @@ b
 ||fourthinternational.org
 ||foxsub.com
 |http://fpmt.org
-||tsdm39.com
 ||fpmtmexico.org
 ||fqrouter.com
 ||frank2019.me
@@ -2121,21 +2114,21 @@ b
 ||freechinaweibo.com
 ||freenetproject.org
 ||freetibet.org
+||sayhanabi.net
 |http://freetibetanheroes.org
-||gstatic.com
 ||freetribe.me
 |http://freevpn.me
+||oaistatic.com
 ||freewallpaper4.me
 ||freewechat.com
 ||freeweibo.com
 ||freezhihu.org
 ||friendfeed.com
-||10minutemail.net
 ||friends-of-tibet.org
 ||friendsoftibet.org
-||101kanshu.com
 |http://www.zensur.freerk.com
 |http://adult.friendfinder.com
+||赔钱机场.site
 ||fring.com
 ||frommel.net
 ||frontlinedefenders.org
@@ -2152,6 +2145,7 @@ b
 ||fxcm-chinese.com
 !--------------------GG-------------------------
 ||gmgn.ai
+||ddfan.org
 ||grokipedia.com
 ||gfwbao.com
 ||greatfirevpn.com
@@ -2161,11 +2155,11 @@ b
 |http://gmp4.com
 ||getsession.org
 ||gdaily.org
+||chunman4.com
 ||gfwatch.org
 ||go-to-zlibrary.se
 ||gitbook.io
 |http://g6hentai.com
-||alicesw.org
 ||g-queen.com
 ||gab.com
 ||gabocorp.com
@@ -2184,6 +2178,7 @@ b
 ||gaymap.cc
 ||images-gaytube.com
 |http://gaywatch.com
+||101kks.com
 ||gazotube.com
 ||gcc.org.hk
 ||gclubs.com
@@ -2265,7 +2260,6 @@ b
 ||greatfirewallofchina.org
 ||greenpeace.org
 ||greasyfork.org
-||qbtr.org
 ||greenvpn.net
 ||grindr.com
 ||ground.news
@@ -2293,13 +2287,10 @@ b
 ||www.hoyolab.com
 ||hbomax.com
 ||hicairo.com
-||tensor.art
 ||herominers.com
 ||hinet.net
 ||hindustantimes.com
 ||hanime1.me
-||mhh1.com
-||赔钱机场.site
 ||halktv.com.tr
 ||haiwaikan.com
 ||home.saxo
@@ -2307,7 +2298,6 @@ b
 ||h-china.org
 |http://h-moe.com
 ||hackmd.io
-||inari.site
 ||hackthatphone.net
 ||haijiao.com
 ||hakkatv.org.tw
@@ -2336,6 +2326,7 @@ b
 ||hexieshe.xyz
 ||hexxeh.net
 ||heyuedi.com
+||ffxs8.com
 ||hiccears.com
 ||hidden-advent.org
 ||hide.me
@@ -2344,6 +2335,7 @@ b
 ||hidemy.name
 ||hidemyass.com
 ||hidemycomp.com
+||cdnshu.com
 ||highrockmedia.com
 ||hiitch.com
 ||hikinggfw.org
@@ -2397,12 +2389,10 @@ b
 ||hrw.org
 ||hsex.men
 ||hsjp.net
-||oaistatic.com
 ||hsselite.com
 ||hst.net.tw
 ||htkou.net
 ||huaglad.com
-||uaa.com
 ||huanghuagang.org
 ||huaren.us
 |http://huashangnews.com
@@ -2416,12 +2406,15 @@ b
 ||huhangfei.com
 ||humanparty.me
 ||humanrightspressawards.org
+||novel543.com
 ||hung-ya.com
 ||huping.net
+||alicesw.com
 ||hutianyi.net
 ||hwayue.org.tw
 ||hxwk.org
 ||hyperrate.com
+||按量计费.com
 ||hypothes.is
 ||ebook.hyread.com.tw
 !--------------------II-------------------------
@@ -2454,6 +2447,7 @@ b
 ||icoco.com
 ||furbo.org
 ||iconpaper.org
+||uaa.com
 ||icu-project.org
 ||identi.ca
 ||idiomconnection.com
@@ -2461,7 +2455,6 @@ b
 ||idope.se
 ||ift.tt
 ||ifcss.org
-||laowang.vip
 |http://ift.tt
 ||ifreewares.com
 ||igcd.net
@@ -2471,6 +2464,7 @@ b
 ||ilhamtohtiinstitute.org
 ||illusionfactory.com
 ||ilove80.be
+||hlib.cc
 ||im88.tw
 ||imgchili.net
 ||imagefap.com
@@ -2482,6 +2476,7 @@ b
 |http://imb.org
 !--IMDB
 ||img.ly
+||gstatic.com
 ||imgasd.com
 ||imgur.com
 ||imkev.com
@@ -2503,7 +2498,6 @@ b
 ||inote.tw
 ||insecam.org
 |http://insecam.org
-||image.acg.lol
 ||inside.com.tw
 ||insidevoa.com
 ||institut-tibetain.org
@@ -2511,6 +2505,7 @@ b
 ||internet.org
 ||internetfreedom.org
 ||internetpopculture.com
+||ylimg.com
 ||inthenameofconfuciusmovie.com
 ||inxian.com
 ||ipdefenseforum.com
@@ -2534,7 +2529,6 @@ b
 ||isgreat.org
 ||ismaelan.com
 ||ismprofessional.net
-||mikanani.me
 ||israbox.com
 ||issuu.com
 ||oversea.istarshine.com
@@ -2545,6 +2539,7 @@ b
 |http://itweet.net
 ||iuhrdf.org
 ||ivacy.com
+||twkan.com
 ||ivonblog.com
 ||ivpn.net
 ||iwara.tv
@@ -2556,6 +2551,7 @@ b
 ||justmysockscn.com
 ||justmysocks.net
 ||jav321.com
+||sxsy.org
 ||javdb.com
 ||jifangge.com
 ||j.mp
@@ -2602,8 +2598,10 @@ b
 !--------------------KK-------------------------
 ||kingkong.com.tw
 ||kanald.com.tr
+||23img.com
 ||kpkuang.org
 ||ka-wai.com
+||yopmail.com
 ||kadokawa.co.jp
 ||kagyu.org.za
 ||kagyuoffice.org
@@ -2613,12 +2611,11 @@ b
 ||kanshifang.com
 ||kantie.org
 ||kaotic.com
-||ddfan.org
-||hlib.cc
 ||karayou.com
 ||kawase.com
 ||kebrum.com
 ||kenengba.com
+||alicesw.org
 ||kepard.com
 ||keycdn.com
 ||kichiku-doujinko.com
@@ -2683,8 +2680,6 @@ b
 ||lausan.hk
 ||le-vpn.com
 ||leafyvpn.net
-||404zu.net
-||101kks.com
 ||ledger.com
 ||left21.hk
 ||lematin.ch
@@ -2693,6 +2688,8 @@ b
 ||letscorp.net
 |http://lhakar.org
 ||liangyou.net
+||ibbs.pro
+||trxs.cc
 ||liaowangxizang.net
 ||liberal.org.hk
 ||libertysculpturepark.com
@@ -2704,9 +2701,9 @@ b
 ||line.me
 ||line-apps.com
 ||lingvodics.com
+||image.acg.lol
 |http://link-o-rama.com
 ||linkedin.com
-||ffxs8.top
 ||linux.org.hk
 ||liquidvpn.com
 ||greatfire.us7.list-manage.com
@@ -2725,6 +2722,7 @@ b
 ||secure.logmein.com
 ||logos.com.hk
 ||longtermly.net
+||acg.lol
 ||lookpic.com
 |http://looktoronto.com
 ||lrip.org
@@ -2768,8 +2766,8 @@ b
 ||mad-ar.ch
 ||madrau.com
 ||madthumbs.com
+||jpxs123.com
 |http://maiplus.com
-||ylimg.com
 ||mangmang.run
 ||manyvoices.news
 ||marc.info
@@ -2788,7 +2786,6 @@ b
 ||meansys.com
 ||mediachinese.com
 ||mediafreakcity.com
-||ffxs8.com
 ||medium.com
 ||meetup.com
 ||mega.co.nz
@@ -2808,7 +2805,6 @@ b
 ||merit-times.com.tw
 ||wiki.metacubex.one
 ||metafilter.com
-||inf.li
 ||meteorshowersonline.com
 ||metro.taipei
 ||metrolife.ca
@@ -2816,6 +2812,7 @@ b
 ||mewe.com
 ||mgoon.com
 ||mgstage.com
+||b2kk.brs5d7fw.com
 ||mh4u.org
 ||bbs.mikocon.com
 ||microvpn.com
@@ -2834,10 +2831,11 @@ b
 ||mingpaocanada.com
 ||mingpaomonthly.com
 ||mingpaonews.com
+||xchina.fit
+||2dfan.com
 |http://mingpaony.com
 |http://mingpaosf.com
 ||mingshengbao.com
-||69shuba.cx
 ||minhhue.net
 ||ministrybooks.org
 ||minzhuzhongguo.org
@@ -2847,7 +2845,6 @@ b
 ||thecenter.mit.edu
 ||scratch.mit.edu
 ||mitbbs.com
-||按量计费.com
 ||mixero.com
 ||mixi.jp
 ||mixx.com
@@ -2858,6 +2855,7 @@ b
 ||mobatek.net
 ||mobile01.com
 ||mobileways.de
+||ffxs8.top
 |http://moby.to
 ||mod.io
 ||modernchinastudies.org
@@ -2868,11 +2866,13 @@ b
 ||momoshop.com.tw
 ||mondex.org
 ||money-link.com.tw
+||101kanshu.com
 |http://www.monlamit.org
 ||moon.fm
 ||moonbbs.com
 ||moptt.tw
 ||moneydj.com
+||hjd2048.com
 ||monica.im
 ||monitorchina.org
 ||monocloud.me
@@ -2887,7 +2887,6 @@ b
 ||mrtweet.com
 |http://mswe1.org
 ||mthruf.com
-||xchina.fit
 ||mubi.com
 ||multiply.com
 ||mullvad.net
@@ -2900,6 +2899,7 @@ b
 ||mychinanews.com
 ||mycnnews.com
 ||mykomica.org
+||hmoe.link
 ||myeclipseide.com
 ||myiphide.com
 ||mymoe.moe
@@ -2919,6 +2919,7 @@ b
 ||bbs.naixi.net
 ||nikke.hotcool.tw
 ||nikke-kr.com
+||aicomic.org
 ||nikke-jp.com
 ||nikke-en.com
 ||netlify.app
@@ -2928,7 +2929,6 @@ b
 ||naacoalition.org
 ||naitik.net
 ||nakido.com
-||hmoe.link
 ||nalandabodhi.org
 ||nalandawest.org
 ||nanyang.com
@@ -2936,7 +2936,6 @@ b
 ||nat.moe
 ||national-lottery.co.uk
 ||nationalawakening.org
-||jpxs123.com
 ||nationalinterest.org
 ||nationalreview.com
 ||line.naver.jp
@@ -2978,12 +2977,11 @@ b
 ||nhentai.net
 ||nicovideo.jp
 ||ninjaproxy.ninja
-||acg.lol
 ||niusnews.com
 ||njactb.org
-||404zu.org
 ||nlfreevpn.com
 ||nmsl.website
+||tensor.art
 ||nnews.eu
 ||gotdns.ch
 |http://dynupdate.no-ip.com/
@@ -2997,6 +2995,7 @@ b
 ||nownews.com
 ||npa.go.jp
 |http://npnt.me
+||seaart.ai
 |http://nradio.me
 ||nrk.no
 ||ntd.tv
@@ -3015,7 +3014,6 @@ b
 ||nybooks.com
 ||nypost.com
 !--------------------OO-------------------------
-||pixhost.to
 ||oklink.com
 ||okcoin.com
 ||opencritic.com
@@ -3033,6 +3031,7 @@ b
 ||officeoftibet.com
 |http://ofile.org
 ||ogaoga.org
+||111bz.cc
 ||ogate.org
 ||ohmyrss.com
 ||ok.ru
@@ -3043,6 +3042,7 @@ b
 ||omct.org
 ||omnitalk.com
 ||omnitalk.org
+||bachashuku.cc
 ||omny.fm
 ||on.cc
 ||onedrive.live.com
