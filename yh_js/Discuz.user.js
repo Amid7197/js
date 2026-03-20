@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         新Discuz
 // @author      Amid7197
-// @version     0.0.22
+// @version     0.0.23
 // @match        *://b2kk.brs5d7fw.com/*
 // @match        *://sxsy*.*/forum.php?mod=forumdisplay&fid=*
 // @match        *://sxsy*.*/search.php?mod=forum&searchid=*
