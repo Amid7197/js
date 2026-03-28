@@ -1020,7 +1020,6 @@ www.aolnews.com
 ||graph.org
 ||legra.ph
 ||quiz.directory
-||bachashuku.cc
 ||t.me
 ||updates.tdesktop.com
 ||telegram.dog
@@ -1028,6 +1027,7 @@ www.aolnews.com
 ||telegram.org
 ||telegram.space
 ||telegramdownload.com
+||ylimg.com
 ||telegra.ph
 ||telesco.pe
 !!!---IP---
@@ -1038,6 +1038,7 @@ www.aolnews.com
 ||tiktokcdn-us.com
 ||tiktokcdn.com
 ||tiktokcdn-eu.com
+||xchina.co
 !!---Twitch---
 ||jtvnw.net
 ||ttvnw.net
@@ -1068,7 +1069,6 @@ www.aolnews.com
 ||dma.mil
 ||jpl.nasa.gov
 ||pds.nasa.gov
-||tongrenquan.org
 ||pacom.mil
 ||soc.mil
 ||solarsystem.nasa.gov
@@ -1106,6 +1106,7 @@ iipdigital.usembassy.gov
 !------5------
 ||wikisource.org
 !------6------
+||pixhost.to
 ||zh.wikiquote.org
 !------7------
 ||wikinews.org
@@ -1123,7 +1124,6 @@ iipdigital.usembassy.gov
 ||yahoo.com.tw
 ||yahoo.com.hk
 ||yahoo.com
-||404zu.net
 !------------------Numerics---------------------
 ||996.icu
 ||ipfs.4everland.io
@@ -1139,7 +1139,6 @@ iipdigital.usembassy.gov
 |http://0rz.tw
 ||1-apple.com.tw
 ||1000giri.net
-||ylimg.com
 ||10beasts.net
 ||10musume.com
 ||12bet.com
@@ -1149,8 +1148,9 @@ iipdigital.usembassy.gov
 ||141jj.com
 ||1688.com.au
 ||173ng.com
+||hjd2048.com
+||laowang.vip
 ||18board.com
-||hmoe.link
 ||zhao.1984.city
 ||1984bbs.com
 ||1991way.com
@@ -1198,6 +1198,7 @@ iipdigital.usembassy.gov
 ||9news.com.au
 !--------------------AA-------------------------
 ||aave.com
+||ffxs8.top
 ||arweave.org
 ||arena.ai
 ||akile.io
@@ -1216,18 +1217,15 @@ iipdigital.usembassy.gov
 ||annas-archive.org
 ||annas-archive.in
 ||annas-archive.li
-||cloudflare.com
 ||annas-archive.pm
 ||av01.tv
 ||acg.rip
 ||annas-archive.se
-||seaart.me
 ||a-normal-day.com
 |http://aamacau.com
 ||abc.net.au
 ||abebooks.co.uk
 ||aboluowang.com
-||ibbs.pro
 ||about.me
 ||acast.com
 ||acevpn.com
@@ -1241,7 +1239,6 @@ iipdigital.usembassy.gov
 ||addyoutube.com
 |http://adpl.org.hk
 ||adult-sex-games.com
-||groq.com
 ||advanscene.com
 ||advertfan.com
 ||aei.org
@@ -1296,7 +1293,6 @@ iipdigital.usembassy.gov
 ||android-x86.org
 ||androidapksfree.com
 ||angularjs.org
-||sxsy18.com
 ||aniscartujo.com
 ||anobii.com
 ||anonfiles.com
@@ -1310,8 +1306,6 @@ iipdigital.usembassy.gov
 |http://aofriend.com
 ||aomiwang.com
 ||apat1989.org
-||xchina.fit
-||laowang.vip
 ||apiary.io
 ||apigee.com
 ||apk.support
@@ -1320,10 +1314,8 @@ iipdigital.usembassy.gov
 ||apkplz.com
 ||apkpure.com
 ||apkpure.net
-||404zu.org
 ||appadvice.com
 ||appbrain.com
-||alicesw.org
 ||appledaily.com
 ||appledaily.com.tw
 |http://appshopper.com
@@ -1332,14 +1324,18 @@ iipdigital.usembassy.gov
 ||aptoide.com
 ||archives.gov
 ||archive.fo
+||ffxs8.com
 ||archive.vn
 ||archive.is
 ||archive.li
+||xchina.fit
 ||archive.md
+||tongrenshe.cc
 ||archive.org
 ||archive.ph
 ||archive.today
 ||archiveofourown.com
+||bgm.tv
 ||archiveofourown.org
 ||arctosia.com
 ||areca-backup.org
@@ -1351,6 +1347,7 @@ iipdigital.usembassy.gov
 ||asianews.it
 ||asiansexdiary.com
 ||asiaone.com
+||twkan.com
 ||ask.com
 ||askstudent.com
 ||askynz.net
@@ -1365,6 +1362,7 @@ iipdigital.usembassy.gov
 ||audacy.com
 ||av.movie
 ||avaaz.org
+||groq.com
 ||avdb.in
 ||avdb.tv
 ||avg.com
@@ -1377,12 +1375,10 @@ iipdigital.usembassy.gov
 !--boxun.azurewebsites.net doesn't exist.
 ||boxun*.azurewebsites.net
 !--------------------BB-------------------------
-||gstatic.com
 ||bittorrent.com
 ||help.byspotify.com
 ||bitbaby.com
 ||bettergpt.chat
-||tensor.art
 ||bt4gprx.com
 ||bt4g.org
 ||betterhash.net
@@ -1404,10 +1400,10 @@ iipdigital.usembassy.gov
 ||bad.news
 ||badiucao.com
 |http://*2.bahamut.com.tw
+||acg.lol
 ||baidu.jp
 ||baijie.org
 ||bailandaily.com
-||pixhost.to
 ||baixing.me
 ||baizhi.org
 ||banana-vpn.com
@@ -1416,8 +1412,8 @@ iipdigital.usembassy.gov
 ||bandwagonhost.com
 |http://bangchen.net
 ||bangkokpost.com
+||aicomic.org
 ||bangyoulater.com
-||xbookcn.org
 ||bannedbook.org
 |http://baramangaonline.com
 ||barnabu.co.uk
@@ -1430,7 +1426,6 @@ iipdigital.usembassy.gov
 ||beevpn.com
 ||beijing1989.com
 ||beijing2022.art
-||66story.com
 ||beijingspring.com
 |http://bell.wiki
 ||berlinerbericht.de
@@ -1453,16 +1448,17 @@ iipdigital.usembassy.gov
 ||vpl.bibliocommons.com
 ||biedian.me
 ||bigjapanesesex.com
-||ffxs8.com
 ||bignews.org
 ||bild.de
 |http://biliworld.com
 |http://bit.do
 |http://bit.ly
+||404zu.net
 ||bitchute.com
 ||bitcointalk.org
 ||bitshare.com
 ||bitvise.com
+||alicesw.org
 ||bl-doujinsouko.com
 ||bjzc.org
 ||blacked.com
@@ -1477,7 +1473,6 @@ iipdigital.usembassy.gov
 ||blogcatalog.com
 ||blogcity.me
 ||blogger.com
-||xbookcn.net
 ||bloglines.com
 ||bloglovin.com
 |http://blogtd.org
@@ -1516,13 +1511,13 @@ iipdigital.usembassy.gov
 ||breakwall.net
 ||brill.com
 ||brizzly.com
+||inf.li
 ||broadpressinc.com
 ||brookings.edu
 ||brutaltgp.com
 ||bsky.app
 ||bsky.network
 ||bsky.social
-||inf.li
 ||bt95.com
 ||btdig.com
 ||btguard.com
@@ -1533,10 +1528,9 @@ iipdigital.usembassy.gov
 ||bullguard.com
 ||bullog.org
 ||bullogger.com
-||blacktealab.com
-||321cdn.com
 ||bumingbai.net
 ||bunbunhk.com
+||trxs.cc
 |http://busayari.com
 ||business-humanrights.org
 ||businesstoday.com.tw
@@ -1563,12 +1557,12 @@ iipdigital.usembassy.gov
 ||ctinews.com
 ||cachefly.com
 ||cachefly.net
+||69shuba.com
 ||cutout.pro
 ||cixiaoya.club
 ||campaign-archive.com
 ||chinauncensored.tv
 ||catbox.moe
-||赔钱.com
 ||crosswall.org
 ||clipconverter.cc
 ||zh-hans.cfsh99.com
@@ -1581,10 +1575,10 @@ iipdigital.usembassy.gov
 ||cablegatesearch.net
 |http://cacnw.com
 ||cactusvpn.com
+||cdnshu.com
 ||calendarz.com
 ||camfrog.com
 ||campaignforuyghurs.org
-||mikanani.me
 ||cams.com
 |http://bbs.cantonese.asia/
 ||canyu.org
@@ -1620,6 +1614,7 @@ iipdigital.usembassy.gov
 ||cdbook.org
 ||cdef.org
 ||cdig.info
+||googletagmanager.com
 ||cdjp.org
 ||cdp1998.org
 ||cdp2006.org
@@ -1630,7 +1625,6 @@ iipdigital.usembassy.gov
 ||cdw.com
 ||cecc.gov
 ||cellulo.info
-||twkan.com
 ||cenews.eu
 ||centerforhumanreprod.com
 ||centralnation.com
@@ -1648,15 +1642,12 @@ iipdigital.usembassy.gov
 ||chengmingmag.com
 ||chenguangcheng.com
 ||chenpokong.com
-||xchina.co
 ||chenpokongvip.com
 ||cherrysave.com
 ||chhongbi.org
 ||china-week.com
 ||china101.com
 ||china18.org
-||tongrenshe.cc
-||trxs.cc
 ||china21.com
 ||china21.org
 ||china5000.us
@@ -1685,9 +1676,9 @@ iipdigital.usembassy.gov
 ||chinese-memorial.org
 ||chinesedailynews.com
 ||chinesedemocracy.com
-||imagetwist.com
 ||chinesegay.org
 ||chinesen.de
+||101kks.com
 ||chinesenews.net.au
 ||chineseradioseattle.com
 ||chineseupress.com
@@ -1696,6 +1687,7 @@ iipdigital.usembassy.gov
 ||cnnews.chosun.com
 |http://chrdnet.com
 ||christianfreedom.org
+||tensor.art
 ||christianstudy.com
 ||christiantimes.org.hk
 ||chrlawyers.hk
@@ -1721,7 +1713,6 @@ iipdigital.usembassy.gov
 |http://www.cmoinc.org
 ||cmule.com
 ||cms.gov
-||pqjc.site
 |http://vpn.cmu.edu
 |http://vpn.sv.cmu.edu
 ||cna.com.tw
@@ -1743,6 +1734,7 @@ iipdigital.usembassy.gov
 ||compileheart.com
 ||cool18.com
 ||coolaler.com
+||novel543.com
 ||coolder.com
 ||coolloud.org.tw
 ||coolstuffinc.com
@@ -1764,7 +1756,6 @@ iipdigital.usembassy.gov
 ||blog.cryptographyengineering.com
 ||csdparty.com
 ||csis.org
-||69shuba.tw
 ||csmonitor.com
 ||csuchen.de
 ||csw.org.uk
@@ -1781,11 +1772,11 @@ iipdigital.usembassy.gov
 ||curvefish.com
 ||cusp.hk
 ||cutscenes.net
+||blacktealab.com
 ||cw.com.tw
 |http://forum.cyberctm.com
 ||cyberghostvpn.com
 ||cynscribe.com
-||trueimages.ru
 ||ifan.cz.cc
 ||mike.cz.cc
 ||nic.cz.cc
@@ -1814,6 +1805,7 @@ iipdigital.usembassy.gov
 ||dailymotion.com
 ||dailysabah.com
 ||dajiyuan.de
+||tsdm39.com
 |http://dalailama.mn
 ||dalailama.ru
 |http://dalailamacenter.org
@@ -1863,7 +1855,6 @@ iipdigital.usembassy.gov
 ||dns2go.com
 ||dnssec.net
 ||dolc.de
-||按量计费.com
 ||dolf.org.hk
 ||dongtaiwang.com
 ||dongtaiwang.net
@@ -1880,6 +1871,7 @@ iipdigital.usembassy.gov
 |https://bartender.dowjones.com
 ||dpp.org.tw
 ||dpr.info
+||yopmail.com
 ||dragonsprings.org
 ||drgan.net
 ||dropbooks.tv
@@ -1899,12 +1891,10 @@ iipdigital.usembassy.gov
 ||duyaoss.com
 ||dvorak.org
 ||dw.com
-||trxs.org
 ||dw.de
 ||dw-world.com
 |http://dw-world.de
 ||dwnews.com
-||2dfan.com
 ||dwnews.net
 ||dynawebinc.com
 ||dysfz.cc
@@ -1912,6 +1902,7 @@ iipdigital.usembassy.gov
 ||economist.com
 ||e621.net
 ||edx-cdn.org
+||xbookcn.org
 ||everipedia.org
 ||epochtimes.com.tw
 ||etherscan.com
@@ -1928,7 +1919,6 @@ iipdigital.usembassy.gov
 |http://www.eastturkistan.net/
 ||eastturkistangovernmentinexile.us
 ||fnc.ebc.net.tw
-||oaistatic.com
 ||news.ebc.net.tw
 ||ecfa.org.tw
 ||ecimg.tw
@@ -1950,6 +1940,7 @@ iipdigital.usembassy.gov
 ||entermap.com
 ||epochhk.com
 ||epochtimes-bg.com
+||ibbs.pro
 ||epochtimes-romania.com
 ||epochtimes.co.il
 ||epochtimes.co.kr
@@ -1966,11 +1957,11 @@ iipdigital.usembassy.gov
 ||eporner.com
 ||erights.net
 ||ernestmandel.org
+||seaart.me
 ||erodaizensyu.com
 ||erodoujinlog.com
 ||erodoujinworld.com
 ||eromanga-kingdom.com
-||hlib.cc
 ||eromangadouzin.com
 |http://eromon.net
 ||eslite.com
@@ -1981,7 +1972,6 @@ iipdigital.usembassy.gov
 ||euronews.com
 ||apps.evozi.com
 ||evschool.net
-||uaa.com
 ||exchristian.hk
 |http://blog.excite.co.jp
 ||exhentai.org
@@ -1999,6 +1989,7 @@ iipdigital.usembassy.gov
 ||forefront.ai
 ||flexclip.com
 ||freegpt.tech
+||gstatic.com
 ||freegpt.es
 ||feedly.com
 ||fuckccp.xyz
@@ -2007,7 +1998,6 @@ iipdigital.usembassy.gov
 ||forbes.com
 ||financialexpress.com
 ||fast.com
-||101kanshu.com
 ||factchecklab.org
 ||ft.com
 ||fuchsia.dev
@@ -2064,11 +2054,12 @@ iipdigital.usembassy.gov
 ||fengzhenghu.com
 ||fengzhenghu.net
 |http://ff.im
-||bgm.tv
 |http://fhreports.net
 ||figprayer.com
 ||fileflyer.com
+||aikanhanman.top
 |http://feeds.fileforum.com
+||imagetwist.com
 ||finchvpn.com
 ||findyoutube.com
 ||findyoutube.net
@@ -2090,7 +2081,6 @@ iipdigital.usembassy.gov
 ||flowhongkong.net
 ||flyvpn.com
 |http://cn.fmnnow.com
-||ddfan.org
 |https://ss*.4sqi.net
 |http://foxgay.com
 ||fringenetwork.com
@@ -2106,6 +2096,7 @@ iipdigital.usembassy.gov
 |http://fpmt.org
 ||fpmtmexico.org
 ||fqrouter.com
+||oaistatic.com
 ||frank2019.me
 ||franklc.com
 |http://freakshare.com
@@ -2120,9 +2111,9 @@ iipdigital.usembassy.gov
 ||freebeacon.com
 ||freechinaweibo.com
 ||freenetproject.org
+||10minutemail.net
 ||freetibet.org
 |http://freetibetanheroes.org
-||b2kk.brs5d7fw.com
 ||freetribe.me
 |http://freevpn.me
 ||freewallpaper4.me
@@ -2132,6 +2123,7 @@ iipdigital.usembassy.gov
 ||friendfeed.com
 ||friends-of-tibet.org
 ||friendsoftibet.org
+||赔钱机场.site
 |http://www.zensur.freerk.com
 |http://adult.friendfinder.com
 ||fring.com
@@ -2173,6 +2165,8 @@ iipdigital.usembassy.gov
 ||gamer.com.tw
 ||gamez.com.tw
 ||gaoming.net
+||trueimages.ru
+||tongrenquan.org
 ||ganjing.com
 ||ganjingworld.com
 |http://gaopi.net
@@ -2182,7 +2176,6 @@ iipdigital.usembassy.gov
 ||images-gaytube.com
 |http://gaywatch.com
 ||gazotube.com
-||111bz.cc
 ||gcc.org.hk
 ||gclubs.com
 ||gcmasia.com
@@ -2222,6 +2215,7 @@ iipdigital.usembassy.gov
 ||githubusercontent.com
 ||githubassets.com
 ||gizlen.net
+||pqjc.site
 ||gjczz.com
 ||glarity.app
 ||globaljihad.net
@@ -2235,6 +2229,7 @@ iipdigital.usembassy.gov
 ||gnci.org.hk
 ||gnews.org
 ||goagent.biz
+||chunman4.com
 ||godaddy.com
 ||godfootsteps.org
 ||gofundme.com
@@ -2243,14 +2238,11 @@ iipdigital.usembassy.gov
 ||golden-ages.org
 ||goldeneyevault.com
 ||goldenfrog.com
-||sayhanabi.net
 ||goldwave.com
 ||gongm.in
 ||gooday.xyz
-||qbtr.org
 ||goodhope.school
 ||goodnewsnetwork.org
-||yopmail.com
 ||goodreads.com
 ||goodreaders.com
 ||goofind.com
@@ -2264,7 +2256,6 @@ iipdigital.usembassy.gov
 ||graphql.org
 ||gravatar.com
 ||greatfirewallofchina.org
-||mhh1.com
 ||greenpeace.org
 ||greasyfork.org
 ||greenvpn.net
@@ -2273,9 +2264,9 @@ iipdigital.usembassy.gov
 ||gsearch.media
 ||gtricks.com
 ||gutteruncensored.com
+||uaa.com
 ||gvm.com.tw
 ||gwins.org
-||nhentai.xxx
 ||gzone-anime.info
 |http://ub0.cc
 ||gospelherald.com
@@ -2285,6 +2276,7 @@ iipdigital.usembassy.gov
 ||gtv1.org
 |http://gu-chu-sum.org
 |http://guaguass.com
+||mhh1.com
 ||guishan.org
 ||gumroad.com
 ||gunsamerica.com
@@ -2301,12 +2293,12 @@ iipdigital.usembassy.gov
 ||hanime1.me
 ||halktv.com.tr
 ||haiwaikan.com
+||101kanshu.com
 ||home.saxo
 ||hoy.tv
 ||h-china.org
 |http://h-moe.com
 ||hackmd.io
-||acg.lol
 ||hackthatphone.net
 ||haijiao.com
 ||hakkatv.org.tw
@@ -2356,7 +2348,6 @@ iipdigital.usembassy.gov
 ||hkbookcity.com
 ||hkchronicles.com
 ||hkcnews.com
-||hjd2048.com
 ||hkcoc.com
 ||hkdc.us
 ||hket.com
@@ -2367,15 +2358,12 @@ iipdigital.usembassy.gov
 ||hkmap.live
 ||hkopentv.com
 ||hkpeanut.com
-||sxsy.org
 ||hkreporter.com
 ||hnjhj.com
 ||hojemacau.com.mo
 ||hola.com
 ||hola.org
 ||holyspiritspeaks.org
-||googletagmanager.com
-||23img.com
 |http://homeservershow.com
 |http://old.honeynet.org/scans/scan31/sub/doug_eric/spam_translation.html
 ||hongkongfp.com
@@ -2390,7 +2378,6 @@ iipdigital.usembassy.gov
 ||hotspotshield.com
 ||hottg.com
 ||hotvpn.com
-||aikanhanman.top
 ||howtoforge.com
 ||hoxx.com
 ||hpjav.com
@@ -2407,12 +2394,14 @@ iipdigital.usembassy.gov
 ||huaglad.com
 ||huanghuagang.org
 ||huaren.us
+||bachashuku.cc
 |http://huashangnews.com
 ||huayuworld.org
 ||huffingtonpost.com
 ||huffpost.com
 ||huggingface.co
 ||hugoroy.eu
+||trxs.org
 ||huhaitai.com
 ||huhamhire.com
 ||huhangfei.com
@@ -2429,6 +2418,7 @@ iipdigital.usembassy.gov
 !--------------------II-------------------------
 ||investing.com
 ||idcflare.com
+||69shuba.tw
 ||interseclab.org
 ||ipify.org
 ||itiger.com
@@ -2444,7 +2434,6 @@ iipdigital.usembassy.gov
 ||invidio.us
 ||improd.works
 ||illawarramercury.com.au
-||seaart.ai
 ||imago-images.com
 ||i2p2.de
 ||i818hk.com
@@ -2463,7 +2452,6 @@ iipdigital.usembassy.gov
 |http://www.idlcoyote.com
 ||idope.se
 ||ift.tt
-||赔钱机场.com
 ||ifcss.org
 |http://ift.tt
 ||ifreewares.com
@@ -2483,6 +2471,7 @@ iipdigital.usembassy.gov
 ||imagevenue.com
 ||imagezilla.net
 |http://imb.org
+||b2kk.brs5d7fw.com
 !--IMDB
 ||img.ly
 ||imgasd.com
@@ -2493,7 +2482,6 @@ iipdigital.usembassy.gov
 ||independent.co.uk
 ||indiablooms.com
 ||indiandefensenews.in
-||alicesw.com
 ||indianarrative.com
 ||timesofindia.indiatimes.com
 ||indiemerch.com
@@ -2529,7 +2517,6 @@ iipdigital.usembassy.gov
 ||iptvbin.com
 ||ipvanish.com
 ||ironpython.net
-||aicomic.org
 ||ironsocket.com
 ||ishr.ch
 |http://islam.org.hk
@@ -2537,11 +2524,9 @@ iipdigital.usembassy.gov
 ||isaacmao.com
 ||isgreat.org
 ||ismaelan.com
-||trxs.me
 ||ismprofessional.net
 ||israbox.com
 ||issuu.com
-||inari.site
 ||oversea.istarshine.com
 ||isupportuyghurs.org
 ||italiatibet.org
@@ -2552,8 +2537,6 @@ iipdigital.usembassy.gov
 ||ivacy.com
 ||ivonblog.com
 ||ivpn.net
-||10minutemail.net
-||dzmm.ai
 ||iwara.tv
 ||ixquick.com
 ||iyouport.com
@@ -2569,7 +2552,6 @@ iipdigital.usembassy.gov
 ||jable.tv
 ||blog.jackjia.com
 ||jamestown.org
-||jpxs123.com
 ||jamyangnorbu.com
 ||jan.ai
 ||japan-whores.com
@@ -2593,6 +2575,7 @@ iipdigital.usembassy.gov
 ||jma.go.jp
 ||jmsc.hku.hk
 |http://jmscult.com
+||2dfan.com
 ||joachims.org
 ||joinclubhouse.com
 ||jornaldacidadeonline.com.br
@@ -2601,6 +2584,7 @@ iipdigital.usembassy.gov
 ||fiddle.jshell.net
 ||juliereyc.com
 ||junauza.com
+||321cdn.com
 ||bbs.junglobal.net
 |http://juoaa.com
 ||justhost.ru
@@ -2609,6 +2593,7 @@ iipdigital.usembassy.gov
 ||cdn.jwplayer.com
 !--------------------KK-------------------------
 ||kingkong.com.tw
+||xbookcn.net
 ||kanald.com.tr
 ||kpkuang.org
 ||ka-wai.com
@@ -2632,6 +2617,7 @@ iipdigital.usembassy.gov
 |http://kindleren.com
 |http://www.kindleren.com
 ||kingdomsalvation.org
+||image.acg.lol
 ||kingstone.com.tw
 ||kinokuniya.com
 ||killwall.com
@@ -2644,10 +2630,12 @@ iipdigital.usembassy.gov
 ||kobobooks.com
 ||kompozer.net
 ||konachan.com
+||66story.com
 ||koolsolutions.com
 ||koornk.com
 ||koranmandarin.com
 ||kqes.net
+||alicesw.com
 |http://gojet.krtco.com.tw
 ||ktzhk.com
 ||kuaichedao.co
@@ -2660,6 +2648,7 @@ iipdigital.usembassy.gov
 ||kzeng.info
 !--------------------LL-------------------------
 ||lovart.ai
+||qbtr.org
 ||library-access.sk
 ||linux.do
 ||lmarena.ai
@@ -2691,15 +2680,14 @@ iipdigital.usembassy.gov
 ||leafyvpn.net
 ||ledger.com
 ||left21.hk
-||cdnshu.com
 ||lematin.ch
 ||lenwhite.com
 ||lesoir.be
-||69shuba.cx
-||69shuba.com
 ||letscorp.net
 |http://lhakar.org
+||23img.com
 ||liangyou.net
+||赔钱.com
 ||liaowangxizang.net
 ||liberal.org.hk
 ||libertysculpturepark.com
@@ -2726,6 +2714,7 @@ iipdigital.usembassy.gov
 ||livingstream.com
 ||livevideo.com
 ||chat.lmsys.org
+||inari.site
 ||localdomain.ws
 ||lockestek.com
 ||secure.logmein.com
@@ -2735,6 +2724,7 @@ iipdigital.usembassy.gov
 |http://looktoronto.com
 ||lrip.org
 ||lsd.org.hk
+||69shuba.cx
 ||lsm.org
 ||lsmchinese.org
 ||lsmkorean.org
@@ -2762,6 +2752,7 @@ iipdigital.usembassy.gov
 ||mergersandinquisitions.com
 ||m.moegirl.org
 ||myjs.tw
+||dzmm.ai
 ||mercari.com
 ||mercari.jp
 ||mirror.xyz
@@ -2779,6 +2770,7 @@ iipdigital.usembassy.gov
 ||manyvoices.news
 ||marc.info
 ||makemymood.com
+||nhentai.xxx
 ||martau.com
 ||blog.martinoei.com
 |http://martsangkagyuofficial.org
@@ -2802,7 +2794,6 @@ iipdigital.usembassy.gov
 ||megaproxy.com
 ||megurineluka.com
 ||meizhong.blog
-||101kks.com
 ||meizhong.report
 ||memehk.com
 ||memes.tw
@@ -2814,6 +2805,7 @@ iipdigital.usembassy.gov
 ||wiki.metacubex.one
 ||metafilter.com
 ||meteorshowersonline.com
+||trxs.me
 ||metro.taipei
 ||metrolife.ca
 ||metroradio.com.hk
@@ -2831,7 +2823,6 @@ iipdigital.usembassy.gov
 ||minghui.or.kr
 ||minghui.org
 ||minghui-school.org
-||image.acg.lol
 ||mingjinglishi.com
 ||mingjingnews.com
 ||mingjingtimes.com
@@ -2851,13 +2842,16 @@ iipdigital.usembassy.gov
 ||thecenter.mit.edu
 ||scratch.mit.edu
 ||mitbbs.com
+||ddfan.org
 ||mixero.com
+||sayhanabi.net
 ||mixi.jp
 ||mixx.com
 ||mizzmona.com
 ||mlc.ai
 ||mlzs.work
 ||mmaaxx.com
+||seaart.ai
 ||mobatek.net
 ||mobile01.com
 ||mobileways.de
@@ -2868,18 +2862,19 @@ iipdigital.usembassy.gov
 ||moeshare.cc
 ||mog.com
 ||mohu.rocks
-||chunman4.com
 ||momoshop.com.tw
 ||mondex.org
 ||money-link.com.tw
 |http://www.monlamit.org
 ||moon.fm
 ||moonbbs.com
+||赔钱机场.com
 ||moptt.tw
 ||moneydj.com
 ||monica.im
 ||monitorchina.org
 ||monocloud.me
+||按量计费.com
 ||morningsun.org
 |http://motherless.com
 ||movements.org
@@ -2891,6 +2886,7 @@ iipdigital.usembassy.gov
 ||mrtweet.com
 |http://mswe1.org
 ||mthruf.com
+||hmoe.link
 ||mubi.com
 ||multiply.com
 ||mullvad.net
@@ -2909,8 +2905,8 @@ iipdigital.usembassy.gov
 ||myparagliding.com
 ||mypopescu.com
 ||myspacecdn.com
+||jpxs123.com
 !--------------------NN-------------------------
-||赔钱机场.site
 ||assets.nxtrace.org
 ||nephobox.com
 ||namu.wiki
@@ -2935,6 +2931,7 @@ iipdigital.usembassy.gov
 ||nalandabodhi.org
 ||nalandawest.org
 ||nanyang.com
+||hlib.cc
 ||nanyangpost.com
 ||nat.moe
 ||national-lottery.co.uk
@@ -2945,10 +2942,13 @@ iipdigital.usembassy.gov
 ||navyfamily.navy.mil
 ||navyreserve.navy.mil
 ||usno.navy.mil
+||sxsy.org
+||404zu.org
 ||nbcnews.com
 |http://nbtvpn.com
 ||nchrd.org
 ||ncn.org
+||mikanani.me
 ||etools.ncol.com
 ||ndi.org
 ||nekoslovakia.net
@@ -2965,7 +2965,6 @@ iipdigital.usembassy.gov
 ||newsancai.com
 ||newsblur.com
 ||newsmax.com
-||novel543.com
 ||newstamago.com
 ||newstapa.org
 ||newstatesman.com
@@ -2984,10 +2983,10 @@ iipdigital.usembassy.gov
 ||niusnews.com
 ||njactb.org
 ||nlfreevpn.com
-||tsdm39.com
 ||nmsl.website
 ||nnews.eu
 ||gotdns.ch
+||cloudflare.com
 |http://dynupdate.no-ip.com/
 ||nobel.se
 ||nodeseek.com
@@ -3004,6 +3003,7 @@ iipdigital.usembassy.gov
 ||ntd.tv
 ||ntdtv.com
 ||ntdtv.com.tw
+||111bz.cc
 ||cbs.ntu.edu.tw
 ||media.nu.nl
 ||nuexpo.com
@@ -3052,7 +3052,6 @@ iipdigital.usembassy.gov
 ||onlineyoutube.com
 ||onlygayvideo.com
 |http://onlytweets.com
-||ffxs8.top
 |http://onthehunt.com
 ||opendemocracy.net
 ||openid.net
@@ -3082,6 +3081,7 @@ iipdigital.usembassy.gov
 ||owltail.com
 ||oxfordscholarship.com
 |http://www.oxid.it
+||sxsy18.com
 ||ow.ly
 ||ozvoice.org
 !--------------------PP-------------------------
@@ -3291,7 +3291,6 @@ iipdigital.usembassy.gov
 ||quitccp.org
 |http://quran.com
 !--------------------RR-------------------------
-||s.rmimg.com
 ||radiojar.com
 ||radio.co
 ||rustdesk.com
