@@ -2052,6 +2052,7 @@ var rules = [
             "kantie.org",
             "kaotic.com",
             "karayou.com",
+            "kaspersky.com",
             "kawaiikawaii.jp",
             "kawase.com",
             "kebrum.com",
