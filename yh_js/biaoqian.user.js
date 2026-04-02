@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         标签过滤器（黑名单标签+白名单标题）
 // @description  隐藏带黑名单标签的帖子，但标题含白名单关键词的除外，纯黑名单页面正常显示
-// @version     1.5.3 Amid7197
-// @author       南竹
+// @version      1.5.5
+// @author       南竹 Amid7197
 // @match        https://sxsy*.*/forum.php?mod=forumdisplay&fid=*
 // @match        https://404*.*/forum.php?mod=forumdisplay&fid=*
 // @license      MIT
