@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         新Discuz
-// @author      Amid7197
-// @version     0.0.23
+// @author       Amid7197
+// @version      0.0.24
 // @match        *://b2kk.brs5d7fw.com/*
 // @match        *://sxsy*.*/forum.php?mod=forumdisplay&fid=*
 // @match        *://sxsy*.*/search.php?mod=forum&searchid=*
@@ -12,6 +12,7 @@
 // @match        *://404*.*/forum.php?mod=viewthread&tid=*
 // @exclude      *://*/forum.php?mod=collection&tid=*
 // @exclude      *://*/forum.php?mod=collection&action=*
+// @exclude      *://*/*dateline*
 // @grant        none
 // @run-at       document-start
 // ==/UserScript==
