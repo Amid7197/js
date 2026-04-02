@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Github 高速下载 (自定义加速源+智能位置版)
 // @match        *://github.com/*
-// @version     1.0.10
+// @version      1.0.11
 // @icon         https://github.githubassets.com/favicons/favicon.png
 // @author       Amid7197
 // @grant        GM_setClipboard
