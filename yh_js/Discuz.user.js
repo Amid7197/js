@@ -12,7 +12,7 @@
 // @match        *://404*.*/forum.php?mod=viewthread&tid=*
 // @exclude      *://*/forum.php?mod=collection&tid=*
 // @exclude      *://*/forum.php?mod=collection&action=*
-// @exclude      *://*/*dateline*
+// @exclude      *://*/*orderby=dateline*
 // @grant        none
 // @run-at       document-start
 // ==/UserScript==
