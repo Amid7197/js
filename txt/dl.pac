@@ -2628,6 +2628,7 @@ var rules = [
             "orientaldaily.com.my",
             "orn.jp",
             "osfoora.com",
+            "osmand.net",
             "otcbtc.com",
             "otto.de",
             "ourdearamy.com",
