@@ -2056,6 +2056,7 @@ var rules = [
             "kawaiikawaii.jp",
             "kawase.com",
             "kebrum.com",
+            "kemono.cr",
             "kendatire.com",
             "kenengba.com",
             "kepard.com",
