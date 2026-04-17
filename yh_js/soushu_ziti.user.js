@@ -38,6 +38,16 @@
         h1, h2, h3, h4, h5, h6, .ts h1, .ts h2 {
             font-weight: 600 !important;
         }
+        /* --- 新增：隐藏搜书吧干扰码 --- */
+        font.jammer {
+            display: none !important;
+            visibility: hidden !important;
+            width: 0 !important;
+            height: 0 !important;
+            overflow: hidden !important;
+            position: absolute !important;
+            z-index: -999 !important;
+        }
     `;
 
     // 样式注入逻辑：兼容不同脚本管理器
