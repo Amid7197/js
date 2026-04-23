@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         新Discuz
+// @name         ssb-sxsy新Discuz
 // @author       Amid7197
 // @version      0.0.26
 // @match        *://vfd3.vdf5ge5a.com/*
