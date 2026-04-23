@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         南加/北加论坛 - 快捷搜索 + 购买回复免刷新
+// @name         南+
 // @namespace    在论坛顶部主菜单添加快捷搜索栏，并支持购买附件/内容免刷新、回复免刷新自动加载新楼层。
 // @version      95.01
 // @author       遠坂凛 gemini deepseek Amid7197
