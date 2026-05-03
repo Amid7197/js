@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         哔哩哔哩 - 自动开播与连播控制整合
 // @namespace    https://github.com/combined-bilibili-script
-// @version      1.0
+// @version      1.0.1
 // @description  强制关闭视频自动开播（含弹幕），并根据页面类型智能控制自动连播按钮：单P关闭，分P/合集/播放列表自动开启（末集关闭）。
 // @author       Amid7197_ai, MaxChang3
 // @match        https://www.bilibili.com/*
+// @icon         https://www.bilibili.com/favicon.ico
 // @grant        none
 // ==/UserScript==
 
@@ -41,10 +42,6 @@
     setTimeout(killAutoplayStrict, 1000);
     setTimeout(killAutoplayStrict, 3000);
     setTimeout(killAutoplayStrict, 5000);
-
-    // 动态监听防止重置
-    new MutationObserver(() => { killAutoplayStrict(); })
-        .observe(document.body, { childList: true, subtree: true });
 
 
     // ==================== 功能2：自动连播按钮矫正 ====================
