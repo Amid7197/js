@@ -1,60 +1,48 @@
 // ==UserScript==
 // @name         哔哩哔哩 - 自动开播与连播控制
 // @namespace    https://github.com/combined-bilibili-script
-// @version      1.0.2
-// @description  强制关闭视频自动开播和弹幕，智能控制自动连播按钮：单P关闭，分P/合集/播放列表自动开启（末集关闭）。
+// @version      1.0.3
+// @description  强制关闭视频自动开播和弹幕；智能控制自动连播按钮：单P关闭，分P/合集/播放列表自动开启（末集关闭）。
 // @author       Amid7197_ai, MaxChang3
 // @match        https://www.bilibili.com/*
-// @icon         https://www.bilibili.com/favicon.ico
 // @grant        none
 // ==/UserScript==
 
 (function() {
     'use strict';
 
-    // ==================== 功能1：彻底关闭自动开播 + 强制关闭弹幕 ====================
+    // ==================== 功能1：彻底关闭自动开播 + 物理关闭弹幕 ====================
     function killAutoplayAndDanmaku() {
-        // 1. 写 localStorage 关闭自动开播（原逻辑保留）
+        // 1. 写入 localStorage 关闭自动开播（保留以防 B 站读取）
         try {
             let raw = localStorage.getItem('bpx_player_profile');
             let profile = raw ? JSON.parse(raw) : {};
-
-            if (!profile.media) {
-                profile.media = {};
-            }
+            if (!profile.media) profile.media = {};
             profile.media.autoplay = false;
-
-            // 弹幕设置也写一下，虽然可能用不上，但以防万一
-            if (!profile.dmSetting) {
-                profile.dmSetting = {};
-            }
+            if (!profile.dmSetting) profile.dmSetting = {};
             profile.dmSetting.dmSwitch = false;
-
             localStorage.setItem('bpx_player_profile', JSON.stringify(profile));
-            console.log("✅ 已强制写入 bpx_player_profile -> autoplay=false, dmSwitch=false");
+            console.log("✅ 已写入 bpx_player_profile -> autoplay=false, dmSwitch=false");
         } catch (e) {
-            console.warn("写入 localStorage 警告:", e);
+            console.warn("localStorage 写入警告:", e);
         }
 
-        // 2. 直接操作弹幕按钮，物理关闭弹幕
+        // 2. 直接操作弹幕按钮，物理关闭弹幕（不依赖 DOM 监听）
         try {
-            // 选择器 .bpx-player-dm-switch 内通常包含一个 checkbox
-            const dmSwitchContainer = document.querySelector('.bpx-player-dm-switch');
-            if (dmSwitchContainer) {
-                const checkbox = dmSwitchContainer.querySelector('input[type="checkbox"]');
+            const dmSwitch = document.querySelector('.bpx-player-dm-switch');
+            if (dmSwitch) {
+                const checkbox = dmSwitch.querySelector('input[type="checkbox"]');
                 if (checkbox && checkbox.checked) {
                     checkbox.checked = false;
-                    // 触发原生事件，通知播放器状态变化
                     checkbox.dispatchEvent(new Event('change', { bubbles: true }));
-                    // 有些播放器可能需要 click 事件
                     checkbox.dispatchEvent(new MouseEvent('click', { bubbles: true }));
                     console.log('✅ 已强制关闭弹幕按钮');
                 } else if (checkbox && !checkbox.checked) {
-                    console.log('✅ 弹幕按钮已经是关闭状态，无需操作');
+                    console.log('✅ 弹幕按钮已处于关闭状态');
                 } else {
-                    // 可能按钮本身不是 checkbox，尝试直接点击容器
-                    dmSwitchContainer.click();
-                    console.log('⚠️ 未找到 checkbox，尝试直接点击弹幕按钮容器');
+                    // 若按钮不是 checkbox 结构，直接点击容器
+                    dmSwitch.click();
+                    console.log('⚠️ 未找到 checkbox，已尝试点击弹幕按钮容器');
                 }
             }
         } catch (e) {
@@ -62,31 +50,9 @@
         }
     }
 
-    // 立刻执行
+    // 立刻执行 + 延时补刀（确保弹幕按钮加载后能被关闭）
     killAutoplayAndDanmaku();
-
-    // 延时补刀（弹幕按钮可能稍后加载）
-    [1000, 2000, 4000, 6000].forEach(ms => {
-        setTimeout(killAutoplayAndDanmaku, ms);
-    });
-
-    // 监听播放器区域，一旦弹幕按钮出现就立即关闭
-    const observerDM = new MutationObserver(() => {
-        const dmSwitch = document.querySelector('.bpx-player-dm-switch');
-        if (dmSwitch) {
-            const checkbox = dmSwitch.querySelector('input[type="checkbox"]');
-            if (checkbox && checkbox.checked) {
-                checkbox.checked = false;
-                checkbox.dispatchEvent(new Event('change', { bubbles: true }));
-                console.log('🔄 检测到弹幕按钮重新开启，已强制关闭');
-            }
-        }
-    });
-    // 仅观察 bpx-player 区域，减少性能消耗
-    const playerContainer = document.querySelector('#bilibili-player, .bpx-player-video-area');
-    if (playerContainer) {
-        observerDM.observe(playerContainer, { childList: true, subtree: true });
-    }
+    [1000, 2000, 4000, 6000].forEach(ms => setTimeout(killAutoplayAndDanmaku, ms));
 
     // ==================== 功能2：自动连播按钮矫正 ====================
     const logger = {
