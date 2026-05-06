@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         哔哩哔哩 - 自动开播与连播控制
 // @namespace    https://github.com/combined-bilibili-script
-// @version      1.0.3
+// @version      1.0.4
 // @description  强制关闭视频自动开播和弹幕；智能控制自动连播按钮：单P关闭，分P/合集/播放列表自动开启（末集关闭）。
 // @author       Amid7197_ai, MaxChang3
 // @match        https://www.bilibili.com/*
@@ -29,21 +29,17 @@
 
         // 2. 直接操作弹幕按钮，物理关闭弹幕（不依赖 DOM 监听）
         try {
-            const dmSwitch = document.querySelector('.bpx-player-dm-switch');
-            if (dmSwitch) {
-                const checkbox = dmSwitch.querySelector('input[type="checkbox"]');
-                if (checkbox && checkbox.checked) {
-                    checkbox.checked = false;
-                    checkbox.dispatchEvent(new Event('change', { bubbles: true }));
-                    checkbox.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-                    console.log('✅ 已强制关闭弹幕按钮');
-                } else if (checkbox && !checkbox.checked) {
-                    console.log('✅ 弹幕按钮已处于关闭状态');
+            const dmSetting = document.querySelector('.bpx-player-dm-setting');
+            if (dmSetting) {
+                if (!dmSetting.classList.contains('disabled')) {
+                    // 当前弹幕处于开启状态，点击关闭
+                    dmSetting.click();
+                    console.log('✅ 已强制关闭弹幕');
                 } else {
-                    // 若按钮不是 checkbox 结构，直接点击容器
-                    dmSwitch.click();
-                    console.log('⚠️ 未找到 checkbox，已尝试点击弹幕按钮容器');
+                    console.log('✅ 弹幕已处于关闭状态');
                 }
+            } else {
+                console.log('⚠️ 未找到 .bpx-player-dm-setting 元素，将延时重试');
             }
         } catch (e) {
             console.warn('关闭弹幕按钮时出错:', e);
