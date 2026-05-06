@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         哔哩哔哩 - 自动开播与连播控制
 // @namespace    https://github.com/combined-bilibili-script
-// @version      1.0.4
+// @version      1.0.5
 // @description  强制关闭视频自动开播和弹幕；智能控制自动连播按钮：单P关闭，分P/合集/播放列表自动开启（末集关闭）。
-// @author       Amid7197_ai, MaxChang3
+// @author       Amid7197_ai, MaxChang3,gemini
 // @match        https://www.bilibili.com/*
 // @grant        none
 // ==/UserScript==
@@ -12,8 +12,9 @@
     'use strict';
 
     // ==================== 功能1：彻底关闭自动开播 + 物理关闭弹幕 ====================
-    function killAutoplayAndDanmaku() {
-        // 1. 写入 localStorage 关闭自动开播（保留以防 B 站读取）
+
+    // 独立函数：写入 localStorage 关闭自动开播和弹幕开关记录
+    function disableAutoplayLocalStorage() {
         try {
             let raw = localStorage.getItem('bpx_player_profile');
             let profile = raw ? JSON.parse(raw) : {};
@@ -22,33 +23,71 @@
             if (!profile.dmSetting) profile.dmSetting = {};
             profile.dmSetting.dmSwitch = false;
             localStorage.setItem('bpx_player_profile', JSON.stringify(profile));
-            console.log("✅ 已写入 bpx_player_profile -> autoplay=false, dmSwitch=false");
+            console.log("✅ 已写入 localStorage -> autoplay=false, dmSwitch=false");
         } catch (e) {
             console.warn("localStorage 写入警告:", e);
         }
-
-        // 2. 直接操作弹幕按钮，物理关闭弹幕（不依赖 DOM 监听）
-        try {
-            const dmSetting = document.querySelector('.bpx-player-dm-setting');
-            if (dmSetting) {
-                if (!dmSetting.classList.contains('disabled')) {
-                    // 当前弹幕处于开启状态，点击关闭
-                    dmSetting.click();
-                    console.log('✅ 已强制关闭弹幕');
-                } else {
-                    console.log('✅ 弹幕已处于关闭状态');
-                }
-            } else {
-                console.log('⚠️ 未找到 .bpx-player-dm-setting 元素，将延时重试');
-            }
-        } catch (e) {
-            console.warn('关闭弹幕按钮时出错:', e);
-        }
     }
 
-    // 立刻执行 + 延时补刀（确保弹幕按钮加载后能被关闭）
-    killAutoplayAndDanmaku();
-    [1000, 2000, 4000, 6000].forEach(ms => setTimeout(killAutoplayAndDanmaku, ms));
+    // 独立函数：使用正确选择器物理关闭弹幕（模拟真实点击）
+    function forceCloseDanmaku() {
+        try {
+            const danmakuInput = document.querySelector('.bui-danmaku-switch-input');
+            if (danmakuInput) {
+                if (danmakuInput.checked) {
+                    danmakuInput.click();
+                    console.log('🔇 弹幕已通过 .click() 关闭');
+                } else {
+                    console.log('🔇 弹幕已处于关闭状态');
+                }
+                return true; // 操作成功或已关闭
+            }
+        } catch (e) {
+            console.warn('关闭弹幕时出错:', e);
+        }
+        return false; // 未找到元素
+    }
+
+    // 初始化时立即执行 localStorage 写入（仅一次）
+    disableAutoplayLocalStorage();
+
+    // ==================== 弹幕关闭与持续监听 ====================
+    let danmakuCheckTimer = null;
+
+    // 启动轮询检查（连续5次已关闭则停止，路由变化时重新启动）
+    function startDanmakuPolling() {
+        // 清除之前的定时器
+        if (danmakuCheckTimer) clearInterval(danmakuCheckTimer);
+        let successCount = 0;
+        danmakuCheckTimer = setInterval(() => {
+            const result = forceCloseDanmaku();
+            if (result) {
+                successCount++;
+                // 连续5次（5秒）都发现弹幕已关闭，停止轮询，节省性能
+                if (successCount >= 5) {
+                    console.log('🛑 弹幕持续关闭，暂停轮询');
+                    clearInterval(danmakuCheckTimer);
+                    danmakuCheckTimer = null;
+                }
+            } else {
+                successCount = 0; // 没找到元素，重置计数继续等待
+            }
+        }, 1000);
+    }
+
+    // 监听 SPA 路由变化（视频跳转、番剧切换等）
+    let lastPath = location.pathname;
+    const routerObserver = new MutationObserver(() => {
+        if (location.pathname !== lastPath) {
+            lastPath = location.pathname;
+            console.log('🔄 检测到路由变化，重新开始弹幕轮询');
+            startDanmakuPolling();
+        }
+    });
+    routerObserver.observe(document.body, { childList: true, subtree: true });
+
+    // 启动首次轮询
+    startDanmakuPolling();
 
     // ==================== 功能2：自动连播按钮矫正 ====================
     const logger = {
