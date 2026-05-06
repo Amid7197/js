@@ -3787,6 +3787,7 @@ var rules = [
             "vllcs.org",
             "vmixcore.com",
             "vmpsoft.com",
+            "vndb.org",
             "vnet.link",
             "voacambodia.com",
             "voacantonese.com",
