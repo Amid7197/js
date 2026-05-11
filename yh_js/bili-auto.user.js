@@ -1,24 +1,14 @@
 // ==UserScript==
 // @name         B站视频植入广告检测器(自动跳过+音频识别+进度条标记)
-// @version      2.2.3
+// @version      2.2.5
 // @author       Amid7197 Warma10032 (modified)
 // @license      GPLv2
-// @description  基于大语言模型检测B站视频中的植入广告，支持自动跳过。无字幕时可调用Groq Whisper语音识别，并在进度条上以绿色块标记广告片段。
+// @description  基于大语言模型检测B站视频中的植入广告，支持自动跳过。无字幕时可调用Groq Whisper语音识别，并在进度条上以绿色块标记广告片段。修复重复调用问题。
 // @match        *://*.bilibili.com/video/*
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setValue
 // @grant        GM_getValue
-// @connect      open.bigmodel.cn
-// @connect      api.openai.com
-// @connect      api.deepseek.com
-// @connect      *.volces.com
-// @connect      dashscope.aliyuncs.com
-// @connect      api.anthropic.com
-// @connect      generativelanguage.googleapis.com
-// @connect      api.siliconflow.cn
-// @connect      api.groq.com
-// @connect      ai-proxy.xiaobaozi.cn
-// @connect      *.xyz
+// @connect      *
 // @run-at       document-end
 // ==/UserScript==
 
@@ -322,8 +312,6 @@
     // ========== AI 服务 ==========
     const AIService = {
         async makeRequest(videoInfo, config) {
-            const cfg = getAIConfig();
-            const enableLocalOllama = cfg.enableLocalOllama || false;
             const requestBody = {
                 model: this.getModel(),
                 messages: [
@@ -341,7 +329,6 @@
                 ...config.bodyExtra
             };
 
-            // 在控制台打印完整请求
             console.log('【VideoAdGuard】发送LLM请求:', JSON.stringify(requestBody, null, 2));
 
             return new Promise((resolve, reject) => {
@@ -412,6 +399,7 @@
         autoSkipEnabled: true,
         autoSkipHandler: null,
         videoDuration: 0,
+        analyzingBvid: null,   // 防重入
 
         async getCurrentBvid() {
             const match = window.location.pathname.match(/\/video\/(BV[\w]+)/);
@@ -420,13 +408,26 @@
         },
 
         async analyze() {
+            let bvid;
+            try {
+                bvid = await this.getCurrentBvid();
+            } catch {
+                return; // 非视频页
+            }
+
+            // 防重入：如果同一个 BV 号正在分析，直接返回
+            if (this.analyzingBvid === bvid) {
+                console.log('【VideoAdGuard】分析正在进行中，跳过重复调用:', bvid);
+                return;
+            }
+            this.analyzingBvid = bvid;
+
             try {
                 const existingButton = document.querySelector('.skip-ad-button10032');
                 if (existingButton) existingButton.remove();
                 this.removeAutoSkip();
                 this.clearProgressBarMarkers();
 
-                const bvid = await this.getCurrentBvid();
                 const cached = getCachedResult(bvid);
                 if (cached) {
                     this.adTimeRanges = cached.adTimeRanges;
@@ -569,6 +570,11 @@
                 this.adDetectionResult = '分析失败：' + error.message;
                 this.adTimeRanges = [];
                 this.autoSkipEnabled = false;
+            } finally {
+                // 释放锁
+                if (this.analyzingBvid === bvid) {
+                    this.analyzingBvid = null;
+                }
             }
         },
 
@@ -614,7 +620,7 @@
             console.log('【VideoAdGuard】已启动自动跳过广告');
         },
 
-        // ---------- 进度条标记 (颜色改为 rgb(0, 212, 0)) ----------
+        // ---------- 进度条标记 (颜色 rgb(0, 212, 0)) ----------
         clearProgressBarMarkers() {
             document.querySelectorAll('.vag-progress-marker').forEach(el => el.remove());
         },
