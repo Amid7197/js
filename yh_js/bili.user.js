@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         哔哩哔哩 - 自动开播与连播控制
 // @namespace    https://github.com/combined-bilibili-script
-// @version      1.0.5
-// @description  强制关闭视频自动开播和弹幕；智能控制自动连播按钮：单P关闭，分P/合集/播放列表自动开启（末集关闭）。
+// @version      1.0.6
+// @description  强制关闭视频自动开播和弹幕；智能控制自动连播按钮：单P关闭，分P/合集/播放列表自动开启（末集关闭）。弹幕关闭后立即停止轮询，长时间找不到开关也会停止。
 // @author       Amid7197_ai, MaxChang3,gemini
 // @match        https://www.bilibili.com/*
 // @grant        none
@@ -51,26 +51,29 @@
     // 初始化时立即执行 localStorage 写入（仅一次）
     disableAutoplayLocalStorage();
 
-    // ==================== 弹幕关闭与持续监听 ====================
+    // ==================== 弹幕关闭与持续监听（优化版） ====================
     let danmakuCheckTimer = null;
 
-    // 启动轮询检查（连续5次已关闭则停止，路由变化时重新启动）
+    // 启动轮询检查：成功关闭一次立即停止，10秒未找到开关也停止
     function startDanmakuPolling() {
         // 清除之前的定时器
         if (danmakuCheckTimer) clearInterval(danmakuCheckTimer);
-        let successCount = 0;
+        let notFoundCount = 0; // 未找到开关的连续次数
         danmakuCheckTimer = setInterval(() => {
             const result = forceCloseDanmaku();
             if (result) {
-                successCount++;
-                // 连续5次（5秒）都发现弹幕已关闭，停止轮询，节省性能
-                if (successCount >= 5) {
-                    console.log('🛑 弹幕持续关闭，暂停轮询');
+                // 弹幕已确认关闭（或成功操作），立即停止轮询
+                console.log('🛑 弹幕已确认关闭，停止轮询');
+                clearInterval(danmakuCheckTimer);
+                danmakuCheckTimer = null;
+            } else {
+                notFoundCount++;
+                if (notFoundCount > 10) {
+                    // 超过10秒仍未找到弹幕开关，放弃轮询
+                    console.log('⚠️ 长时间未找到弹幕开关，暂停轮询');
                     clearInterval(danmakuCheckTimer);
                     danmakuCheckTimer = null;
                 }
-            } else {
-                successCount = 0; // 没找到元素，重置计数继续等待
             }
         }, 1000);
     }
