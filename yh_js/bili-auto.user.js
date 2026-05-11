@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         B站视频植入广告检测器(自动跳过+音频识别)
-// @version      2.0.1
+// @name         B站视频植入广告检测器(自动跳过+音频识别+进度条标记)
+// @version      2.2.1
 // @author       Amid7197 Warma10032 (modified)
 // @license      GPLv2
-// @description  基于大语言模型检测B站视频中的植入广告，支持自动跳过。无字幕时可调用Groq Whisper语音识别。
+// @description  基于大语言模型检测B站视频中的植入广告，支持自动跳过。无字幕时可调用Groq Whisper语音识别，并在进度条上以绿色块标记广告片段。
 // @match        *://*.bilibili.com/video/*
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setValue
@@ -18,6 +18,7 @@
 // @connect      api.siliconflow.cn
 // @connect      api.groq.com
 // @connect      ai-proxy.xiaobaozi.cn
+// @connect      *.xyz
 // @run-at       document-end
 // ==/UserScript==
 
@@ -28,7 +29,18 @@
     const DEFAULT_MODEL = 'glm-4-flash';
     const AD_RATIO_THRESHOLD = 1 / 3;
 
-    // ---------- 缓存工具（统一 ad 对象，按自然日清理）----------
+    // ========== 全局配置存取 ==========
+    const CONFIG_KEY = 'ai-config';
+
+    function getAIConfig() {
+        return GM_getValue(CONFIG_KEY, {});
+    }
+
+    function setAIConfig(config) {
+        GM_setValue(CONFIG_KEY, config);
+    }
+
+    // 缓存键
     const CACHE_KEY = 'vag_ad_cache';
     const CACHE_DURATION_DAYS = 3;
 
@@ -64,7 +76,6 @@
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
         const threshold = todayStart - (CACHE_DURATION_DAYS - 1) * 86400000;
         if (entry.timestamp >= threshold) {
-            console.log('【VideoAdGuard】命中缓存:', entry);
             return {
                 adTimeRanges: entry.adTimeRanges,
                 videoDuration: entry.videoDuration
@@ -84,10 +95,9 @@
             timestamp: Date.now(),
         };
         setCacheStore(store);
-        console.log('【VideoAdGuard】缓存已保存:', bvid);
     }
 
-    // ---------- WBI 签名工具 ----------
+    // ========== WBI 签名工具 ==========
     const WbiUtils = {
         mixinKeyEncTab: [
             46, 47, 18, 2, 53, 8, 23, 32, 15, 50, 10, 31, 58, 3, 45, 35, 27, 43, 5, 49,
@@ -113,13 +123,12 @@
         },
 
         async getWbiKeys() {
-            const wbiCache = GM_getValue('wbi_cache');
+            const config = getAIConfig();
+            const wbiCache = config.wbi_cache;
             const today = new Date().setHours(0, 0, 0, 0);
-
             if (wbiCache && wbiCache.timestamp >= today) {
                 return [wbiCache.img_key, wbiCache.sub_key];
             }
-
             try {
                 const response = await fetch('https://api.bilibili.com/x/web-interface/nav', {
                     method: 'GET',
@@ -129,18 +138,15 @@
                     },
                     credentials: 'include'
                 });
-
                 const data = await response.json();
                 if (data.code !== 0) throw new Error(data.message);
-
                 const imgUrl = data.data.wbi_img.img_url;
                 const subUrl = data.data.wbi_img.sub_url;
-
                 const imgKey = imgUrl.substring(imgUrl.lastIndexOf('/') + 1, imgUrl.lastIndexOf('.'));
                 const subKey = subUrl.substring(subUrl.lastIndexOf('/') + 1, subUrl.lastIndexOf('.'));
-
-                const cache = { img_key: imgKey, sub_key: subKey, timestamp: today };
-                GM_setValue('wbi_cache', cache);
+                const newWbiCache = { img_key: imgKey, sub_key: subKey, timestamp: today };
+                config.wbi_cache = newWbiCache;
+                setAIConfig(config);
                 return [imgKey, subKey];
             } catch (error) {
                 console.error('【VideoAdGuard】获取WBI密钥失败:', error);
@@ -152,9 +158,7 @@
             const [imgKey, subKey] = await this.getWbiKeys();
             const mixinKey = this.getMixinKey(imgKey + subKey);
             const currTime = Math.floor(Date.now() / 1000);
-
             const newParams = { ...params, wts: currTime };
-
             const query = Object.keys(newParams)
                 .sort()
                 .map(key => {
@@ -164,19 +168,16 @@
                     return `${key}=${encodeURIComponent(value)}`;
                 })
                 .join('&');
-
             const wbiSign = this.md5(query + mixinKey);
             return { ...newParams, w_rid: wbiSign };
         }
     };
 
-    // ---------- B站 API 封装 ----------
+    // ========== B站 API 封装 ==========
     const BilibiliService = {
         async fetchWithCookie(url, params = {}) {
             const queryString = new URLSearchParams(params).toString();
             const fullUrl = `${url}?${queryString}`;
-            console.log('【VideoAdGuard】[BilibiliService] Fetching URL:', fullUrl);
-
             try {
                 const response = await fetch(fullUrl, {
                     method: 'GET',
@@ -186,10 +187,7 @@
                     },
                     credentials: 'include'
                 });
-
                 const data = await response.json();
-                console.log('【VideoAdGuard】[BilibiliService] Response data:', data);
-
                 if (data.code !== 0) throw new Error(data.message);
                 return data.data;
             } catch (error) {
@@ -201,28 +199,18 @@
         async getVideoInfo(bvid) {
             return await this.fetchWithCookie('https://api.bilibili.com/x/web-interface/view', { bvid });
         },
-
         async getComments(bvid) {
             return await this.fetchWithCookie('https://api.bilibili.com/x/v2/reply', { oid: bvid, type: 1 });
         },
-
         async getPlayerInfo(bvid, cid) {
             const params = { bvid, cid };
             const signedParams = await WbiUtils.encWbi(params);
             return await this.fetchWithCookie('https://api.bilibili.com/x/player/wbi/v2', signedParams);
         },
-
         async getCaptions(url) {
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.error('【VideoAdGuard】获取字幕失败:', error);
-                throw error;
-            }
+            const response = await fetch(url);
+            return await response.json();
         },
-
         async getPlayUrl(bvid, cid) {
             const params = await WbiUtils.encWbi({
                 bvid,
@@ -232,12 +220,11 @@
                 fnver: 0,
                 fourk: 1
             });
-            const data = await this.fetchWithCookie('https://api.bilibili.com/x/player/playurl', params);
-            return data;
+            return await this.fetchWithCookie('https://api.bilibili.com/x/player/playurl', params);
         }
     };
 
-    // ---------- 音频服务（Groq Whisper）----------
+    // ========== 音频服务（Groq Whisper）==========
     const AudioService = {
         GROQ_OFFICIAL_URL: 'https://api.groq.com/openai/v1/audio/transcriptions',
         GROQ_PROXY_URL: 'https://ai-proxy.xiaobaozi.cn/api.groq.com/openai/v1/audio/transcriptions',
@@ -245,10 +232,10 @@
         MAX_SIZE_MB: 19,
 
         getGroqApiKey() {
-            return GM_getValue('groqApiKey', '');
+            return getAIConfig().groqApiKey || '';
         },
         getEnableGroqProxy() {
-            return GM_getValue('enableGroqProxy', false);
+            return getAIConfig().enableGroqProxy || false;
         },
 
         async getAudioUrl(playUrlData) {
@@ -284,20 +271,20 @@
         async transcribe(audioBytes, fileInfo) {
             const apiKey = this.getGroqApiKey();
             if (!apiKey) throw new Error('未配置Groq API密钥');
-
             if (audioBytes.byteLength > this.MAX_SIZE_MB * 1024 * 1024) {
                 throw new Error(`音频文件过大 (${(audioBytes.byteLength/1024/1024).toFixed(2)}MB)，超过Groq限制(${this.MAX_SIZE_MB}MB)`);
             }
-
-            const file = new File([new Blob([audioBytes], { type: fileInfo.type || 'audio/m4a' })], fileInfo.name || 'audio.m4a', { type: fileInfo.type || 'audio/m4a' });
+            const file = new File(
+                [new Blob([audioBytes], { type: fileInfo.type || 'audio/m4a' })],
+                fileInfo.name || 'audio.m4a',
+                { type: fileInfo.type || 'audio/m4a' }
+            );
             const formData = new FormData();
             formData.append('file', file);
             formData.append('model', this.DEFAULT_MODEL);
             formData.append('response_format', 'verbose_json');
 
-            const endpoints = [
-                { url: this.GROQ_OFFICIAL_URL, label: '官方' }
-            ];
+            const endpoints = [{ url: this.GROQ_OFFICIAL_URL, label: '官方' }];
             if (this.getEnableGroqProxy()) {
                 endpoints.push({ url: this.GROQ_PROXY_URL, label: '代理' });
             }
@@ -309,130 +296,116 @@
                         GM_xmlhttpRequest({
                             method: 'POST',
                             url,
-                            headers: {
-                                'Authorization': `Bearer ${apiKey}`
-                            },
+                            headers: { 'Authorization': `Bearer ${apiKey}` },
                             data: formData,
                             onload: (resp) => {
                                 if (resp.status >= 200 && resp.status < 300) {
-                                    try {
-                                        resolve(JSON.parse(resp.responseText));
-                                    } catch(e) {
-                                        reject(new Error('解析识别结果失败'));
-                                    }
+                                    resolve(JSON.parse(resp.responseText));
                                 } else {
-                                    reject(new Error(`${resp.status} ${resp.statusText} - ${resp.responseText}`));
+                                    reject(new Error(`${resp.status} ${resp.statusText}`));
                                 }
                             },
                             onerror: reject
                         });
                     });
-                    if (label === '代理') {
-                        console.log('【VideoAdGuard】Groq代理接口调用成功');
-                    }
+                    if (label === '代理') console.log('【VideoAdGuard】Groq代理接口调用成功');
                     return result;
                 } catch (err) {
                     lastError = err;
                     console.warn(`【VideoAdGuard】Groq ${label} 接口失败:`, err);
                 }
             }
-            throw new Error(`语音识别失败: ${lastError?.message || '未知错误'}`);
+            throw new Error(`语音识别失败: ${lastError?.message}`);
         }
     };
 
-    // ---------- AI 服务 ----------
+    // ========== AI 服务 ==========
     const AIService = {
         async makeRequest(videoInfo, config) {
-            console.log('【VideoAdGuard】准备向大模型发送请求');
+            const cfg = getAIConfig();
+            const enableLocalOllama = cfg.enableLocalOllama || false;
+            const requestBody = {
+                model: this.getModel(),
+                messages: [
+                    {
+                        role: 'system',
+                        content: '你是一个敏感的视频观看者，能根据视频的连贯性改变和宣传推销类内容，找出视频中可能存在的植入广告。内容如果和主题相关，即使是推荐/评价也可能只是分享而不是广告，重点要看有没有提到通过视频博主可以受益的渠道进行购买。'
+                    },
+                    {
+                        role: 'user',
+                        content: this.buildPrompt(videoInfo)
+                    }
+                ],
+                temperature: 0.1,
+                max_tokens: 1024,
+                ...config.bodyExtra
+            };
+
+            // 在控制台打印完整请求
+            console.log('【VideoAdGuard】发送LLM请求:', JSON.stringify(requestBody, null, 2));
 
             return new Promise((resolve, reject) => {
                 GM_xmlhttpRequest({
                     method: 'POST',
                     url: this.getApiUrl(),
                     headers: config.headers,
-                    data: JSON.stringify({
-                        model: this.getModel(),
-                        messages: [
-                            {
-                                role: 'system',
-                                content: '你是一个敏感的视频观看者，能根据视频的连贯性改变和宣传推销类内容，找出视频中可能存在的植入广告。内容如果和主题相关，即使是推荐/评价也可能只是分享而不是广告，重点要看有没有提到通过视频博主可以受益的渠道进行购买。'
-                            },
-                            {
-                                role: 'user',
-                                content: this.buildPrompt(videoInfo)
-                            }
-                        ],
-                        temperature: 0.1,
-                        max_tokens: 1024,
-                        ...config.bodyExtra
-                    }),
+                    data: JSON.stringify(requestBody),
                     onload: function(response) {
                         if (response.status >= 200 && response.status < 300) {
-                            try {
-                                const data = JSON.parse(response.responseText);
-                                console.log('【VideoAdGuard】收到大模型响应:', data);
-                                resolve(data);
-                            } catch (error) {
-                                reject(error);
-                            }
+                            resolve(JSON.parse(response.responseText));
                         } else {
                             reject(new Error('请求失败: ' + response.statusText));
                         }
                     },
-                    onerror: function(error) {
-                        reject(error);
-                    }
+                    onerror: reject
                 });
             });
         },
 
         async analyze(videoInfo) {
-            console.log('【VideoAdGuard】开始分析视频信息:', videoInfo);
-            const enableLocalOllama = this.getEnableLocalOllama();
-
-            try {
-                if (enableLocalOllama) {
-                    const data = await this.makeRequest(videoInfo, {
-                        headers: { 'Content-Type': 'application/json' },
-                        bodyExtra: { format: "json", stream: false }
-                    });
-                    return JSON.parse(data.message.content);
-                } else {
-                    const apiKey = this.getApiKey();
-                    if (!apiKey) throw new Error('未设置API密钥');
-                    const data = await this.makeRequest(videoInfo, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${apiKey}`
-                        },
-                        bodyExtra: { response_format: { type: "json_object" } }
-                    });
-                    return JSON.parse(data.choices[0].message.content);
-                }
-            } catch (error) {
-                console.error('【VideoAdGuard】分析失败:', error);
-                throw error;
+            const cfg = getAIConfig();
+            const enableLocalOllama = cfg.enableLocalOllama || false;
+            if (enableLocalOllama) {
+                const data = await this.makeRequest(videoInfo, {
+                    headers: { 'Content-Type': 'application/json' },
+                    bodyExtra: { format: "json", stream: false }
+                });
+                return JSON.parse(data.message.content);
+            } else {
+                const apiKey = cfg.apiKey;
+                if (!apiKey) throw new Error('未设置API密钥');
+                const data = await this.makeRequest(videoInfo, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    bodyExtra: { response_format: { type: "json_object" } }
+                });
+                return JSON.parse(data.choices[0].message.content);
             }
         },
 
         buildPrompt(videoInfo) {
-            const prompt = `视频的标题和置顶评论如下，可供参考判断是否有植入广告。如果置顶评论中有购买链接，则肯定有广告，同时可以根据置顶评论的内容判断视频中的广告商从而确定哪部分是广告。
+            return `视频的标题和置顶评论如下，可供参考判断是否有植入广告。如果置顶评论中有购买链接，则肯定有广告，同时可以根据置顶评论的内容判断视频中的广告商从而确定哪部分是广告。
 视频标题：${videoInfo.title}
 置顶评论：${videoInfo.topComment || '无'}
 下面我会给你这个视频的字幕字典，形式为 index: context. 请你完整地找出其中的植入广告，返回json格式的数据。注意要返回一整段的广告，从广告的引入到结尾重新转折回到视频内容前，因此不要返回太短的广告，可以组合成一整段返回。
 字幕内容：${JSON.stringify(videoInfo.captions)}
 先返回'exist': bool。true表示存在植入广告，false表示不存在植入广告。
 再返回'index_lists': list[list[int]]。二维数组，行数表示广告的段数，一般来说视频是没有广告的，但也有小部分会植入一段广告，极少部分是多段广告，因此不要返回过多，只返回与标题最不相关或者与置顶链接中的商品最相关的部分。每一行是长度为2的数组[start, end]，表示一段广告的开头结尾，start和end是字幕的index。`;
-            return prompt;
         },
 
-        getEnableLocalOllama() { return GM_getValue('enableLocalOllama', false); },
-        getApiUrl() { return GM_getValue('apiUrl', DEFAULT_API_URL); },
-        getApiKey() { return GM_getValue('apiKey', null); },
-        getModel() { return GM_getValue('model', DEFAULT_MODEL); }
+        getApiUrl() {
+            const cfg = getAIConfig();
+            return cfg.apiUrl || DEFAULT_API_URL;
+        },
+        getModel() {
+            const cfg = getAIConfig();
+            return cfg.model || DEFAULT_MODEL;
+        }
     };
 
-    // ---------- 广告检测器 ----------
+    // ========== 广告检测器 ==========
     const AdDetector = {
         adDetectionResult: null,
         adTimeRanges: [],
@@ -451,13 +424,14 @@
                 const existingButton = document.querySelector('.skip-ad-button10032');
                 if (existingButton) existingButton.remove();
                 this.removeAutoSkip();
+                this.clearProgressBarMarkers();
 
                 const bvid = await this.getCurrentBvid();
-
                 const cached = getCachedResult(bvid);
                 if (cached) {
                     this.adTimeRanges = cached.adTimeRanges;
                     this.videoDuration = cached.videoDuration;
+
                     if (this.adTimeRanges.length) {
                         const adTotal = this.adTimeRanges.reduce((sum, [s, e]) => sum + (e - s), 0);
                         const ratio = adTotal / this.videoDuration;
@@ -475,11 +449,14 @@
                         this.adDetectionResult = '无广告内容';
                         this.autoSkipEnabled = false;
                     }
+
+                    this.updateProgressBarMarkers();
                     console.log('【VideoAdGuard】从缓存恢复结果:', this.adDetectionResult);
                     this.showNotification(this.adDetectionResult);
                     return;
                 }
 
+                // 无缓存，正常检测
                 const videoInfo = await BilibiliService.getVideoInfo(bvid);
                 const comments = await BilibiliService.getComments(bvid);
                 this.videoDuration = videoInfo.duration;
@@ -487,7 +464,6 @@
                 let captions = null;
                 let segmentsData = null;
 
-                // 尝试获取内置字幕
                 try {
                     const playerInfo = await BilibiliService.getPlayerInfo(bvid, videoInfo.cid);
                     if (playerInfo.subtitle?.subtitles?.length) {
@@ -509,26 +485,23 @@
                     console.warn('【VideoAdGuard】获取字幕失败:', e);
                 }
 
-                // 无字幕时，尝试音频识别
-                const enableAudio = GM_getValue('enableAudioRecognition', true);
+                const cfg = getAIConfig();
+                const enableAudio = cfg.enableAudioRecognition !== false;
                 if (!captions && enableAudio) {
                     try {
                         const groqKey = AudioService.getGroqApiKey();
-                        if (!groqKey) throw new Error('Groq密钥未设置，无法使用语音识别');
+                        if (!groqKey) throw new Error('Groq密钥未设置');
                         console.log('【VideoAdGuard】无字幕，开始音频识别...');
                         this.showNotification('无字幕，正在使用语音识别，请稍候...');
 
                         const playUrlData = await BilibiliService.getPlayUrl(bvid, videoInfo.cid);
                         const audioUrl = await AudioService.getAudioUrl(playUrlData);
                         if (!audioUrl) throw new Error('未找到音频流');
-
                         const audioBytes = await AudioService.downloadAudioAsBytes(audioUrl);
                         const transcription = await AudioService.transcribe(audioBytes, { name: 'audio.m4a', type: 'audio/m4a' });
-
                         if (!transcription.segments || transcription.segments.length === 0) {
                             throw new Error('未识别到任何语音内容');
                         }
-
                         captions = {};
                         segmentsData = transcription.segments;
                         segmentsData.forEach((seg, idx) => {
@@ -544,7 +517,6 @@
                 }
 
                 if (!captions) {
-                    console.log('【VideoAdGuard】无可用字幕/语音内容');
                     this.adDetectionResult = '当前视频无字幕且无法获取语音内容';
                     this.adTimeRanges = [];
                     return;
@@ -557,10 +529,8 @@
                 });
 
                 if (result.exist) {
-                    console.log('【VideoAdGuard】检测到广告片段:', JSON.stringify(result.index_lists));
                     const second_lists = this.segments2second(result.index_lists, segmentsData);
                     this.adTimeRanges = second_lists;
-
                     const adTotal = second_lists.reduce((sum, [s, e]) => sum + (e - s), 0);
                     const ratio = adTotal / this.videoDuration;
 
@@ -588,7 +558,7 @@
                     console.log('【VideoAdGuard】未检测到广告内容');
                 }
 
-                // 保存缓存，不再存储 segments
+                this.updateProgressBarMarkers();
                 setCachedResult(bvid, {
                     adTimeRanges: this.adTimeRanges,
                     videoDuration: this.videoDuration
@@ -628,10 +598,7 @@
         setupAutoSkip() {
             this.removeAutoSkip();
             const video = document.querySelector('video');
-            if (!video) {
-                console.error('【VideoAdGuard】未找到视频元素，无法设置自动跳过');
-                return;
-            }
+            if (!video) return;
             this.autoSkipHandler = () => {
                 if (!this.autoSkipEnabled || !this.adTimeRanges.length) return;
                 const currentTime = video.currentTime;
@@ -645,6 +612,67 @@
             };
             video.addEventListener('timeupdate', this.autoSkipHandler);
             console.log('【VideoAdGuard】已启动自动跳过广告');
+        },
+
+        // ---------- 进度条标记 (颜色改为 rgb(0, 212, 0)) ----------
+        clearProgressBarMarkers() {
+            document.querySelectorAll('.vag-progress-marker').forEach(el => el.remove());
+        },
+
+        async updateProgressBarMarkers() {
+            this.clearProgressBarMarkers();
+            if (!this.adTimeRanges.length || this.videoDuration <= 0) return;
+
+            const waitForElement = (selector, parent = document.body, timeout = 5000) => {
+                return new Promise((resolve, reject) => {
+                    const el = parent.querySelector(selector);
+                    if (el) return resolve(el);
+                    const observer = new MutationObserver((_m, obs) => {
+                        const elem = parent.querySelector(selector);
+                        if (elem) {
+                            obs.disconnect();
+                            resolve(elem);
+                        }
+                    });
+                    observer.observe(parent, { childList: true, subtree: true });
+                    setTimeout(() => {
+                        observer.disconnect();
+                        reject(new Error('未找到进度条容器'));
+                    }, timeout);
+                });
+            };
+
+            try {
+                const container = await waitForElement('.bpx-player-progress-schedule', document.body, 5000);
+                if (getComputedStyle(container).position === 'static') {
+                    container.style.position = 'relative';
+                }
+                container.style.overflow = 'visible';
+
+                for (const [start, end] of this.adTimeRanges) {
+                    const startRatio = Math.min(1, start / this.videoDuration);
+                    const endRatio = Math.min(1, end / this.videoDuration);
+                    const widthRatio = endRatio - startRatio;
+                    if (widthRatio <= 0) continue;
+
+                    const marker = document.createElement('div');
+                    marker.className = 'vag-progress-marker';
+                    marker.style.cssText = `
+                        position: absolute;
+                        top: 0;
+                        left: ${startRatio * 100}%;
+                        width: ${widthRatio * 100}%;
+                        height: 100%;
+                        background: rgb(0, 212, 0);   /* 亮绿色实色 */
+                        min-width: 2px;
+                        pointer-events: none;
+                        z-index: 2;
+                    `;
+                    container.appendChild(marker);
+                }
+            } catch (e) {
+                console.warn('【VideoAdGuard】进度条标记更新失败:', e);
+            }
         },
 
         showNotification(message) {
@@ -697,6 +725,8 @@
                 return;
             }
 
+            const currentConfig = getAIConfig();
+
             const panel = document.createElement('div');
             panel.className = 'vag-settings-panel';
             panel.style.cssText = `
@@ -709,132 +739,196 @@
                 border-radius: 8px;
                 box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
                 z-index: 10000;
-                width: 300px;
+                width: 320px;
                 color: #333;
+                font-family: Arial, sans-serif;
             `;
 
             const style = document.createElement('style');
             style.textContent = `
-                .vag-settings-panel .form-group { margin-bottom: 10px; }
-                .vag-settings-panel label { display: block; margin-bottom: 5px; }
+                .vag-settings-panel .form-group { margin-bottom: 12px; }
+                .vag-settings-panel label { display: block; margin-bottom: 4px; font-size: 14px; }
                 .vag-settings-panel input[type="text"],
-                .vag-settings-panel input[type="password"] { width: 100%; padding: 5px; box-sizing: border-box; }
-                .vag-settings-panel button { width: 100%; padding: 8px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; margin-bottom: 5px; }
-                .vag-settings-panel button:hover { background-color: #45a049; }
-                .vag-settings-panel #vag-message { margin-top: 10px; padding: 5px; border-radius: 4px; }
-                .vag-settings-panel .success { background-color: #dff0d8; color: #3c763d; }
-                .vag-settings-panel .error { background-color: #f2dede; color: #a94442; }
-                .vag-settings-panel .checkbox-container { display: flex; align-items: center; position: relative; padding-left: 30px; cursor: pointer; user-select: none; }
-                .vag-settings-panel .checkbox-container input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
-                .vag-settings-panel .checkmark { position: absolute; left: 0; height: 20px; width: 20px; background-color: #eee; border-radius: 4px; }
-                .vag-settings-panel .checkbox-container:hover input ~ .checkmark { background-color: #ccc; }
-                .vag-settings-panel .checkbox-container input:checked ~ .checkmark { background-color: #4CAF50; }
-                .vag-settings-panel .checkmark:after { content: ""; position: absolute; display: none; }
-                .vag-settings-panel .checkbox-container input:checked ~ .checkmark:after { display: block; }
-                .vag-settings-panel .checkbox-container .checkmark:after { left: 7px; top: 3px; width: 5px; height: 10px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+                .vag-settings-panel input[type="password"] {
+                    width: 100%;
+                    padding: 6px 8px;
+                    box-sizing: border-box;
+                    border: 1px solid #ccc;
+                    border-radius: 4px;
+                }
+                .vag-settings-panel button {
+                    padding: 8px 15px;
+                    border: none;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 14px;
+                }
+                .vag-settings-panel #vag-message {
+                    margin-top: 10px;
+                    padding: 6px 10px;
+                    border-radius: 4px;
+                    font-size: 14px;
+                }
+                .vag-settings-panel .success { background: #dff0d8; color: #3c763d; }
+                .vag-settings-panel .error { background: #f2dede; color: #a94442; }
+                .vag-settings-panel .checkbox-container {
+                    display: flex;
+                    align-items: center;
+                    position: relative;
+                    padding-left: 30px;
+                    cursor: pointer;
+                    user-select: none;
+                    font-size: 14px;
+                }
+                .vag-settings-panel .checkbox-container input {
+                    position: absolute;
+                    opacity: 0;
+                    cursor: pointer;
+                    height: 0;
+                    width: 0;
+                }
+                .vag-settings-panel .checkmark {
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    height: 20px;
+                    width: 20px;
+                    background-color: #eee;
+                    border-radius: 4px;
+                }
+                .vag-settings-panel .checkbox-container:hover input ~ .checkmark {
+                    background-color: #ccc;
+                }
+                .vag-settings-panel .checkbox-container input:checked ~ .checkmark {
+                    background-color: #4CAF50;
+                }
+                .vag-settings-panel .checkmark:after {
+                    content: "";
+                    position: absolute;
+                    display: none;
+                }
+                .vag-settings-panel .checkbox-container input:checked ~ .checkmark:after {
+                    display: block;
+                }
+                .vag-settings-panel .checkbox-container .checkmark:after {
+                    left: 7px;
+                    top: 3px;
+                    width: 5px;
+                    height: 10px;
+                    border: solid white;
+                    border-width: 0 2px 2px 0;
+                    transform: rotate(45deg);
+                }
+                .vag-settings-panel hr {
+                    margin: 15px 0 10px;
+                    border: 0;
+                    border-top: 1px solid #eee;
+                }
             `;
             document.head.appendChild(style);
 
             panel.innerHTML = `
-                <h3>B站广告检测设置</h3>
+                <h3 style="margin: 0 0 15px 0; font-size: 18px;">广告检测设置</h3>
                 <div class="form-group">
                     <label for="vag-local-ollama" class="checkbox-container">
-                        <input type="checkbox" id="vag-local-ollama" ${GM_getValue('enableLocalOllama', false) ? 'checked' : ''}>
+                        <input type="checkbox" id="vag-local-ollama" ${currentConfig.enableLocalOllama ? 'checked' : ''}>
                         <span class="checkmark"></span>
                         连接到本地Ollama
                     </label>
                 </div>
                 <div class="form-group">
                     <label for="vag-api-url">API地址：</label>
-                    <input type="text" id="vag-api-url" placeholder="请输入API地址" value="${GM_getValue('apiUrl', DEFAULT_API_URL)}">
+                    <input type="text" id="vag-api-url" value="${currentConfig.apiUrl || DEFAULT_API_URL}">
                 </div>
-                <div class="form-group apiKey-field" id="vag-api-key-group" style="${GM_getValue('enableLocalOllama', false) ? 'display:none' : ''}">
+                <div class="form-group apiKey-field" id="vag-api-key-group" style="${currentConfig.enableLocalOllama ? 'display:none' : ''}">
                     <label for="vag-api-key">API密钥：</label>
-                    <input type="password" id="vag-api-key" placeholder="请输入API密钥" value="${GM_getValue('apiKey', '')}">
+                    <input type="password" id="vag-api-key" value="${currentConfig.apiKey || ''}">
                 </div>
                 <div class="form-group">
                     <label for="vag-model">模型名称：</label>
-                    <input type="text" id="vag-model" placeholder="请输入模型名称" value="${GM_getValue('model', DEFAULT_MODEL)}">
+                    <input type="text" id="vag-model" value="${currentConfig.model || DEFAULT_MODEL}">
                 </div>
                 <hr>
                 <div class="form-group">
                     <label for="vag-groq-key">Groq API密钥：</label>
-                    <input type="password" id="vag-groq-key" placeholder="用于音频识别" value="${GM_getValue('groqApiKey', '')}">
+                    <input type="password" id="vag-groq-key" value="${currentConfig.groqApiKey || ''}">
                 </div>
                 <div class="form-group">
                     <label for="vag-enable-groq-proxy" class="checkbox-container">
-                        <input type="checkbox" id="vag-enable-groq-proxy" ${GM_getValue('enableGroqProxy', false) ? 'checked' : ''}>
+                        <input type="checkbox" id="vag-enable-groq-proxy" ${currentConfig.enableGroqProxy ? 'checked' : ''}>
                         <span class="checkmark"></span>
                         启用Groq代理回退
                     </label>
                 </div>
                 <div class="form-group">
                     <label for="vag-enable-audio" class="checkbox-container">
-                        <input type="checkbox" id="vag-enable-audio" ${GM_getValue('enableAudioRecognition', true) ? 'checked' : ''}>
+                        <input type="checkbox" id="vag-enable-audio" ${currentConfig.enableAudioRecognition !== false ? 'checked' : ''}>
                         <span class="checkmark"></span>
                         无字幕时使用语音识别
                     </label>
                 </div>
-                <div style="display: flex; justify-content: space-between;">
-                    <button id="vag-save">保存</button>
-                    <button id="vag-cancel" style="background: #f44336;">取消</button>
+                <div style="display: flex; justify-content: space-between; margin-top: 15px;">
+                    <button id="vag-save" style="background: #4CAF50; color: white; flex: 1; margin-right: 5px;">保存</button>
+                    <button id="vag-cancel" style="background: #f44336; color: white; flex: 1; margin-left: 5px;">取消</button>
                 </div>
                 <div id="vag-message"></div>
             `;
 
             document.body.appendChild(panel);
 
-            const apiUrlInput = document.getElementById('vag-api-url');
-            const apiKeyInput = document.getElementById('vag-api-key');
-            const modelInput = document.getElementById('vag-model');
             const ollamaCheckbox = document.getElementById('vag-local-ollama');
             const apiKeyGroup = document.getElementById('vag-api-key-group');
-            const groqKeyInput = document.getElementById('vag-groq-key');
-            const groqProxyCheckbox = document.getElementById('vag-enable-groq-proxy');
-            const enableAudioCheckbox = document.getElementById('vag-enable-audio');
-            const messageDiv = document.getElementById('vag-message');
-
             ollamaCheckbox.addEventListener('change', () => {
                 apiKeyGroup.style.display = ollamaCheckbox.checked ? 'none' : 'block';
             });
 
-            const saveBtn = document.getElementById('vag-save');
-            saveBtn.addEventListener('click', () => {
-                const apiUrl = apiUrlInput.value;
-                const apiKey = apiKeyInput.value;
-                const model = modelInput.value;
+            const messageDiv = document.getElementById('vag-message');
+            const showMsg = (msg, type) => {
+                messageDiv.textContent = msg;
+                messageDiv.className = type;
+                setTimeout(() => { messageDiv.textContent = ''; messageDiv.className = ''; }, 3000);
+            };
+
+            document.getElementById('vag-save').addEventListener('click', () => {
+                const apiUrl = document.getElementById('vag-api-url').value.trim();
+                const apiKey = document.getElementById('vag-api-key').value.trim();
+                const model = document.getElementById('vag-model').value.trim();
                 const enableLocalOllama = ollamaCheckbox.checked;
-                const groqKey = groqKeyInput.value;
-                const enableGroqProxy = groqProxyCheckbox.checked;
-                const enableAudio = enableAudioCheckbox.checked;
+                const groqKey = document.getElementById('vag-groq-key').value.trim();
+                const enableGroqProxy = document.getElementById('vag-enable-groq-proxy').checked;
+                const enableAudio = document.getElementById('vag-enable-audio').checked;
 
                 if (!apiUrl) { showMsg('请输入API地址', 'error'); return; }
                 if (!enableLocalOllama && !apiKey) { showMsg('请输入API密钥', 'error'); return; }
                 if (!model) { showMsg('请输入模型名称', 'error'); return; }
 
-                GM_setValue('apiUrl', apiUrl);
-                GM_setValue('apiKey', apiKey);
-                GM_setValue('model', model);
-                GM_setValue('enableLocalOllama', enableLocalOllama);
-                GM_setValue('groqApiKey', groqKey);
-                GM_setValue('enableGroqProxy', enableGroqProxy);
-                GM_setValue('enableAudioRecognition', enableAudio);
+                const newConfig = getAIConfig();
+                newConfig.apiUrl = apiUrl;
+                newConfig.apiKey = apiKey;
+                newConfig.model = model;
+                newConfig.enableLocalOllama = enableLocalOllama;
+                newConfig.groqApiKey = groqKey;
+                newConfig.enableGroqProxy = enableGroqProxy;
+                newConfig.enableAudioRecognition = enableAudio;
 
+                setAIConfig(newConfig);
                 showMsg('设置已保存', 'success');
                 setTimeout(() => panel.remove(), 1000);
             });
 
             document.getElementById('vag-cancel').addEventListener('click', () => panel.remove());
 
-            const showMsg = (message, type) => {
-                messageDiv.textContent = message;
-                messageDiv.className = type;
-                setTimeout(() => { messageDiv.textContent = ''; messageDiv.className = ''; }, 3000);
-            };
+            ['vag-api-url', 'vag-api-key', 'vag-model', 'vag-groq-key'].forEach(id => {
+                const input = document.getElementById(id);
+                if (input) {
+                    input.addEventListener('click', e => e.stopPropagation());
+                    input.addEventListener('keydown', e => e.stopPropagation());
+                }
+            });
         }
     };
 
-    // ---------- 初始化 ----------
+    // ========== 初始化 ==========
     function init() {
         AdDetector.analyze();
         AdDetector.addSettingsButton();
