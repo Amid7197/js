@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         B站视频植入广告检测器(自动跳过)
-// @version      1.1.3
+// @version      1.2.0
 // @author       Amid7197 Warma10032 (modified)
 // @license      GPLv2
-// @description  基于大语言模型检测B站视频中的植入广告，支持自动跳过（广告过多时自动禁用）
+// @description  基于大语言模型检测B站视频中的植入广告，支持自动跳过（广告过多时自动禁用）。默认缓存3天结果（按自然日清理）。
 // @match        *://*.bilibili.com/video/*
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setValue
@@ -24,6 +24,68 @@
 
     const DEFAULT_API_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
     const DEFAULT_MODEL = 'glm-4-flash';
+    const AD_RATIO_THRESHOLD = 1 / 3;  // 广告占比超过此值时禁用自动跳过
+
+    // ---------- 缓存工具（统一 ad 对象，按自然日清理）----------
+    const CACHE_KEY = 'vag_ad_cache';
+    const CACHE_DURATION_DAYS = 3;
+
+    function getCacheStore() {
+        return GM_getValue(CACHE_KEY, {});
+    }
+
+    function setCacheStore(store) {
+        GM_setValue(CACHE_KEY, store);
+    }
+
+    function cleanExpiredCache(store) {
+        const now = new Date();
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+        const threshold = todayStart - (CACHE_DURATION_DAYS - 1) * 86400000; // 保留最近3天（含今天）
+        let changed = false;
+        for (const bvid in store) {
+            const entry = store[bvid];
+            if (entry && entry.timestamp < threshold) {
+                delete store[bvid];
+                changed = true;
+            }
+        }
+        if (changed) setCacheStore(store);
+    }
+
+    function getCachedResult(bvid) {
+        const store = getCacheStore();
+        cleanExpiredCache(store); // 清理过期并自动保存
+        const entry = store[bvid];
+        if (!entry) return null;
+
+        const now = new Date();
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+        const threshold = todayStart - (CACHE_DURATION_DAYS - 1) * 86400000;
+        if (entry.timestamp >= threshold) {
+            console.log('【VideoAdGuard】命中缓存:', entry);
+            return {
+                adTimeRanges: entry.adTimeRanges,
+                videoDuration: entry.videoDuration
+            };
+        } else {
+            // 过期但未被清理时手动删除
+            delete store[bvid];
+            setCacheStore(store);
+            return null;
+        }
+    }
+
+    function setCachedResult(bvid, data) {
+        const store = getCacheStore();
+        store[bvid] = {
+            adTimeRanges: data.adTimeRanges,
+            videoDuration: data.videoDuration,
+            timestamp: Date.now(),
+        };
+        setCacheStore(store);
+        console.log('【VideoAdGuard】缓存已保存:', bvid);
+    }
 
     // ---------- WBI 签名工具 ----------
     const WbiUtils = {
@@ -41,8 +103,6 @@
                 .slice(0, 32);
         },
 
-        // 注意：原脚本中的 md5 仅为简单哈希，并非标准 MD5，可能导致 WBI 签名失败
-        // 建议引入 CryptoJS 或 Web Crypto API 替换
         md5(text) {
             let hash = 0;
             for (let i = 0; i < text.length; i++) {
@@ -270,7 +330,7 @@
         getModel() { return GM_getValue('model', DEFAULT_MODEL); }
     };
 
-    // ---------- 广告检测器（核心修改） ----------
+    // ---------- 广告检测器 ----------
     const AdDetector = {
         adDetectionResult: null,
         adTimeRanges: [],
@@ -286,31 +346,54 @@
 
         async analyze() {
             try {
-                // 移除已存在的跳过按钮（旧版残留）
                 const existingButton = document.querySelector('.skip-ad-button10032');
                 if (existingButton) existingButton.remove();
-
-                // 移除旧的自动跳过监听
                 this.removeAutoSkip();
 
                 const bvid = await this.getCurrentBvid();
 
-                // 获取视频信息
+                // 尝试读取缓存
+                const cached = getCachedResult(bvid);
+                if (cached) {
+                    this.adTimeRanges = cached.adTimeRanges;
+                    this.videoDuration = cached.videoDuration;
+
+                    const adTotal = this.adTimeRanges.reduce((sum, [s, e]) => sum + (e - s), 0);
+                    const ratio = adTotal / this.videoDuration;
+
+                    if (this.adTimeRanges.length && ratio > AD_RATIO_THRESHOLD) {
+                        this.autoSkipEnabled = false;
+                        this.adDetectionResult = `检测到过多广告（占视频${(ratio * 100).toFixed(1)}%），已禁用自动跳过`;
+                    } else if (this.adTimeRanges.length) {
+                        this.autoSkipEnabled = true;
+                        this.adDetectionResult = `发现${this.adTimeRanges.length}处广告：${
+                            this.adTimeRanges.map(([start, end]) => `${this.second2time(start)}~${this.second2time(end)}`).join(' | ')
+                        }`;
+                        this.setupAutoSkip();
+                    } else {
+                        this.adDetectionResult = '无广告内容';
+                        this.autoSkipEnabled = false;
+                    }
+
+                    console.log('【VideoAdGuard】从缓存恢复结果:', this.adDetectionResult);
+                    this.showNotification(this.adDetectionResult);
+                    return;
+                }
+
+                // 无缓存，正常分析
                 const videoInfo = await BilibiliService.getVideoInfo(bvid);
                 const comments = await BilibiliService.getComments(bvid);
                 const playerInfo = await BilibiliService.getPlayerInfo(bvid, videoInfo.cid);
 
-                // 保存视频总时长（秒）
                 this.videoDuration = videoInfo.duration;
 
-                // 获取字幕
                 if (!playerInfo.subtitle?.subtitles?.length) {
                     console.log('【VideoAdGuard】无字幕');
                     this.adDetectionResult = '当前视频无字幕，无法检测';
+                    this.adTimeRanges = [];
                     return;
                 }
 
-                // 优先选择中文字幕
                 let sub = playerInfo.subtitle.subtitles[0];
                 const zhSub = playerInfo.subtitle.subtitles.find(s =>
                     s.lan?.startsWith('zh') || s.lan_doc?.includes('中文')
@@ -320,13 +403,11 @@
                 const captionsUrl = 'https:' + sub.subtitle_url;
                 const captionsData = await BilibiliService.getCaptions(captionsUrl);
 
-                // 字幕索引映射
                 const captions = {};
                 captionsData.body.forEach((caption, index) => {
                     captions[index] = caption.content;
                 });
 
-                // AI分析
                 const result = await AIService.analyze({
                     title: videoInfo.title,
                     topComment: comments.upper?.top?.content?.message || null,
@@ -338,23 +419,21 @@
                     const second_lists = this.index2second(result.index_lists, captionsData.body);
                     this.adTimeRanges = second_lists;
 
-                    // 计算广告占比
                     const adTotal = second_lists.reduce((sum, [s, e]) => sum + (e - s), 0);
                     const ratio = adTotal / this.videoDuration;
 
-                    if (ratio > 1 / 3) {
+                    if (ratio > AD_RATIO_THRESHOLD) {
                         this.autoSkipEnabled = false;
                         this.adDetectionResult = `检测到过多广告（占视频${(ratio * 100).toFixed(1)}%），已禁用自动跳过`;
-                        console.warn('【VideoAdGuard】广告占比超过1/3，不进行自动跳过');
+                        console.warn('【VideoAdGuard】广告占比超过阈值，不进行自动跳过');
                     } else {
                         this.autoSkipEnabled = true;
                         this.adDetectionResult = `发现${second_lists.length}处广告：${
                             second_lists.map(([start, end]) => `${this.second2time(start)}~${this.second2time(end)}`).join(' | ')
                         }`;
-                        this.setupAutoSkip(); // 启用自动跳过
+                        this.setupAutoSkip();
                     }
 
-                    // 控制台输出广告时间段
                     second_lists.forEach(([start, end]) => {
                         console.log(`【VideoAdGuard】检测到广告片段: [${this.second2time(start)}~${this.second2time(end)}]`);
                     });
@@ -366,6 +445,13 @@
                     this.autoSkipEnabled = false;
                     console.log('【VideoAdGuard】未检测到广告内容');
                 }
+
+                // 保存缓存
+                setCachedResult(bvid, {
+                    adTimeRanges: this.adTimeRanges,
+                    videoDuration: this.videoDuration
+                });
+
             } catch (error) {
                 console.error('分析失败:', error);
                 this.adDetectionResult = '分析失败：' + error.message;
@@ -591,10 +677,9 @@
 
     // ---------- 初始化 ----------
     function init() {
-        AdDetector.analyze();       // 页面加载后自动分析（包含自动跳过逻辑）
+        AdDetector.analyze();
         AdDetector.addSettingsButton();
 
-        // 监听 URL 变化（B 站单页跳转）
         let lastUrl = location.href;
         new MutationObserver(() => {
             const url = location.href;
