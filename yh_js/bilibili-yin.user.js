@@ -143,7 +143,8 @@
 
     // ==================== DOM 监听（防抖版） ====================
     let observerTimer = null;
-    const DEBOUNCE_DELAY = 500; // 500ms 防抖
+#    const DEBOUNCE_DELAY = 500; // 500ms 防抖
+    const DEBOUNCE_DELAY = 2000; // 0.2s 防抖
 
     function debouncedObserverCallback() {
         tryAddControlBtn();
