@@ -1,22 +1,30 @@
 // ==UserScript==
-// @name         Bilibili 视频音量均衡器-自动恢复音频上下文，避免声音中断
+// @name         Bilibili 视频音量均衡器 (终极流畅版)
 // @namespace    http://tampermonkey.net/
-// @version      0.2.2
-// @description  通过 Web Audio API 压缩 Bilibili 视频中音频的动态范围，使不同视频或同一视频中差距过大的响度保持一致
+// @version      0.2.3
+// @description  通过 Web Audio API 压缩 Bilibili 视频中音频的动态范围，使不同视频或同一视频中差距过大的响度保持一致。防抖音恢复，零停顿。
 // @author       Amid7197 Timothy Tao & Github Copilot
 // @match        *://www.bilibili.com/video/*
 // @match        *://www.bilibili.com/bangumi/play/*
 // @match        *://live.bilibili.com/*
 // @match        *://www.bilibili.com/list/*
-// @match        https://greasyfork.org/scripts/557295
 // @icon         https://www.bilibili.com/favicon.ico
 // @grant        none
 // @run-at       document-start
 // @license      MIT
+// 原版脚本地址: https://greasyfork.org/scripts/557295
 // ==/UserScript==
 
 (function() {
     'use strict';
+
+    // ==================== 用户可配置参数（单位：ms） ====================
+    // 切回页面时音量淡入时长（推荐 50 ~ 300）
+    const FADE_IN_DURATION_MS = 200;
+
+    // MutationObserver 防抖延迟（推荐 300 ~ 800）
+    const DEBOUNCE_DELAY_MS = 500;
+    // ===================================================================
 
     const $ = s => document.querySelector(s);
     let audioCtx, sourceNode, compressorNode, gainNode, currentVideo;
@@ -63,7 +71,7 @@
         const now = audioCtx.currentTime;
         gainNode.gain.cancelScheduledValues(now);
         gainNode.gain.setValueAtTime(0, now);
-        gainNode.gain.linearRampToValueAtTime(1, now + 0.05);
+        gainNode.gain.linearRampToValueAtTime(1, now + FADE_IN_DURATION_MS / 1000);
     }
 
     function initAudioContext() {
@@ -122,47 +130,45 @@
         video.addEventListener('play', resumeCtx);
         video.addEventListener('playing', resumeCtx);
 
-        // 防后台暂停
+        // 防后台暂停（只绑定一次到当前视频）
         video.addEventListener('pause', () => {
             if (shouldKeepPlaying && document.hidden) {
                 video.play().catch(() => {});
             }
         });
-
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                shouldKeepPlaying = video && !video.paused;
-            } else {
-                if (audioCtx?.state === 'suspended') {
-                    audioCtx.resume();
-                }
-                setTimeout(() => { shouldKeepPlaying = false; }, 100);
-            }
-        });
     }
+
+    // ==================== 全局页面可见性事件（仅绑定一次） ====================
+    document.addEventListener('visibilitychange', () => {
+        const video = currentVideo;
+        if (!video) return;
+        if (document.hidden) {
+            shouldKeepPlaying = !video.paused;
+        } else {
+            if (audioCtx?.state === 'suspended') {
+                audioCtx.resume();
+            }
+            setTimeout(() => { shouldKeepPlaying = false; }, 100);
+        }
+    });
 
     // ==================== DOM 监听（防抖版） ====================
     let observerTimer = null;
-#    const DEBOUNCE_DELAY = 500; // 500ms 防抖
-    const DEBOUNCE_DELAY = 2000; // 0.2s 防抖
 
     function debouncedObserverCallback() {
         tryAddControlBtn();
-        // 精准定位主播放器的视频元素（避免抓到隐藏预览）
         const video = document.querySelector('.bpx-player-video-wrap video, .bilibili-player-video video, video');
         if (video) processVideo(video);
     }
 
     const observer = new MutationObserver(() => {
-        // 清除上一次定时器，重新计时
         if (observerTimer) clearTimeout(observerTimer);
-        observerTimer = setTimeout(debouncedObserverCallback, DEBOUNCE_DELAY);
+        observerTimer = setTimeout(debouncedObserverCallback, DEBOUNCE_DELAY_MS);
     });
 
     // ==================== 初始化 ====================
     function init() {
         document.head.appendChild(style);
-        // 缩小监听范围：仅监听播放器可能所在的主内容区
         const targetNode = document.querySelector('#app, .bpx-player, .bilibili-player, body');
         if (targetNode) {
             observer.observe(targetNode, { childList: true, subtree: true });
