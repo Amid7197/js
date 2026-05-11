@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         B站视频植入广告检测器(自动跳过+音频识别+进度条标记)
-// @version      2.2.2
+// @version      2.2.3
 // @author       Amid7197 Warma10032 (modified)
 // @license      GPLv2
 // @description  基于大语言模型检测B站视频中的植入广告，支持自动跳过。无字幕时可调用Groq Whisper语音识别，并在进度条上以绿色块标记广告片段。
@@ -41,7 +41,7 @@
     }
 
     // 缓存键
-    const CACHE_KEY = 'ad_cache';
+    const CACHE_KEY = 'cache_AD';
     const CACHE_DURATION_DAYS = 3;
 
     function getCacheStore() {
