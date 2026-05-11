@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         B站视频植入广告检测器(自动跳过+音频识别+进度条标记)
-// @version      2.2.5
+// @version      2.3.0
 // @author       Amid7197 Warma10032 (modified)
 // @license      GPLv2
-// @description  基于大语言模型检测B站视频中的植入广告，支持自动跳过。无字幕时可调用Groq Whisper语音识别，并在进度条上以绿色块标记广告片段。修复重复调用问题。
+// @description  基于大语言模型检测B站视频中的植入广告，支持自动跳过。无字幕时可调用Groq Whisper语音识别，并在进度条上以绿色块标记广告片段。支持UP主白名单。
 // @match        *://*.bilibili.com/video/*
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setValue
@@ -30,7 +30,7 @@
         GM_setValue(CONFIG_KEY, config);
     }
 
-    // 缓存键
+    // 广告缓存键
     const CACHE_KEY = 'cache_AD';
     const CACHE_DURATION_DAYS = 3;
 
@@ -309,7 +309,7 @@
         }
     };
 
-    // ========== AI 服务 ==========
+    // ========== AI 服务 （移除了 Ollama 分支） ==========
     const AIService = {
         async makeRequest(videoInfo, config) {
             const requestBody = {
@@ -351,25 +351,16 @@
 
         async analyze(videoInfo) {
             const cfg = getAIConfig();
-            const enableLocalOllama = cfg.enableLocalOllama || false;
-            if (enableLocalOllama) {
-                const data = await this.makeRequest(videoInfo, {
-                    headers: { 'Content-Type': 'application/json' },
-                    bodyExtra: { format: "json", stream: false }
-                });
-                return JSON.parse(data.message.content);
-            } else {
-                const apiKey = cfg.apiKey;
-                if (!apiKey) throw new Error('未设置API密钥');
-                const data = await this.makeRequest(videoInfo, {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
-                    },
-                    bodyExtra: { response_format: { type: "json_object" } }
-                });
-                return JSON.parse(data.choices[0].message.content);
-            }
+            const apiKey = cfg.apiKey;
+            if (!apiKey) throw new Error('未设置API密钥');
+            const data = await this.makeRequest(videoInfo, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                bodyExtra: { response_format: { type: "json_object" } }
+            });
+            return JSON.parse(data.choices[0].message.content);
         },
 
         buildPrompt(videoInfo) {
@@ -399,7 +390,7 @@
         autoSkipEnabled: true,
         autoSkipHandler: null,
         videoDuration: 0,
-        analyzingBvid: null,   // 防重入
+        analyzingBvid: null,
 
         async getCurrentBvid() {
             const match = window.location.pathname.match(/\/video\/(BV[\w]+)/);
@@ -407,15 +398,24 @@
             return match[1];
         },
 
+        // 检查 UP 主是否在白名单中
+        isUpWhitelisted(ownerMid) {
+            const cfg = getAIConfig();
+            const whitelistStr = cfg.upWhitelist || '';
+            if (!whitelistStr.trim()) return false;
+            const whitelist = whitelistStr.split(',').map(s => s.trim()).filter(Boolean);
+            return whitelist.includes(String(ownerMid));
+        },
+
         async analyze() {
             let bvid;
             try {
                 bvid = await this.getCurrentBvid();
             } catch {
-                return; // 非视频页
+                return;
             }
 
-            // 防重入：如果同一个 BV 号正在分析，直接返回
+            // 防重入
             if (this.analyzingBvid === bvid) {
                 console.log('【VideoAdGuard】分析正在进行中，跳过重复调用:', bvid);
                 return;
@@ -428,6 +428,24 @@
                 this.removeAutoSkip();
                 this.clearProgressBarMarkers();
 
+                // 获取视频信息（含UP主UID）
+                const videoInfo = await BilibiliService.getVideoInfo(bvid);
+                const ownerMid = videoInfo.owner?.mid;
+
+                // 白名单检查
+                if (ownerMid && this.isUpWhitelisted(ownerMid)) {
+                    console.log(`【VideoAdGuard】UP主 ${ownerMid} 在白名单中，跳过检测`);
+                    this.adTimeRanges = [];
+                    this.autoSkipEnabled = false;
+                    this.adDetectionResult = '该UP主在白名单中，已跳过广告检测';
+                    this.showNotification(this.adDetectionResult);
+                    return;
+                }
+
+                const comments = await BilibiliService.getComments(bvid);
+                this.videoDuration = videoInfo.duration;
+
+                // 先尝试读缓存
                 const cached = getCachedResult(bvid);
                 if (cached) {
                     this.adTimeRanges = cached.adTimeRanges;
@@ -457,11 +475,7 @@
                     return;
                 }
 
-                // 无缓存，正常检测
-                const videoInfo = await BilibiliService.getVideoInfo(bvid);
-                const comments = await BilibiliService.getComments(bvid);
-                this.videoDuration = videoInfo.duration;
-
+                // 无缓存，开始分析
                 let captions = null;
                 let segmentsData = null;
 
@@ -571,7 +585,6 @@
                 this.adTimeRanges = [];
                 this.autoSkipEnabled = false;
             } finally {
-                // 释放锁
                 if (this.analyzingBvid === bvid) {
                     this.analyzingBvid = null;
                 }
@@ -669,7 +682,7 @@
                         left: ${startRatio * 100}%;
                         width: ${widthRatio * 100}%;
                         height: 100%;
-                        background: rgb(0, 212, 0);   /* 亮绿色实色 */
+                        background: rgb(0, 212, 0);
                         min-width: 2px;
                         pointer-events: none;
                         z-index: 2;
@@ -745,7 +758,7 @@
                 border-radius: 8px;
                 box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
                 z-index: 10000;
-                width: 320px;
+                width: 380px;
                 color: #333;
                 font-family: Arial, sans-serif;
             `;
@@ -836,17 +849,10 @@
             panel.innerHTML = `
                 <h3 style="margin: 0 0 15px 0; font-size: 18px;">广告检测设置</h3>
                 <div class="form-group">
-                    <label for="vag-local-ollama" class="checkbox-container">
-                        <input type="checkbox" id="vag-local-ollama" ${currentConfig.enableLocalOllama ? 'checked' : ''}>
-                        <span class="checkmark"></span>
-                        连接到本地Ollama
-                    </label>
-                </div>
-                <div class="form-group">
                     <label for="vag-api-url">API地址：</label>
                     <input type="text" id="vag-api-url" value="${currentConfig.apiUrl || DEFAULT_API_URL}">
                 </div>
-                <div class="form-group apiKey-field" id="vag-api-key-group" style="${currentConfig.enableLocalOllama ? 'display:none' : ''}">
+                <div class="form-group">
                     <label for="vag-api-key">API密钥：</label>
                     <input type="password" id="vag-api-key" value="${currentConfig.apiKey || ''}">
                 </div>
@@ -873,6 +879,10 @@
                         无字幕时使用语音识别
                     </label>
                 </div>
+                <div class="form-group">
+                    <label for="vag-up-whitelist">UP主白名单（UID，逗号分隔）：</label>
+                    <input type="text" id="vag-up-whitelist" value="${currentConfig.upWhitelist || ''}" placeholder="例如：1343321779,123456">
+                </div>
                 <div style="display: flex; justify-content: space-between; margin-top: 15px;">
                     <button id="vag-save" style="background: #4CAF50; color: white; flex: 1; margin-right: 5px;">保存</button>
                     <button id="vag-cancel" style="background: #f44336; color: white; flex: 1; margin-left: 5px;">取消</button>
@@ -881,12 +891,6 @@
             `;
 
             document.body.appendChild(panel);
-
-            const ollamaCheckbox = document.getElementById('vag-local-ollama');
-            const apiKeyGroup = document.getElementById('vag-api-key-group');
-            ollamaCheckbox.addEventListener('change', () => {
-                apiKeyGroup.style.display = ollamaCheckbox.checked ? 'none' : 'block';
-            });
 
             const messageDiv = document.getElementById('vag-message');
             const showMsg = (msg, type) => {
@@ -899,23 +903,24 @@
                 const apiUrl = document.getElementById('vag-api-url').value.trim();
                 const apiKey = document.getElementById('vag-api-key').value.trim();
                 const model = document.getElementById('vag-model').value.trim();
-                const enableLocalOllama = ollamaCheckbox.checked;
                 const groqKey = document.getElementById('vag-groq-key').value.trim();
                 const enableGroqProxy = document.getElementById('vag-enable-groq-proxy').checked;
                 const enableAudio = document.getElementById('vag-enable-audio').checked;
+                const upWhitelist = document.getElementById('vag-up-whitelist').value.trim();
 
                 if (!apiUrl) { showMsg('请输入API地址', 'error'); return; }
-                if (!enableLocalOllama && !apiKey) { showMsg('请输入API密钥', 'error'); return; }
+                if (!apiKey) { showMsg('请输入API密钥', 'error'); return; }
                 if (!model) { showMsg('请输入模型名称', 'error'); return; }
 
                 const newConfig = getAIConfig();
                 newConfig.apiUrl = apiUrl;
                 newConfig.apiKey = apiKey;
                 newConfig.model = model;
-                newConfig.enableLocalOllama = enableLocalOllama;
                 newConfig.groqApiKey = groqKey;
                 newConfig.enableGroqProxy = enableGroqProxy;
                 newConfig.enableAudioRecognition = enableAudio;
+                newConfig.upWhitelist = upWhitelist;
+                // wbi_cache 保持不变
 
                 setAIConfig(newConfig);
                 showMsg('设置已保存', 'success');
@@ -924,7 +929,7 @@
 
             document.getElementById('vag-cancel').addEventListener('click', () => panel.remove());
 
-            ['vag-api-url', 'vag-api-key', 'vag-model', 'vag-groq-key'].forEach(id => {
+            ['vag-api-url', 'vag-api-key', 'vag-model', 'vag-groq-key', 'vag-up-whitelist'].forEach(id => {
                 const input = document.getElementById(id);
                 if (input) {
                     input.addEventListener('click', e => e.stopPropagation());
