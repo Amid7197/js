@@ -1,14 +1,22 @@
 // ==UserScript==
 // @name         B站视频植入广告检测器(自动跳过+音频识别+进度条标记)
-// @version      2.3.0
+// @version      2.3.1
 // @author       Amid7197 Warma10032 (modified)
 // @license      GPLv2
-// @description  基于大语言模型检测B站视频中的植入广告，支持自动跳过。无字幕时可调用Groq Whisper语音识别，并在进度条上以绿色块标记广告片段。支持UP主白名单。
+// @description  检测B站视频植入广告，支持自动跳过、语音识别、进度条标记，修复页面切换后自动跳过失效等问题
 // @match        *://*.bilibili.com/video/*
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setValue
 // @grant        GM_getValue
-// @connect      *
+// @connect      open.bigmodel.cn
+// @connect      api.openai.com
+// @connect      api.deepseek.com
+// @connect      *.volces.com
+// @connect      dashscope.aliyuncs.com
+// @connect      api.anthropic.com
+// @connect      generativelanguage.googleapis.com
+// @connect      api.siliconflow.cn
+// @connect      *.xyz
 // @run-at       document-end
 // ==/UserScript==
 
@@ -18,6 +26,7 @@
     const DEFAULT_API_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
     const DEFAULT_MODEL = 'glm-4-flash';
     const AD_RATIO_THRESHOLD = 1 / 3;
+    const MAX_CAPTIONS_LENGTH = 15000; // 字幕截断长度
 
     // ========== 全局配置存取 ==========
     const CONFIG_KEY = 'ai-config';
@@ -309,7 +318,7 @@
         }
     };
 
-    // ========== AI 服务 （移除了 Ollama 分支） ==========
+    // ========== AI 服务 ==========
     const AIService = {
         async makeRequest(videoInfo, config) {
             const requestBody = {
@@ -364,11 +373,17 @@
         },
 
         buildPrompt(videoInfo) {
+            // 截断字幕，避免过长
+            let captionsStr = JSON.stringify(videoInfo.captions);
+            if (captionsStr.length > MAX_CAPTIONS_LENGTH) {
+                captionsStr = captionsStr.substring(0, MAX_CAPTIONS_LENGTH) + '...\"...(已截断)';
+            }
+
             return `视频的标题和置顶评论如下，可供参考判断是否有植入广告。如果置顶评论中有购买链接，则肯定有广告，同时可以根据置顶评论的内容判断视频中的广告商从而确定哪部分是广告。
 视频标题：${videoInfo.title}
 置顶评论：${videoInfo.topComment || '无'}
 下面我会给你这个视频的字幕字典，形式为 index: context. 请你完整地找出其中的植入广告，返回json格式的数据。注意要返回一整段的广告，从广告的引入到结尾重新转折回到视频内容前，因此不要返回太短的广告，可以组合成一整段返回。
-字幕内容：${JSON.stringify(videoInfo.captions)}
+字幕内容：${captionsStr}
 先返回'exist': bool。true表示存在植入广告，false表示不存在植入广告。
 再返回'index_lists': list[list[int]]。二维数组，行数表示广告的段数，一般来说视频是没有广告的，但也有小部分会植入一段广告，极少部分是多段广告，因此不要返回过多，只返回与标题最不相关或者与置顶链接中的商品最相关的部分。每一行是长度为2的数组[start, end]，表示一段广告的开头结尾，start和end是字幕的index。`;
         },
@@ -391,6 +406,7 @@
         autoSkipHandler: null,
         videoDuration: 0,
         analyzingBvid: null,
+        currentNotification: null,   // 用于通知防堆积
 
         async getCurrentBvid() {
             const match = window.location.pathname.match(/\/video\/(BV[\w]+)/);
@@ -398,7 +414,6 @@
             return match[1];
         },
 
-        // 检查 UP 主是否在白名单中
         isUpWhitelisted(ownerMid) {
             const cfg = getAIConfig();
             const whitelistStr = cfg.upWhitelist || '';
@@ -415,12 +430,14 @@
                 return;
             }
 
-            // 防重入
             if (this.analyzingBvid === bvid) {
                 console.log('【VideoAdGuard】分析正在进行中，跳过重复调用:', bvid);
                 return;
             }
             this.analyzingBvid = bvid;
+
+            // 记录开始时的bvid，用于异步完成后校验
+            const startBvid = bvid;
 
             try {
                 const existingButton = document.querySelector('.skip-ad-button10032');
@@ -428,11 +445,9 @@
                 this.removeAutoSkip();
                 this.clearProgressBarMarkers();
 
-                // 获取视频信息（含UP主UID）
                 const videoInfo = await BilibiliService.getVideoInfo(bvid);
                 const ownerMid = videoInfo.owner?.mid;
 
-                // 白名单检查
                 if (ownerMid && this.isUpWhitelisted(ownerMid)) {
                     console.log(`【VideoAdGuard】UP主 ${ownerMid} 在白名单中，跳过检测`);
                     this.adTimeRanges = [];
@@ -500,6 +515,7 @@
                     console.warn('【VideoAdGuard】获取字幕失败:', e);
                 }
 
+                // 无字幕且开启语音识别
                 const cfg = getAIConfig();
                 const enableAudio = cfg.enableAudioRecognition !== false;
                 if (!captions && enableAudio) {
@@ -514,6 +530,13 @@
                         if (!audioUrl) throw new Error('未找到音频流');
                         const audioBytes = await AudioService.downloadAudioAsBytes(audioUrl);
                         const transcription = await AudioService.transcribe(audioBytes, { name: 'audio.m4a', type: 'audio/m4a' });
+
+                        // 检查是否已切换到其他视频
+                        if (startBvid !== await this.getCurrentBvid().catch(() => null)) {
+                            console.log('【VideoAdGuard】视频已切换，放弃语音识别结果');
+                            return;
+                        }
+
                         if (!transcription.segments || transcription.segments.length === 0) {
                             throw new Error('未识别到任何语音内容');
                         }
@@ -543,7 +566,7 @@
                     captions
                 });
 
-                if (result.exist) {
+                if (result.exist && result.index_lists?.length) {
                     const second_lists = this.segments2second(result.index_lists, segmentsData);
                     this.adTimeRanges = second_lists;
                     const adTotal = second_lists.reduce((sum, [s, e]) => sum + (e - s), 0);
@@ -552,7 +575,6 @@
                     if (ratio > AD_RATIO_THRESHOLD) {
                         this.autoSkipEnabled = false;
                         this.adDetectionResult = `检测到过多广告（占视频${(ratio * 100).toFixed(1)}%），已禁用自动跳过`;
-                        console.warn('【VideoAdGuard】广告占比超过阈值，不进行自动跳过');
                     } else {
                         this.autoSkipEnabled = true;
                         this.adDetectionResult = `发现${second_lists.length}处广告：${
@@ -566,6 +588,12 @@
                     });
 
                     this.showNotification(this.adDetectionResult);
+
+                    // 仅当确实有广告且成功获取区间时才缓存
+                    setCachedResult(bvid, {
+                        adTimeRanges: this.adTimeRanges,
+                        videoDuration: this.videoDuration
+                    });
                 } else {
                     this.adDetectionResult = '无广告内容';
                     this.adTimeRanges = [];
@@ -574,10 +602,6 @@
                 }
 
                 this.updateProgressBarMarkers();
-                setCachedResult(bvid, {
-                    adTimeRanges: this.adTimeRanges,
-                    videoDuration: this.videoDuration
-                });
 
             } catch (error) {
                 console.error('分析失败:', error);
@@ -591,10 +615,16 @@
             }
         },
 
+        // 兼容 LLM 可能返回的一维或二维数组
         segments2second(indexLists, segments) {
+            if (!Array.isArray(indexLists) || indexLists.length === 0) return [];
+            // 如果第一个元素不是数组，则视为单段广告 [start, end]
+            if (!Array.isArray(indexLists[0])) {
+                indexLists = [indexLists];
+            }
             return indexLists.map(list => {
-                const start = segments[list[0]]?.from || segments[list[0]]?.start || 0;
-                const end = segments[list[list.length - 1]]?.to || segments[list[list.length - 1]]?.end || 0;
+                const start = segments[list[0]]?.from ?? segments[list[0]]?.start ?? 0;
+                const end = segments[list[list.length - 1]]?.to ?? segments[list[list.length - 1]]?.end ?? 0;
                 return [start, end];
             });
         },
@@ -633,12 +663,12 @@
             console.log('【VideoAdGuard】已启动自动跳过广告');
         },
 
-        // ---------- 进度条标记 (颜色 rgb(0, 212, 0)) ----------
+        // ---------- 进度条标记 ----------
         clearProgressBarMarkers() {
             document.querySelectorAll('.vag-progress-marker').forEach(el => el.remove());
         },
 
-        async updateProgressBarMarkers() {
+        async updateProgressBarMarkers(retries = 2) {
             this.clearProgressBarMarkers();
             if (!this.adTimeRanges.length || this.videoDuration <= 0) return;
 
@@ -661,40 +691,49 @@
                 });
             };
 
-            try {
-                const container = await waitForElement('.bpx-player-progress-schedule', document.body, 5000);
-                if (getComputedStyle(container).position === 'static') {
-                    container.style.position = 'relative';
-                }
-                container.style.overflow = 'visible';
+            for (let i = 0; i <= retries; i++) {
+                try {
+                    const container = await waitForElement('.bpx-player-progress-schedule', document.body, 5000);
+                    if (getComputedStyle(container).position === 'static') {
+                        container.style.position = 'relative';
+                    }
+                    container.style.overflow = 'visible';
 
-                for (const [start, end] of this.adTimeRanges) {
-                    const startRatio = Math.min(1, start / this.videoDuration);
-                    const endRatio = Math.min(1, end / this.videoDuration);
-                    const widthRatio = endRatio - startRatio;
-                    if (widthRatio <= 0) continue;
+                    for (const [start, end] of this.adTimeRanges) {
+                        const startRatio = Math.min(1, start / this.videoDuration);
+                        const endRatio = Math.min(1, end / this.videoDuration);
+                        const widthRatio = endRatio - startRatio;
+                        if (widthRatio <= 0) continue;
 
-                    const marker = document.createElement('div');
-                    marker.className = 'vag-progress-marker';
-                    marker.style.cssText = `
-                        position: absolute;
-                        top: 0;
-                        left: ${startRatio * 100}%;
-                        width: ${widthRatio * 100}%;
-                        height: 100%;
-                        background: rgb(0, 212, 0);
-                        min-width: 2px;
-                        pointer-events: none;
-                        z-index: 2;
-                    `;
-                    container.appendChild(marker);
+                        const marker = document.createElement('div');
+                        marker.className = 'vag-progress-marker';
+                        marker.style.cssText = `
+                            position: absolute;
+                            top: 0;
+                            left: ${startRatio * 100}%;
+                            width: ${widthRatio * 100}%;
+                            height: 100%;
+                            background: rgb(0, 212, 0);
+                            min-width: 2px;
+                            pointer-events: none;
+                            z-index: 2;
+                        `;
+                        container.appendChild(marker);
+                    }
+                    return; // 成功，退出
+                } catch (e) {
+                    if (i === retries) console.warn('【VideoAdGuard】进度条标记更新失败:', e);
+                    else await new Promise(r => setTimeout(r, 2000));
                 }
-            } catch (e) {
-                console.warn('【VideoAdGuard】进度条标记更新失败:', e);
             }
         },
 
         showNotification(message) {
+            // 移除已有通知，防止堆积
+            if (this.currentNotification) {
+                this.currentNotification.remove();
+                clearTimeout(this._notiTimer);
+            }
             const noti = document.createElement('div');
             noti.style.cssText = `
                 position: fixed;
@@ -709,10 +748,14 @@
             `;
             noti.textContent = message;
             document.body.appendChild(noti);
-            setTimeout(() => {
+            this.currentNotification = noti;
+            this._notiTimer = setTimeout(() => {
                 noti.style.opacity = '0';
                 noti.style.transition = 'opacity 0.5s';
-                setTimeout(() => noti.remove(), 500);
+                setTimeout(() => {
+                    noti.remove();
+                    if (this.currentNotification === noti) this.currentNotification = null;
+                }, 500);
             }, 5000);
         },
 
@@ -939,24 +982,47 @@
         }
     };
 
+    // ========== 页面可见性监听，修复切后台自动跳过失效 ==========
+    function setupVisibilityListener() {
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                const hasAds = AdDetector.adTimeRanges && AdDetector.adTimeRanges.length > 0;
+                if (hasAds && AdDetector.autoSkipEnabled) {
+                    console.log('【VideoAdGuard】页面恢复可见，重新绑定自动跳过和进度条标记');
+                    AdDetector.setupAutoSkip();
+                    AdDetector.updateProgressBarMarkers();
+                }
+            }
+        });
+    }
+
     // ========== 初始化 ==========
     function init() {
         AdDetector.analyze();
         AdDetector.addSettingsButton();
+        setupVisibilityListener();
 
         let lastUrl = location.href;
+        let analyzeDebounceTimer = null;
+
         new MutationObserver(() => {
             const url = location.href;
             if (url !== lastUrl) {
                 lastUrl = url;
-                console.log('【VideoAdGuard】URL changed:', url);
-                AdDetector.analyze();
+                clearTimeout(analyzeDebounceTimer);
+                analyzeDebounceTimer = setTimeout(() => {
+                    console.log('【VideoAdGuard】URL changed:', url);
+                    AdDetector.analyze();
+                }, 200);
             }
         }).observe(document, { subtree: true, childList: true });
 
         window.addEventListener('popstate', () => {
             console.log('【VideoAdGuard】History changed:', location.href);
-            AdDetector.analyze();
+            clearTimeout(analyzeDebounceTimer);
+            analyzeDebounceTimer = setTimeout(() => {
+                AdDetector.analyze();
+            }, 200);
         });
     }
 
