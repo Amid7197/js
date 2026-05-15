@@ -1,15 +1,17 @@
 // ==UserScript==
-// @name         Bilibili 视频音量均衡器 (终极流畅版)
+// @name         Bilibili 视频音量均衡器 (可配置版)
 // @namespace    http://tampermonkey.net/
-// @version      0.2.3
-// @description  通过 Web Audio API 压缩 Bilibili 视频中音频的动态范围，使不同视频或同一视频中差距过大的响度保持一致。防抖音恢复，零停顿。
+// @version      0.3.0
+// @description  通过 Web Audio API 压缩 Bilibili 视频中音频的动态范围，使不同视频或同一视频中差距过大的响度保持一致。防抖音恢复，零停顿。支持菜单命令调整淡入时长和防抖延迟。
 // @author       Amid7197 Timothy Tao & Github Copilot
 // @match        *://www.bilibili.com/video/*
 // @match        *://www.bilibili.com/bangumi/play/*
 // @match        *://live.bilibili.com/*
 // @match        *://www.bilibili.com/list/*
 // @icon         https://www.bilibili.com/favicon.ico
-// @grant        none
+// @grant        GM_setValue
+// @grant        GM_getValue
+// @grant        GM_registerMenuCommand
 // @run-at       document-start
 // @license      MIT
 // 原版脚本地址: https://greasyfork.org/scripts/557295
@@ -18,18 +20,61 @@
 (function() {
     'use strict';
 
-    // ==================== 用户可配置参数（单位：ms） ====================
-    // 切回页面时音量淡入时长（推荐 50 ~ 300）
-    const FADE_IN_DURATION_MS = 200;
+    // ==================== 默认配置 ====================
+    const DEFAULT_FADE_IN_MS = 200;
+    const DEFAULT_DEBOUNCE_MS = 500;
 
-    // MutationObserver 防抖延迟（推荐 300 ~ 800）
-    const DEBOUNCE_DELAY_MS = 500;
-    // ===================================================================
+    // ==================== 读取存储配置 ====================
+    let FADE_IN_DURATION_MS = GM_getValue('fadeInMs', DEFAULT_FADE_IN_MS);
+    let DEBOUNCE_DELAY_MS = GM_getValue('debounceMs', DEFAULT_DEBOUNCE_MS);
 
+    // 保存配置的辅助函数
+    function saveFadeIn(value) {
+        GM_setValue('fadeInMs', value);
+        FADE_IN_DURATION_MS = value;
+    }
+
+    function saveDebounce(value) {
+        GM_setValue('debounceMs', value);
+        DEBOUNCE_DELAY_MS = value;
+        // 防抖延迟改变后需要重启 observer
+        restartObserver();
+    }
+
+    // ==================== 菜单命令 ====================
+    GM_registerMenuCommand('⚙️ 设置淡入时长 (ms)', () => {
+        let newVal = prompt('当前淡入时长（切回页面时音量恢复的淡入时间，单位毫秒（推荐 50 ~ 300））:', FADE_IN_DURATION_MS);
+        if (newVal !== null) {
+            let num = parseInt(newVal, 10);
+            if (!isNaN(num) && num >= 0 && num <= 3000) {
+                saveFadeIn(num);
+                GM_notification?.(`淡入时长已设为 ${num} ms`, '音量均衡器');
+            } else {
+                alert('请输入 0~3000 之间的整数');
+            }
+        }
+    });
+
+    GM_registerMenuCommand('⚙️ 设置防抖延迟 (ms)', () => {
+        let newVal = prompt('当前防抖延迟（DOM 变化监听延迟，推荐 300~800 毫秒）:', DEBOUNCE_DELAY_MS);
+        if (newVal !== null) {
+            let num = parseInt(newVal, 10);
+            if (!isNaN(num) && num >= 100 && num <= 3000) {
+                saveDebounce(num);
+                GM_notification?.(`防抖延迟已设为 ${num} ms，已重启监听`, '音量均衡器');
+            } else {
+                alert('请输入 100~3000 之间的整数');
+            }
+        }
+    });
+
+    // ==================== 辅助函数 ====================
     const $ = s => document.querySelector(s);
     let audioCtx, sourceNode, compressorNode, gainNode, currentVideo;
     let isEnabled = true;
     let shouldKeepPlaying = false;
+    let observerTimer = null;
+    let currentObserver = null;
 
     // ==================== 样式 ====================
     const style = document.createElement('style');
@@ -138,7 +183,7 @@
         });
     }
 
-    // ==================== 全局页面可见性事件（仅绑定一次） ====================
+    // ==================== 全局页面可见性事件 ====================
     document.addEventListener('visibilitychange', () => {
         const video = currentVideo;
         if (!video) return;
@@ -152,35 +197,62 @@
         }
     });
 
-    // ==================== DOM 监听（防抖版） ====================
-    let observerTimer = null;
-
+    // ==================== DOM 监听（防抖 + 可重启） ====================
     function debouncedObserverCallback() {
         tryAddControlBtn();
         const video = document.querySelector('.bpx-player-video-wrap video, .bilibili-player-video video, video');
         if (video) processVideo(video);
     }
 
-    const observer = new MutationObserver(() => {
-        if (observerTimer) clearTimeout(observerTimer);
-        observerTimer = setTimeout(debouncedObserverCallback, DEBOUNCE_DELAY_MS);
-    });
+    function startObserver() {
+        if (currentObserver) {
+            currentObserver.disconnect();
+            currentObserver = null;
+        }
+        if (observerTimer) {
+            clearTimeout(observerTimer);
+            observerTimer = null;
+        }
+
+        const targetNode = document.querySelector('#app, .bpx-player, .bilibili-player, body');
+        if (!targetNode) {
+            // 如果还没出现根节点，稍后再试
+            setTimeout(startObserver, 500);
+            return;
+        }
+
+        currentObserver = new MutationObserver(() => {
+            if (observerTimer) clearTimeout(observerTimer);
+            observerTimer = setTimeout(debouncedObserverCallback, DEBOUNCE_DELAY_MS);
+        });
+        currentObserver.observe(targetNode, { childList: true, subtree: true });
+    }
+
+    function restartObserver() {
+        if (currentObserver) {
+            currentObserver.disconnect();
+            if (observerTimer) clearTimeout(observerTimer);
+            observerTimer = null;
+        }
+        startObserver();
+    }
 
     // ==================== 初始化 ====================
     function init() {
         document.head.appendChild(style);
-        const targetNode = document.querySelector('#app, .bpx-player, .bilibili-player, body');
-        if (targetNode) {
-            observer.observe(targetNode, { childList: true, subtree: true });
-        }
+        startObserver();
         debouncedObserverCallback();
+
         document.addEventListener('fullscreenchange', () => setTimeout(async () => {
             if (audioCtx?.state === 'suspended') await audioCtx.resume();
             tryAddControlBtn();
         }, 300));
     }
 
-    document.readyState === 'loading'
-        ? document.addEventListener('DOMContentLoaded', init)
-        : init();
+    // 等待 DOMContentLoaded 或立即执行
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 })();
