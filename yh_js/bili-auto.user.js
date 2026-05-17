@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         B站视频植入广告检测器(自动跳过+音频识别+进度条标记)
-// @version      2.3.3
+// @version      2.3.4
 // @author       Amid7197 Warma10032 (modified)
 // @license      GPLv2
-// @description  基于大语言模型检测B站视频中的植入广告，支持自动跳过。优化提示词以识别洗面奶、转转等常见广告。
+// @description  基于大语言模型检测B站视频中的植入广告，支持自动跳过。优化提示词以识别洗面奶、转转等常见广告。缓存天数可自定义。
 // @match        *://*.bilibili.com/video/*
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setValue
@@ -30,8 +30,13 @@
         GM_setValue(CONFIG_KEY, config);
     }
 
+    // 获取缓存保留天数，未设置时默认3天
+    function getCacheDurationDays() {
+        const cfg = getAIConfig();
+        return (cfg.cacheDurationDays && cfg.cacheDurationDays > 0) ? cfg.cacheDurationDays : 3;
+    }
+
     const CACHE_KEY = 'cache_AD';
-    const CACHE_DURATION_DAYS = 3;
 
     function getCacheStore() {
         return GM_getValue(CACHE_KEY, {});
@@ -44,7 +49,8 @@
     function cleanExpiredCache(store) {
         const now = new Date();
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-        const threshold = todayStart - (CACHE_DURATION_DAYS - 1) * 86400000;
+        const days = getCacheDurationDays();
+        const threshold = todayStart - (days - 1) * 86400000;
         let changed = false;
         for (const bvid in store) {
             const entry = store[bvid];
@@ -63,7 +69,8 @@
         if (!entry) return null;
         const now = new Date();
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-        const threshold = todayStart - (CACHE_DURATION_DAYS - 1) * 86400000;
+        const days = getCacheDurationDays();
+        const threshold = todayStart - (days - 1) * 86400000;
         if (entry.timestamp >= threshold) {
             return {
                 adTimeRanges: entry.adTimeRanges,
@@ -308,7 +315,7 @@
         }
     };
 
-    // ========== AI 服务（优化提示词，移除 response_format）==========
+    // ========== AI 服务 ==========
     const AIService = {
         async makeRequest(videoInfo, config) {
             const requestBody = {
@@ -324,7 +331,7 @@
                     }
                 ],
                 temperature: 0.8,
-                max_tokens: 65536,   // 增大 token 数，避免 JSON 截断
+                max_tokens: 65536,
                 ...config.bodyExtra
             };
 
@@ -353,7 +360,6 @@
             const apiKey = cfg.apiKey;
             if (!apiKey) throw new Error('未设置API密钥');
 
-            // 构建请求配置，根据设置决定是否开启深度思考
             const requestConfig = {
                 headers: {
                     'Content-Type': 'application/json',
@@ -372,7 +378,6 @@
                 throw new Error('模型返回内容为空，请尝试增大 max_tokens 或更换模型');
             }
 
-            // 容错处理：提取可能的 JSON 代码块
             const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
             if (jsonMatch) {
                 content = jsonMatch[1];
@@ -659,7 +664,6 @@
             console.log('【VideoAdGuard】已启动自动跳过广告');
         },
 
-        // ---------- 进度条标记 ----------
         clearProgressBarMarkers() {
             document.querySelectorAll('.vag-progress-marker').forEach(el => el.remove());
         },
@@ -794,7 +798,8 @@
                 .vag-settings-panel .form-group { margin-bottom: 12px; }
                 .vag-settings-panel label { display: block; margin-bottom: 4px; font-size: 14px; }
                 .vag-settings-panel input[type="text"],
-                .vag-settings-panel input[type="password"] {
+                .vag-settings-panel input[type="password"],
+                .vag-settings-panel input[type="number"] {
                     width: 100%;
                     padding: 6px 8px;
                     box-sizing: border-box;
@@ -916,6 +921,10 @@
                     <label for="vag-up-whitelist">UP主白名单（UID，逗号分隔）：</label>
                     <input type="text" id="vag-up-whitelist" value="${currentConfig.upWhitelist || ''}" placeholder="例如：1343321779,123456">
                 </div>
+                <div class="form-group">
+                    <label for="vag-cache-days">缓存保留天数（默认3）：</label>
+                    <input type="number" id="vag-cache-days" min="1" max="365" value="${currentConfig.cacheDurationDays || 3}" placeholder="1~365">
+                </div>
                 <div style="display: flex; justify-content: space-between; margin-top: 15px;">
                     <button id="vag-save" style="background: #4CAF50; color: white; flex: 1; margin-right: 5px;">保存</button>
                     <button id="vag-cancel" style="background: #f44336; color: white; flex: 1; margin-left: 5px;">取消</button>
@@ -941,10 +950,15 @@
                 const enableAudio = document.getElementById('vag-enable-audio').checked;
                 const enableThinking = document.getElementById('vag-enable-thinking').checked;
                 const upWhitelist = document.getElementById('vag-up-whitelist').value.trim();
+                const cacheDurationDays = parseInt(document.getElementById('vag-cache-days').value, 10);
 
                 if (!apiUrl) { showMsg('请输入API地址', 'error'); return; }
                 if (!apiKey) { showMsg('请输入API密钥', 'error'); return; }
                 if (!model) { showMsg('请输入模型名称', 'error'); return; }
+                if (isNaN(cacheDurationDays) || cacheDurationDays < 1) {
+                    showMsg('缓存天数必须为不小于1的整数', 'error');
+                    return;
+                }
 
                 const newConfig = getAIConfig();
                 newConfig.apiUrl = apiUrl;
@@ -955,6 +969,7 @@
                 newConfig.enableAudioRecognition = enableAudio;
                 newConfig.enableThinking = enableThinking;
                 newConfig.upWhitelist = upWhitelist;
+                newConfig.cacheDurationDays = cacheDurationDays;
 
                 setAIConfig(newConfig);
                 showMsg('设置已保存', 'success');
@@ -963,7 +978,7 @@
 
             document.getElementById('vag-cancel').addEventListener('click', () => panel.remove());
 
-            ['vag-api-url', 'vag-api-key', 'vag-model', 'vag-groq-key', 'vag-up-whitelist'].forEach(id => {
+            ['vag-api-url', 'vag-api-key', 'vag-model', 'vag-groq-key', 'vag-up-whitelist', 'vag-cache-days'].forEach(id => {
                 const input = document.getElementById(id);
                 if (input) {
                     input.addEventListener('click', e => e.stopPropagation());
