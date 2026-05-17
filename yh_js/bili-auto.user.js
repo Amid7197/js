@@ -1,9 +1,9 @@
 // ==UserScript==
-// @name         B站视频植入广告检测器(自动跳过+音频识别+进度条标记)
-// @version      2.3.4
+// @name         B站视频植入广告检测器(自动跳过+音频识别+进度条标记+多API切换)
+// @version      2.4.0
 // @author       Amid7197 Warma10032 (modified)
 // @license      GPLv2
-// @description  基于大语言模型检测B站视频中的植入广告，支持自动跳过。优化提示词以识别洗面奶、转转等常见广告。缓存天数可自定义。
+// @description  基于大语言模型检测B站视频中的植入广告，支持自动跳过。优化提示词以识别洗面奶、转转等常见广告。缓存天数可自定义，新增多套API配置及快速切换。
 // @match        *://*.bilibili.com/video/*
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setValue
@@ -16,14 +16,34 @@
     'use strict';
 
     const DEFAULT_API_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
-    const DEFAULT_MODEL = 'glm-4.7-flash';
+    const DEFAULT_MODEL = 'glm-4-flash';
     const AD_RATIO_THRESHOLD = 1 / 3;
 
     // ========== 全局配置存取 ==========
     const CONFIG_KEY = 'ai-config';
 
     function getAIConfig() {
-        return GM_getValue(CONFIG_KEY, {});
+        const cfg = GM_getValue(CONFIG_KEY, {});
+        // 自动迁移旧配置
+        if (!cfg.apiConfigs && cfg.apiUrl) {
+            cfg.apiConfigs = [{
+                name: '默认配置',
+                apiUrl: cfg.apiUrl,
+                apiKey: cfg.apiKey || '',
+                model: cfg.model || DEFAULT_MODEL
+            }];
+            cfg.activeApiIndex = 0;
+            // 清理旧字段（可选）
+            delete cfg.apiUrl;
+            delete cfg.apiKey;
+            delete cfg.model;
+        }
+        // 确保必有字段
+        cfg.apiConfigs = cfg.apiConfigs || [];
+        if (cfg.activeApiIndex === undefined || cfg.activeApiIndex >= cfg.apiConfigs.length) {
+            cfg.activeApiIndex = 0;
+        }
+        return cfg;
     }
 
     function setAIConfig(config) {
@@ -317,6 +337,13 @@
 
     // ========== AI 服务 ==========
     const AIService = {
+        getActiveApiConfig() {
+            const cfg = getAIConfig();
+            const list = cfg.apiConfigs || [];
+            const idx = cfg.activeApiIndex ?? 0;
+            return list[idx] || {};
+        },
+
         async makeRequest(videoInfo, config) {
             const requestBody = {
                 model: this.getModel(),
@@ -331,7 +358,7 @@
                     }
                 ],
                 temperature: 0.8,
-                max_tokens: 65536,
+                max_tokens: 4096,
                 ...config.bodyExtra
             };
 
@@ -347,7 +374,7 @@
                         if (response.status >= 200 && response.status < 300) {
                             resolve(JSON.parse(response.responseText));
                         } else {
-                            reject(new Error('请求失败: ' + response.statusText));
+                            reject(new Error('请求失败: status=' + response.status + ' ' + response.statusText));
                         }
                     },
                     onerror: reject
@@ -356,10 +383,11 @@
         },
 
         async analyze(videoInfo) {
-            const cfg = getAIConfig();
-            const apiKey = cfg.apiKey;
-            if (!apiKey) throw new Error('未设置API密钥');
+            const activeCfg = this.getActiveApiConfig();
+            const apiKey = activeCfg.apiKey;
+            if (!apiKey) throw new Error('未设置API密钥（当前激活配置）');
 
+            const cfg = getAIConfig();
             const requestConfig = {
                 headers: {
                     'Content-Type': 'application/json',
@@ -402,12 +430,12 @@
         },
 
         getApiUrl() {
-            const cfg = getAIConfig();
-            return cfg.apiUrl || DEFAULT_API_URL;
+            const active = this.getActiveApiConfig();
+            return active.apiUrl || DEFAULT_API_URL;
         },
         getModel() {
-            const cfg = getAIConfig();
-            return cfg.model || DEFAULT_MODEL;
+            const active = this.getActiveApiConfig();
+            return active.model || DEFAULT_MODEL;
         }
     };
 
@@ -775,6 +803,9 @@
             }
 
             const currentConfig = getAIConfig();
+            const configList = currentConfig.apiConfigs || [];
+            const activeIdx = currentConfig.activeApiIndex ?? 0;
+            const activeCfg = configList[activeIdx] || {};
 
             const panel = document.createElement('div');
             panel.className = 'vag-settings-panel';
@@ -788,7 +819,9 @@
                 border-radius: 8px;
                 box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
                 z-index: 10000;
-                width: 380px;
+                width: 420px;
+                max-height: 90vh;
+                overflow-y: auto;
                 color: #333;
                 font-family: Arial, sans-serif;
             `;
@@ -821,6 +854,7 @@
                 }
                 .vag-settings-panel .success { background: #dff0d8; color: #3c763d; }
                 .vag-settings-panel .error { background: #f2dede; color: #a94442; }
+                .vag-settings-panel .info { background: #d9edf7; color: #31708f; }
                 .vag-settings-panel .checkbox-container {
                     display: flex;
                     align-items: center;
@@ -874,23 +908,70 @@
                     border: 0;
                     border-top: 1px solid #eee;
                 }
+                .vag-settings-panel .inline-btn {
+                    margin-left: 6px;
+                    padding: 4px 8px;
+                    font-size: 12px;
+                }
+                .vag-settings-panel select {
+                    width: 100%;
+                    padding: 6px 8px;
+                    border: 1px solid #ccc;
+                    border-radius: 4px;
+                }
             `;
             document.head.appendChild(style);
 
+            const optionsHtml = configList.map((cfg, i) => 
+                `<option value="${i}" ${i === activeIdx ? 'selected' : ''}>${cfg.name || '未命名'}</option>`
+            ).join('');
+
             panel.innerHTML = `
                 <h3 style="margin: 0 0 15px 0; font-size: 18px;">广告检测设置</h3>
+                
+                <!-- API配置管理区 -->
                 <div class="form-group">
-                    <label for="vag-api-url">API地址：</label>
-                    <input type="text" id="vag-api-url" value="${currentConfig.apiUrl || DEFAULT_API_URL}">
+                    <label>当前API配置：</label>
+                    <select id="vag-api-select">${optionsHtml}</select>
+                    <div style="margin-top: 4px;">
+                        <button id="vag-add-config" style="background: #2196F3; color:white; font-size:12px;">➕ 新增</button>
+                        <button id="vag-edit-config" style="background: #FF9800; color:white; font-size:12px; margin-left:4px;">✏️ 编辑</button>
+                        <button id="vag-del-config" style="background: #f44336; color:white; font-size:12px; margin-left:4px;">🗑 删除</button>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="vag-api-key">API密钥：</label>
-                    <input type="password" id="vag-api-key" value="${currentConfig.apiKey || ''}">
+
+                <!-- 当前配置详情（只读预览，编辑时使用另一个区域） -->
+                <div id="vag-config-detail" style="background:#f5f5f5; padding:10px; border-radius:4px; font-size:13px;">
+                    <div><b>名称：</b><span id="vag-disp-name">${activeCfg.name || '无'}</span></div>
+                    <div><b>地址：</b><span id="vag-disp-url">${activeCfg.apiUrl || DEFAULT_API_URL}</span></div>
+                    <div><b>密钥：</b><span id="vag-disp-key">${activeCfg.apiKey ? '***已填写***' : '(未填写)'}</span></div>
+                    <div><b>模型：</b><span id="vag-disp-model">${activeCfg.model || DEFAULT_MODEL}</span></div>
                 </div>
-                <div class="form-group">
-                    <label for="vag-model">模型名称：</label>
-                    <input type="text" id="vag-model" value="${currentConfig.model || DEFAULT_MODEL}">
+
+                <!-- 编辑表单（默认隐藏） -->
+                <div id="vag-edit-form" style="display:none; border:1px solid #ccc; padding:10px; border-radius:4px; margin-top:10px;">
+                    <div class="form-group">
+                        <label>配置名称：</label>
+                        <input type="text" id="vag-edit-name" value="${activeCfg.name || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label>API地址：</label>
+                        <input type="text" id="vag-edit-url" value="${activeCfg.apiUrl || DEFAULT_API_URL}">
+                    </div>
+                    <div class="form-group">
+                        <label>API密钥：</label>
+                        <input type="password" id="vag-edit-key" value="${activeCfg.apiKey || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label>模型名称：</label>
+                        <input type="text" id="vag-edit-model" value="${activeCfg.model || DEFAULT_MODEL}">
+                    </div>
+                    <div style="text-align:right;">
+                        <button id="vag-save-edit" style="background: #4CAF50; color:white;">保存修改</button>
+                        <button id="vag-cancel-edit" style="background: #999; color:white; margin-left:4px;">取消</button>
+                    </div>
                 </div>
+
                 <hr>
                 <div class="form-group">
                     <label for="vag-groq-key">Groq API密钥：</label>
@@ -925,9 +1006,10 @@
                     <label for="vag-cache-days">缓存保留天数（默认3）：</label>
                     <input type="number" id="vag-cache-days" min="1" max="365" value="${currentConfig.cacheDurationDays || 3}" placeholder="1~365">
                 </div>
-                <div style="display: flex; justify-content: space-between; margin-top: 15px;">
-                    <button id="vag-save" style="background: #4CAF50; color: white; flex: 1; margin-right: 5px;">保存</button>
-                    <button id="vag-cancel" style="background: #f44336; color: white; flex: 1; margin-left: 5px;">取消</button>
+                <div style="display: flex; justify-content: space-between; margin-top: 15px; gap: 5px;">
+                    <button id="vag-test-connection" style="background: #2196F3; color: white; flex: 1;">测试连接</button>
+                    <button id="vag-save-all" style="background: #4CAF50; color: white; flex: 1;">保存全部设置</button>
+                    <button id="vag-cancel" style="background: #f44336; color: white; flex: 1;">取消</button>
                 </div>
                 <div id="vag-message"></div>
             `;
@@ -938,51 +1020,210 @@
             const showMsg = (msg, type) => {
                 messageDiv.textContent = msg;
                 messageDiv.className = type;
-                setTimeout(() => { messageDiv.textContent = ''; messageDiv.className = ''; }, 3000);
+                setTimeout(() => { messageDiv.textContent = ''; messageDiv.className = ''; }, 5000);
             };
 
-            document.getElementById('vag-save').addEventListener('click', () => {
-                const apiUrl = document.getElementById('vag-api-url').value.trim();
-                const apiKey = document.getElementById('vag-api-key').value.trim();
-                const model = document.getElementById('vag-model').value.trim();
-                const groqKey = document.getElementById('vag-groq-key').value.trim();
-                const enableGroqProxy = document.getElementById('vag-enable-groq-proxy').checked;
-                const enableAudio = document.getElementById('vag-enable-audio').checked;
-                const enableThinking = document.getElementById('vag-enable-thinking').checked;
-                const upWhitelist = document.getElementById('vag-up-whitelist').value.trim();
-                const cacheDurationDays = parseInt(document.getElementById('vag-cache-days').value, 10);
+            // 辅助函数：更新详情显示
+            const updateDetailDisplay = () => {
+                const cfg = getAIConfig();
+                const list = cfg.apiConfigs || [];
+                const idx = cfg.activeApiIndex ?? 0;
+                const active = list[idx] || {};
+                document.getElementById('vag-disp-name').textContent = active.name || '无';
+                document.getElementById('vag-disp-url').textContent = active.apiUrl || DEFAULT_API_URL;
+                document.getElementById('vag-disp-key').textContent = active.apiKey ? '***已填写***' : '(未填写)';
+                document.getElementById('vag-disp-model').textContent = active.model || DEFAULT_MODEL;
+                // 刷新下拉框
+                const select = document.getElementById('vag-api-select');
+                if (select) {
+                    select.innerHTML = list.map((c, i) => 
+                        `<option value="${i}" ${i === idx ? 'selected' : ''}>${c.name || '未命名'}</option>`
+                    ).join('');
+                }
+            };
 
-                if (!apiUrl) { showMsg('请输入API地址', 'error'); return; }
-                if (!apiKey) { showMsg('请输入API密钥', 'error'); return; }
-                if (!model) { showMsg('请输入模型名称', 'error'); return; }
-                if (isNaN(cacheDurationDays) || cacheDurationDays < 1) {
+            // 下拉框切换激活配置
+            document.getElementById('vag-api-select').addEventListener('change', (e) => {
+                const newIdx = parseInt(e.target.value, 10);
+                if (isNaN(newIdx)) return;
+                const config = getAIConfig();
+                config.activeApiIndex = newIdx;
+                setAIConfig(config);
+                updateDetailDisplay();
+                showMsg('已切换到配置：' + ((config.apiConfigs[newIdx] || {}).name || '未命名'), 'success');
+            });
+
+            // 新增配置
+            document.getElementById('vag-add-config').addEventListener('click', () => {
+                const config = getAIConfig();
+                if (!config.apiConfigs) config.apiConfigs = [];
+                const newCfg = {
+                    name: '新配置 ' + (config.apiConfigs.length + 1),
+                    apiUrl: DEFAULT_API_URL,
+                    apiKey: '',
+                    model: DEFAULT_MODEL
+                };
+                config.apiConfigs.push(newCfg);
+                config.activeApiIndex = config.apiConfigs.length - 1;
+                setAIConfig(config);
+                updateDetailDisplay();
+                showMsg('已添加新配置，可点击“编辑”修改', 'info');
+            });
+
+            // 编辑当前配置：显示编辑表单并填充当前值
+            document.getElementById('vag-edit-config').addEventListener('click', () => {
+                const config = getAIConfig();
+                const list = config.apiConfigs || [];
+                const idx = config.activeApiIndex ?? 0;
+                const active = list[idx];
+                if (!active) return;
+                document.getElementById('vag-edit-name').value = active.name || '';
+                document.getElementById('vag-edit-url').value = active.apiUrl || DEFAULT_API_URL;
+                document.getElementById('vag-edit-key').value = active.apiKey || '';
+                document.getElementById('vag-edit-model').value = active.model || DEFAULT_MODEL;
+                document.getElementById('vag-edit-form').style.display = 'block';
+            });
+
+            // 保存编辑
+            document.getElementById('vag-save-edit').addEventListener('click', () => {
+                const config = getAIConfig();
+                const list = config.apiConfigs || [];
+                const idx = config.activeApiIndex ?? 0;
+                if (idx >= list.length) return;
+                const newName = document.getElementById('vag-edit-name').value.trim();
+                const newUrl = document.getElementById('vag-edit-url').value.trim();
+                const newKey = document.getElementById('vag-edit-key').value.trim();
+                const newModel = document.getElementById('vag-edit-model').value.trim();
+                if (!newName) { showMsg('配置名称不能为空', 'error'); return; }
+                if (!newUrl) { showMsg('API地址不能为空', 'error'); return; }
+                if (!newModel) { showMsg('模型名称不能为空', 'error'); return; }
+                list[idx] = {
+                    name: newName,
+                    apiUrl: newUrl,
+                    apiKey: newKey,
+                    model: newModel
+                };
+                setAIConfig(config);
+                document.getElementById('vag-edit-form').style.display = 'none';
+                updateDetailDisplay();
+                showMsg('配置已更新', 'success');
+            });
+
+            // 取消编辑
+            document.getElementById('vag-cancel-edit').addEventListener('click', () => {
+                document.getElementById('vag-edit-form').style.display = 'none';
+            });
+
+            // 删除配置
+            document.getElementById('vag-del-config').addEventListener('click', () => {
+                const config = getAIConfig();
+                const list = config.apiConfigs || [];
+                if (list.length <= 1) {
+                    showMsg('至少保留一个API配置', 'error');
+                    return;
+                }
+                const idx = config.activeApiIndex ?? 0;
+                if (!confirm(`确定要删除配置“${list[idx]?.name || '未命名'}”吗？`)) return;
+                list.splice(idx, 1);
+                if (config.activeApiIndex >= list.length) {
+                    config.activeApiIndex = list.length - 1;
+                }
+                setAIConfig(config);
+                updateDetailDisplay();
+                showMsg('配置已删除', 'success');
+            });
+
+            // 测试连接（使用当前激活的配置）
+            document.getElementById('vag-test-connection').addEventListener('click', async () => {
+                const config = getAIConfig();
+                const list = config.apiConfigs || [];
+                const idx = config.activeApiIndex ?? 0;
+                const active = list[idx];
+                if (!active || !active.apiUrl || !active.apiKey || !active.model) {
+                    showMsg('当前配置不完整，请先完善API地址、密钥和模型', 'error');
+                    return;
+                }
+                showMsg('正在测试连接…', 'info');
+                const testBody = {
+                    model: active.model,
+                    messages: [{ role: 'user', content: 'Hi' }],
+                    max_tokens: 5,
+                    temperature: 0
+                };
+                try {
+                    const response = await new Promise((resolve, reject) => {
+                        GM_xmlhttpRequest({
+                            method: 'POST',
+                            url: active.apiUrl,
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${active.apiKey}`
+                            },
+                            data: JSON.stringify(testBody),
+                            onload: (resp) => {
+                                if (resp.status >= 200 && resp.status < 300) {
+                                    try {
+                                        const data = JSON.parse(resp.responseText);
+                                        if (data.choices && data.choices.length > 0) {
+                                            resolve(data);
+                                        } else {
+                                            reject(new Error('返回格式异常：无 choices'));
+                                        }
+                                    } catch (e) {
+                                        reject(new Error('解析响应失败: ' + e.message));
+                                    }
+                                } else {
+                                    reject(new Error(`状态码 ${resp.status} ${resp.statusText}`));
+                                }
+                            },
+                            onerror: () => reject(new Error('网络错误'))
+                        });
+                    });
+                    showMsg('连接成功！模型回复: ' + (response.choices[0].message.content || '(空)'), 'success');
+                } catch (err) {
+                    showMsg('连接失败: ' + err.message, 'error');
+                }
+            });
+
+            // 保存全部设置（Groq、白名单等）
+            document.getElementById('vag-save-all').addEventListener('click', () => {
+                const config = getAIConfig();
+                // 先检查当前激活配置的完整性（可能还没保存编辑，但提示用户）
+                const list = config.apiConfigs || [];
+                const idx = config.activeApiIndex ?? 0;
+                if (idx < list.length) {
+                    const active = list[idx];
+                    if (!active.apiUrl || !active.model) {
+                        showMsg('当前API配置不完整，请点击“编辑”完善后再保存', 'error');
+                        return;
+                    }
+                }
+                config.groqApiKey = document.getElementById('vag-groq-key').value.trim();
+                config.enableGroqProxy = document.getElementById('vag-enable-groq-proxy').checked;
+                config.enableAudioRecognition = document.getElementById('vag-enable-audio').checked;
+                config.enableThinking = document.getElementById('vag-enable-thinking').checked;
+                config.upWhitelist = document.getElementById('vag-up-whitelist').value.trim();
+                const cacheDays = parseInt(document.getElementById('vag-cache-days').value, 10);
+                if (isNaN(cacheDays) || cacheDays < 1) {
                     showMsg('缓存天数必须为不小于1的整数', 'error');
                     return;
                 }
-
-                const newConfig = getAIConfig();
-                newConfig.apiUrl = apiUrl;
-                newConfig.apiKey = apiKey;
-                newConfig.model = model;
-                newConfig.groqApiKey = groqKey;
-                newConfig.enableGroqProxy = enableGroqProxy;
-                newConfig.enableAudioRecognition = enableAudio;
-                newConfig.enableThinking = enableThinking;
-                newConfig.upWhitelist = upWhitelist;
-                newConfig.cacheDurationDays = cacheDurationDays;
-
-                setAIConfig(newConfig);
-                showMsg('设置已保存', 'success');
+                config.cacheDurationDays = cacheDays;
+                setAIConfig(config);
+                showMsg('全部设置已保存', 'success');
                 setTimeout(() => panel.remove(), 1000);
             });
 
             document.getElementById('vag-cancel').addEventListener('click', () => panel.remove());
 
-            ['vag-api-url', 'vag-api-key', 'vag-model', 'vag-groq-key', 'vag-up-whitelist', 'vag-cache-days'].forEach(id => {
-                const input = document.getElementById(id);
-                if (input) {
-                    input.addEventListener('click', e => e.stopPropagation());
-                    input.addEventListener('keydown', e => e.stopPropagation());
+            // 阻止事件冒泡，避免触发视频快捷键
+            ['vag-api-select', 'vag-add-config', 'vag-edit-config', 'vag-del-config',
+             'vag-edit-name', 'vag-edit-url', 'vag-edit-key', 'vag-edit-model',
+             'vag-groq-key', 'vag-up-whitelist', 'vag-cache-days'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('click', e => e.stopPropagation());
+                    el.addEventListener('keydown', e => e.stopPropagation());
                 }
             });
         }
