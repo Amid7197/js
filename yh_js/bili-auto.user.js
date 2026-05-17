@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         B站视频植入广告检测器(自动跳过+音频识别+进度条标记)
-// @version      2.3.2
+// @version      2.3.3
 // @author       Amid7197 Warma10032 (modified)
 // @license      GPLv2
 // @description  基于大语言模型检测B站视频中的植入广告，支持自动跳过。优化提示词以识别洗面奶、转转等常见广告。
@@ -16,7 +16,7 @@
     'use strict';
 
     const DEFAULT_API_URL = 'https://open.bigmodel.cn/api/paas/v4/chat/completions';
-    const DEFAULT_MODEL = 'glm-4-flash';
+    const DEFAULT_MODEL = 'glm-4.7-flash';
     const AD_RATIO_THRESHOLD = 1 / 3;
 
     // ========== 全局配置存取 ==========
@@ -308,7 +308,7 @@
         }
     };
 
-    // ========== AI 服务（优化提示词）==========
+    // ========== AI 服务（优化提示词，移除 response_format）==========
     const AIService = {
         async makeRequest(videoInfo, config) {
             const requestBody = {
@@ -323,8 +323,8 @@
                         content: this.buildPrompt(videoInfo)
                     }
                 ],
-                temperature: 0.1,
-                max_tokens: 1024,
+                temperature: 0.8,
+                max_tokens: 65536,   // 增大 token 数，避免 JSON 截断
                 ...config.bodyExtra
             };
 
@@ -352,14 +352,38 @@
             const cfg = getAIConfig();
             const apiKey = cfg.apiKey;
             if (!apiKey) throw new Error('未设置API密钥');
-            const data = await this.makeRequest(videoInfo, {
+
+            // 构建请求配置，根据设置决定是否开启深度思考
+            const requestConfig = {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${apiKey}`
-                },
-                bodyExtra: { response_format: { type: "json_object" } }
-            });
-            return JSON.parse(data.choices[0].message.content);
+                }
+            };
+            if (cfg.enableThinking) {
+                requestConfig.bodyExtra = {
+                    thinking: { type: "enabled" }
+                };
+            }
+
+            const data = await this.makeRequest(videoInfo, requestConfig);
+            let content = data.choices[0].message.content;
+            if (!content || content.trim() === '') {
+                throw new Error('模型返回内容为空，请尝试增大 max_tokens 或更换模型');
+            }
+
+            // 容错处理：提取可能的 JSON 代码块
+            const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
+            if (jsonMatch) {
+                content = jsonMatch[1];
+            }
+
+            try {
+                return JSON.parse(content);
+            } catch (e) {
+                console.error('【VideoAdGuard】模型返回内容不是有效 JSON:', content);
+                throw new Error('模型未返回合法 JSON，请检查提示词或模型配置');
+            }
         },
 
         buildPrompt(videoInfo) {
@@ -882,6 +906,13 @@
                     </label>
                 </div>
                 <div class="form-group">
+                    <label for="vag-enable-thinking" class="checkbox-container">
+                        <input type="checkbox" id="vag-enable-thinking" ${currentConfig.enableThinking ? 'checked' : ''}>
+                        <span class="checkmark"></span>
+                        启用深度思考 (GLM-4.7-Flash 等支持)
+                    </label>
+                </div>
+                <div class="form-group">
                     <label for="vag-up-whitelist">UP主白名单（UID，逗号分隔）：</label>
                     <input type="text" id="vag-up-whitelist" value="${currentConfig.upWhitelist || ''}" placeholder="例如：1343321779,123456">
                 </div>
@@ -908,6 +939,7 @@
                 const groqKey = document.getElementById('vag-groq-key').value.trim();
                 const enableGroqProxy = document.getElementById('vag-enable-groq-proxy').checked;
                 const enableAudio = document.getElementById('vag-enable-audio').checked;
+                const enableThinking = document.getElementById('vag-enable-thinking').checked;
                 const upWhitelist = document.getElementById('vag-up-whitelist').value.trim();
 
                 if (!apiUrl) { showMsg('请输入API地址', 'error'); return; }
@@ -921,6 +953,7 @@
                 newConfig.groqApiKey = groqKey;
                 newConfig.enableGroqProxy = enableGroqProxy;
                 newConfig.enableAudioRecognition = enableAudio;
+                newConfig.enableThinking = enableThinking;
                 newConfig.upWhitelist = upWhitelist;
 
                 setAIConfig(newConfig);
