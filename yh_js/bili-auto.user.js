@@ -3,7 +3,7 @@
 // @version      2.3.2
 // @author       Amid7197 Warma10032 (modified)
 // @license      GPLv2
-// @description  基于大语言模型检测B站视频中的植入广告，支持自动跳过。无字幕时可调用Groq Whisper语音识别，并在进度条上以绿色块标记广告片段。支持UP主白名单。
+// @description  基于大语言模型检测B站视频中的植入广告，支持自动跳过。优化提示词以识别洗面奶、转转等常见广告。
 // @match        *://*.bilibili.com/video/*
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setValue
@@ -30,7 +30,6 @@
         GM_setValue(CONFIG_KEY, config);
     }
 
-    // 广告缓存键
     const CACHE_KEY = 'cache_AD';
     const CACHE_DURATION_DAYS = 3;
 
@@ -309,7 +308,7 @@
         }
     };
 
-    // ========== AI 服务 （移除了 Ollama 分支） ==========
+    // ========== AI 服务（优化提示词）==========
     const AIService = {
         async makeRequest(videoInfo, config) {
             const requestBody = {
@@ -317,7 +316,7 @@
                 messages: [
                     {
                         role: 'system',
-                        content: '你是一个敏感的视频观看者，能根据视频的连贯性改变和宣传推销类内容，找出视频中可能存在的植入广告。内容如果和主题相关，即使是推荐/评价也可能只是分享而不是广告，重点要看有没有提到通过视频博主可以受益的渠道进行购买。'
+                        content: '你是一个专业的广告检测助手，能敏锐识别视频字幕中的植入广告。广告通常表现为：突然出现的与视频主题无关的品牌/产品介绍，提及具体购买渠道（如链接、优惠码、特定平台），或反复强调某个产品的优点并引导用户购买。常见植入广告类型包括但不限于：护肤品（洗面奶、面膜等）、二手交易平台（转转、闲鱼等）、电子产品、课程推销等。请仔细阅读字幕，找出所有包含此类商业推广的连续段落，并标记其起始和结束索引。注意，与主题相关的普通推荐不算广告，除非明确引导购买或包含合作渠道。'
                     },
                     {
                         role: 'user',
@@ -367,7 +366,7 @@
             return `视频的标题和置顶评论如下，可供参考判断是否有植入广告。如果置顶评论中有购买链接，则肯定有广告，同时可以根据置顶评论的内容判断视频中的广告商从而确定哪部分是广告。
 视频标题：${videoInfo.title}
 置顶评论：${videoInfo.topComment || '无'}
-下面我会给你这个视频的字幕字典，形式为 index: context. 请你完整地找出其中的植入广告，返回json格式的数据。注意要返回一整段的广告，从广告的引入到结尾重新转折回到视频内容前，因此不要返回太短的广告，可以组合成一整段返回。
+下面我会给你这个视频的字幕字典，形式为 index: context. 请你完整地找出其中的植入广告，返回json格式的数据。注意要返回一整段的广告，从广告的引入到结尾重新转折回到视频内容前，因此不要返回太短的广告，可以组合成一整段返回。**特别注意**：请仔细检查字幕中是否出现了与主题无关的产品推销，例如洗面奶、转转等，如果有，请务必标记出来。
 字幕内容：${JSON.stringify(videoInfo.captions)}
 先返回'exist': bool。true表示存在植入广告，false表示不存在植入广告。
 再返回'index_lists': list[list[int]]。二维数组，行数表示广告的段数，一般来说视频是没有广告的，但也有小部分会植入一段广告，极少部分是多段广告，因此不要返回过多，只返回与标题最不相关或者与置顶链接中的商品最相关的部分。每一行是长度为2的数组[start, end]，表示一段广告的开头结尾，start和end是字幕的index。`;
@@ -398,7 +397,6 @@
             return match[1];
         },
 
-        // 检查 UP 主是否在白名单中
         isUpWhitelisted(ownerMid) {
             const cfg = getAIConfig();
             const whitelistStr = cfg.upWhitelist || '';
@@ -415,7 +413,6 @@
                 return;
             }
 
-            // 防重入
             if (this.analyzingBvid === bvid) {
                 console.log('【VideoAdGuard】分析正在进行中，跳过重复调用:', bvid);
                 return;
@@ -428,11 +425,9 @@
                 this.removeAutoSkip();
                 this.clearProgressBarMarkers();
 
-                // 获取视频信息（含UP主UID）
                 const videoInfo = await BilibiliService.getVideoInfo(bvid);
                 const ownerMid = videoInfo.owner?.mid;
 
-                // 白名单检查
                 if (ownerMid && this.isUpWhitelisted(ownerMid)) {
                     console.log(`【VideoAdGuard】UP主 ${ownerMid} 在白名单中，跳过检测`);
                     this.adTimeRanges = [];
@@ -445,7 +440,6 @@
                 const comments = await BilibiliService.getComments(bvid);
                 this.videoDuration = videoInfo.duration;
 
-                // 先尝试读缓存
                 const cached = getCachedResult(bvid);
                 if (cached) {
                     this.adTimeRanges = cached.adTimeRanges;
@@ -475,7 +469,6 @@
                     return;
                 }
 
-                // 无缓存，开始分析
                 let captions = null;
                 let segmentsData = null;
 
@@ -544,8 +537,10 @@
                 });
 
                 if (result.exist) {
-                    const second_lists = this.segments2second(result.index_lists, segmentsData);
+                    let second_lists = this.segments2second(result.index_lists, segmentsData);
+                    second_lists = second_lists.map(([start, end]) => [start, Math.min(end, this.videoDuration)]);
                     this.adTimeRanges = second_lists;
+
                     const adTotal = second_lists.reduce((sum, [s, e]) => sum + (e - s), 0);
                     const ratio = adTotal / this.videoDuration;
 
@@ -618,22 +613,29 @@
             this.removeAutoSkip();
             const video = document.querySelector('video');
             if (!video) return;
+
             this.autoSkipHandler = () => {
                 if (!this.autoSkipEnabled || !this.adTimeRanges.length) return;
                 const currentTime = video.currentTime;
-                for (const [start, end] of this.adTimeRanges) {
+                const duration = video.duration;
+                if (!duration) return;
+
+                for (let [start, end] of this.adTimeRanges) {
+                    end = Math.min(end, duration);
                     if (currentTime >= start && currentTime < end) {
+                        if (duration - end < 2) return;
                         video.currentTime = end;
                         console.log(`【VideoAdGuard】自动跳过广告: ${this.second2time(start)}~${this.second2time(end)}`);
                         break;
                     }
                 }
             };
+
             video.addEventListener('timeupdate', this.autoSkipHandler);
             console.log('【VideoAdGuard】已启动自动跳过广告');
         },
 
-        // ---------- 进度条标记 (颜色 rgb(0, 212, 0)) ----------
+        // ---------- 进度条标记 ----------
         clearProgressBarMarkers() {
             document.querySelectorAll('.vag-progress-marker').forEach(el => el.remove());
         },
@@ -920,7 +922,6 @@
                 newConfig.enableGroqProxy = enableGroqProxy;
                 newConfig.enableAudioRecognition = enableAudio;
                 newConfig.upWhitelist = upWhitelist;
-                // wbi_cache 保持不变
 
                 setAIConfig(newConfig);
                 showMsg('设置已保存', 'success');
