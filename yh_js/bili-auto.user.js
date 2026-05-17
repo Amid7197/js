@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         B站视频植入广告检测器(自动跳过+音频识别+进度条标记+多API切换)
-// @version      2.4.0
+// @version      2.4.1
 // @author       Amid7197 Warma10032 (modified)
 // @license      GPLv2
 // @description  基于大语言模型检测B站视频中的植入广告，支持自动跳过。优化提示词以识别洗面奶、转转等常见广告。缓存天数可自定义，新增多套API配置及快速切换。
@@ -922,13 +922,13 @@
             `;
             document.head.appendChild(style);
 
-            const optionsHtml = configList.map((cfg, i) => 
+            const optionsHtml = configList.map((cfg, i) =>
                 `<option value="${i}" ${i === activeIdx ? 'selected' : ''}>${cfg.name || '未命名'}</option>`
             ).join('');
 
             panel.innerHTML = `
                 <h3 style="margin: 0 0 15px 0; font-size: 18px;">广告检测设置</h3>
-                
+
                 <!-- API配置管理区 -->
                 <div class="form-group">
                     <label>当前API配置：</label>
@@ -1036,7 +1036,7 @@
                 // 刷新下拉框
                 const select = document.getElementById('vag-api-select');
                 if (select) {
-                    select.innerHTML = list.map((c, i) => 
+                    select.innerHTML = list.map((c, i) =>
                         `<option value="${i}" ${i === idx ? 'selected' : ''}>${c.name || '未命名'}</option>`
                     ).join('');
                 }
