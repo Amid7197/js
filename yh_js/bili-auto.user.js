@@ -8,7 +8,14 @@
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setValue
 // @grant        GM_getValue
-// @connect      *
+// @connect      open.bigmodel.cn
+// @connect      api.openai.com
+// @connect      api.deepseek.com
+// @connect      *.volces.com
+// @connect      dashscope.aliyuncs.com
+// @connect      api.anthropic.com
+// @connect      generativelanguage.googleapis.com
+// @connect      api.siliconflow.cn
 // @run-at       document-end
 // ==/UserScript==
 
