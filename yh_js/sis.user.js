@@ -13,6 +13,7 @@
 // @grant        GM_deleteValue
 // @grant        GM_listValues
 // @run-at       document-start
+//https://sleazyfork.org/zh-CN/scripts/539804
 // ==/UserScript==
 
 (function() {
