@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         NGA网址重定向 + 版头折叠助手
-// @version      1.0
+// @version      1.0.1
 // @description  统一NGA域名避免重复登录，支持自定义目标域名；并在目标域名下自动折叠版头/版规/置顶。
 // @match        *://bbs.nga.cn/*
 // @match        *://g.nga.cn/*
@@ -8,12 +8,14 @@
 // @match        *://ngabbs.com/*
 // @match        *://bbs.ngacn.cc/*
 // @author       Amid7197,WaterEast, Shy07
-// @namespace    https://greasyfork.org/users/73441
+// @icon         https://bbs.nga.cn/favicon.ico
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
 // @run-at       document-start
 // @license      MIT
+// https://greasyfork.org/zh-CN/scripts/453395
+// https://greasyfork.org/zh-CN/scripts/36772
 // ==/UserScript==
 
 (function() {
