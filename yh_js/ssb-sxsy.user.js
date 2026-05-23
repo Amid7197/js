@@ -20,6 +20,13 @@
 (function () {
     'use strict';
 
+
+    if (location.hostname === 'vfd3.vdf.com') {
+        const newUrl = new URL(location.href);
+        newUrl.hostname = 'vfd3.vdf5ge5a.com';
+        location.href = newUrl.href;
+        return; // 跳转后停止后续执行
+    }
     const allowedTitles = [
         "搜书吧 - Powered by Discuz!",
         "尚香书苑",
