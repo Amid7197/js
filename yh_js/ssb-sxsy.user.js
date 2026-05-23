@@ -3,6 +3,7 @@
 // @author       Amid7197
 // @version      0.0.26
 // @match        *://vfd3.vdf5ge5a.com/*
+
 // @match        *://sxsy*.*/forum.php?mod=forumdisplay&fid=*
 // @match        *://sxsy*.*/search.php?mod=forum&searchid=*
 // @match        *://sxsy*.*/forum.php?mod=viewthread&tid=*
