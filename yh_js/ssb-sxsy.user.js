@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ssb-sxsy新Discuz
 // @author       Amid7197
-// @version      0.0.27
+// @version      0.0.28
 // @match        *://mu3h.vr6erw5d.com/*
 // @match        *://vfd3.vdf5ge5a.com/*
 // @match        *://sxsy*.*/forum.php?mod=forumdisplay&fid=*
@@ -25,7 +25,8 @@
     if (location.hostname === 'vfd3.vdf5ge5a.com') {
         const newUrl = new URL(location.href);
         newUrl.hostname = 'mu3h.vr6erw5d.com';
-        location.href = newUrl.href;
+        location.href = 'https://' + newUrl.hostname + '/forum.php?mod=forumdisplay&fid=40&filter=author&orderby=dateline';
+        //location.href = newUrl.href;
         return; // 跳转后停止后续执行
     }
     const allowedTitles = [
