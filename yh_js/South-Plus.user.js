@@ -44,7 +44,7 @@
 
     GM_registerMenuCommand('设置跳转目标域名', () => {
         let current = GM_getValue('targetBaseUrl', 'south-plus.net');
-        let input = prompt('请输入目标域名（无需 https://）', current.replace(/^https?:\/\//i, ''));
+        let input = prompt('请输入目标域名', current.replace(/^https?:\/\//i, ''));
         if (input != null && (input = input.trim())) {
             GM_setValue('targetBaseUrl', input);
             alert('已保存，刷新后生效');
