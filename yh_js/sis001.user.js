@@ -1,17 +1,13 @@
 // ==UserScript==
 // @name         sis001 综合增强：图片预览·板块收纳·搜索优化·小说内容保存
 // @namespace    ai
-// @version      2.0.0
+// @version      2.0.1
 // @description  sis001第一会所综合社区，帖子图片预览，板块收纳，搜索优化，论坛小说内容保存与格式化下载
-// @author       Amid7197, 羽
+// @author       羽 MY_AI
 // @match        https://sis001.com/*
 // @match        https://*.sis001.com/*
 // @match        *://sexinsex.net/bbs/*
 // @match        *://sis001.com/forum/*
-// @match        *://*/bbs/*
-// @match        *://*/luntan/*
-// @match        *://*/forum/thread*
-// @icon         https://www.google.com/s2/favicons?sz=64&domain=sis001.com
 // @license      MIT
 // @grant        GM_setValue
 // @grant        GM_getValue
