@@ -1,12 +1,11 @@
 // ==UserScript==
 // @name         sis001-图片预览，板块收纳，搜索优化
 // @namespace    ai
-// @version      1.3.13
+// @version      1.3.14
 // @description  sis001第一会所综合社区，帖子图片预览，板块收纳，搜索优化
-// @author       Amid7197
+// @author       MY_AI
 // @match        https://sis001.com/*
 // @match        https://*.sis001.com/*
-// @icon         https://www.google.com/s2/favicons?sz=64&domain=sis001.com
 // @license      MIT
 // @grant        GM_setValue
 // @grant        GM_getValue
