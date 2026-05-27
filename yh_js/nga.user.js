@@ -1,14 +1,13 @@
 // ==UserScript==
 // @name         NGA网址重定向 + 版头折叠助手
-// @version      1.0.1
+// @version      1.0.2
 // @description  统一NGA域名避免重复登录，支持自定义目标域名；并在目标域名下自动折叠版头/版规/置顶。
 // @match        *://bbs.nga.cn/*
 // @match        *://g.nga.cn/*
 // @match        *://nga.178.com/*
 // @match        *://ngabbs.com/*
 // @match        *://bbs.ngacn.cc/*
-// @author       Amid7197,WaterEast, Shy07
-// @icon         https://bbs.nga.cn/favicon.ico
+// @author       WaterEast, Shy07 MY_AI
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
