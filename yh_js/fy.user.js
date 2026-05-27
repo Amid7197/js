@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         去繁留简
 // @namespace    https://space.bilibili.com/482343
-// @version      2.11.8
+// @version      2.11.9
 // @description  网页上的繁体中文字转为简体。
-// @author       古海沉舟 Amid7197
+// @author       古海沉舟 MY_AI
 // @include      *
 // @exclude      *pan.baidu.com*
 // @exclude      *hdslb.com*
