@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         B站视频植入广告检测器(自动跳过+音频识别+进度条标记+多API切换)
-// @version      2.4.1
-// @author       Amid7197 Warma10032 (modified)
+// @version      2.4.2
+// @author       Warma10032 (modified) MY_AI
 // @license      GPLv2
 // @description  基于大语言模型检测B站视频中的植入广告，支持自动跳过。优化提示词以识别洗面奶、转转等常见广告。缓存天数可自定义，新增多套API配置及快速切换。
 // @match        *://*.bilibili.com/video/*
@@ -433,7 +433,11 @@
 下面我会给你这个视频的字幕字典，形式为 index: context. 请你完整地找出其中的植入广告，返回json格式的数据。注意要返回一整段的广告，从广告的引入到结尾重新转折回到视频内容前，因此不要返回太短的广告，可以组合成一整段返回。**特别注意**：请仔细检查字幕中是否出现了与主题无关的产品推销，例如洗面奶、转转等，如果有，请务必标记出来。
 字幕内容：${JSON.stringify(videoInfo.captions)}
 先返回'exist': bool。true表示存在植入广告，false表示不存在植入广告。
-再返回'index_lists': list[list[int]]。二维数组，行数表示广告的段数，一般来说视频是没有广告的，但也有小部分会植入一段广告，极少部分是多段广告，因此不要返回过多，只返回与标题最不相关或者与置顶链接中的商品最相关的部分。每一行是长度为2的数组[start, end]，表示一段广告的开头结尾，start和end是字幕的index。`;
+再返回'index_lists': list[list[int]]。二维数组，行数表示广告的段数，一般来说视频是没有广告的，但也有小部分会植入一段广告，极少部分是多段广告，因此不要返回过多，只返回与标题最不相关或者与置顶链接中的商品最相关的部分。每一行是长度为2的数组[start, end]，表示一段广告的开头结尾，start和end是字幕的index。
+
+【严格要求】你的回答必须是一个合法的 JSON 对象，格式如下：
+{"exist": true/false, "index_lists": [[start1, end1], [start2, end2], ...]}
+不要输出任何其他文字、解释、注释或 Markdown 标记（如 \`\`\`json）。只输出 JSON 对象本身。`;
         },
 
         getApiUrl() {
