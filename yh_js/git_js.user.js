@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         Github 高速下载 (自定义加速源+apk二维码)
 // @match        *://github.com/*
-// @version      1.0.12
+// @version      1.0.13
 // @icon         https://github.githubassets.com/favicons/favicon.png
-// @author       Amid7197
+// @author       MY_AI
 // @grant        GM_setClipboard
 // @grant        GM_addStyle
 // @grant        GM_setValue
