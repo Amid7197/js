@@ -1,14 +1,13 @@
 // ==UserScript==
 // @name         Bilibili 视频音量均衡器 (可配置版)
 // @namespace    http://tampermonkey.net/
-// @version      0.3.1
+// @version      0.3.2
 // @description  通过 Web Audio API 压缩 Bilibili 视频中音频的动态范围，使不同视频或同一视频中差距过大的响度保持一致。防抖音恢复，零停顿。支持菜单命令调整淡入时长和防抖延迟。
-// @author       Amid7197 Timothy Tao & Github Copilot
+// @author       Timothy Tao & Github Copilot MY_AI
 // @match        *://www.bilibili.com/video/*
 // @match        *://www.bilibili.com/bangumi/play/*
 // @match        *://live.bilibili.com/*
 // @match        *://www.bilibili.com/list/*
-// @icon         https://www.bilibili.com/favicon.ico
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
