@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         51cto文章复制功能重写
 // @namespace    http://tampermonkey.net/
-// @version      1.1.12
+// @version      1.1.13
 // @description  重写网页复制功能，解除复制限制 1.1.1
-// @author       Amid7197
+// @author       MY_AI
 // @match        *://blog.51cto.com/*
 // @grant        none
 // @run-at       document-start
