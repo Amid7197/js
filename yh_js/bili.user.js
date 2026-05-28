@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         哔哩哔哩 - 自动开播与连播控制
 // @namespace    https://github.com/combined-bilibili-script
-// @version      1.0.7
+// @version      1.0.8
 // @description  强制关闭视频自动开播和弹幕；智能控制自动连播按钮：单P关闭，分P/合集/播放列表自动开启（末集关闭）。弹幕关闭后立即停止轮询，长时间找不到开关也会停止。
-// @author       MY_AI, MaxChang3
+// @author       aiedit MaxChang3
 // @match        https://www.bilibili.com/*
 // @grant        none
 // ==/UserScript==
