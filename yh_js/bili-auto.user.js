@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         B站视频植入广告检测器(自动跳过+音频识别+进度条标记+多API切换)
-// @version      2.4.2
-// @author       Warma10032 (modified) MY_AI
+// @version      2.4.3
+// @author       aiedit Warma10032 (modified)
 // @license      GPLv2
 // @description  基于大语言模型检测B站视频中的植入广告，支持自动跳过。优化提示词以识别洗面奶、转转等常见广告。缓存天数可自定义，新增多套API配置及快速切换。
 // @match        *://*.bilibili.com/video/*
