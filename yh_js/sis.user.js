@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         sis001-图片预览，板块收纳，搜索优化
 // @namespace    ai
-// @version      1.3.14
+// @version      1.3.15
 // @description  sis001第一会所综合社区，帖子图片预览，板块收纳，搜索优化
-// @author       MY_AI
+// @author       aiedit
 // @match        https://sis001.com/*
 // @match        https://*.sis001.com/*
 // @license      MIT
