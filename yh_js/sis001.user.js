@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         sis001 综合增强：图片预览·板块收纳·搜索优化·小说内容保存
 // @namespace    ai
-// @version      2.0.1
+// @version      2.0.2
 // @description  sis001第一会所综合社区，帖子图片预览，板块收纳，搜索优化，论坛小说内容保存与格式化下载
-// @author       羽 MY_AI
+// @author       aiedit 羽
 // @match        https://sis001.com/*
 // @match        https://*.sis001.com/*
 // @match        *://sexinsex.net/bbs/*
