@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         South Plus 跳转
 // @namespace    https://south-plus.net/
-// @version      2.0.1
+// @version      2.0.2
 // @description  镜像站统一跳转至自定义域名（保留路径），自动转换 /simple/ 链接
-// @author       MY_AI
+// @author       aiedit
 // @match        *://*.east-plus.net/*
 // @match        *://east-plus.net/*
 // @match        *://*.south-plus.net/*
