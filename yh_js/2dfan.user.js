@@ -3,7 +3,7 @@
 // @namespace    http://tampermonkey.net/
 // @version      1.0.9
 // @description  多彩渐变搜索按钮1.0.2
-// @author       MyAiEdit cuddly
+// @author       aiedit cuddly
 // @match        *://ddfan.*/*
 // @match        *://2dfan.*/*
 // @match        *://*2dfan.com/*
