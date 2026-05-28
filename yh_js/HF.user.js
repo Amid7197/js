@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         HuggingFace Enhanced Tools Pro
 // @namespace    http://tampermonkey.net/
-// @version      1.2.3
-// @author       MY_AI
+// @version      1.2.4
+// @author       aiedit
 // @description  Tools for HuggingFace: GGUF filter, mirror redirect and download links extraction
 // @match        https://huggingface.co/*
 // @match        https://hf-mirror.com/*
