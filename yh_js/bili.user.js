@@ -1,103 +1,84 @@
 // ==UserScript==
-// @name         哔哩哔哩 - 自动开播与连播控制
-// @namespace    https://github.com/combined-bilibili-script
-// @version      1.0.8
-// @description  强制关闭视频自动开播和弹幕；智能控制自动连播按钮：单P关闭，分P/合集/播放列表自动开启（末集关闭）。弹幕关闭后立即停止轮询，长时间找不到开关也会停止。
-// @author       aiedit MaxChang3
-// @match        https://www.bilibili.com/*
-// @grant        none
+// @name          B站增强：默认关闭弹幕+禁用自动播放+独立连播开关
+// @namespace     https://github.com/yourname/bilibili-enhance
+// @version       1.0.0
+// @description   自动关闭弹幕，禁用自动播放，并分别记忆分P/合集/单视频/收藏列表的自动连播状态。
+// @author        YourName
+// @match         https://www.bilibili.com/video/*
+// @match         https://www.bilibili.com/list/*
+// @grant         GM_setValue
+// @grant         GM_getValue
+// @grant         GM_addStyle
+// @grant         GM_registerMenuCommand
+// @license       MIT
 // ==/UserScript==
 
 (function() {
     'use strict';
 
-    // ==================== 功能1：彻底关闭自动开播 + 物理关闭弹幕 ====================
+    // ========================= 日志工具 =========================
+    const logger = {
+        log: (...args) => console.log('[B站增强]', ...args),
+        error: (...args) => console.error('[B站增强]', ...args),
+    };
 
-    // 独立函数：写入 localStorage 关闭自动开播和弹幕开关记录
+    // ========================= 功能1：禁用自动播放 =========================
     function disableAutoplayLocalStorage() {
         try {
             let raw = localStorage.getItem('bpx_player_profile');
             let profile = raw ? JSON.parse(raw) : {};
             if (!profile.media) profile.media = {};
-            profile.media.autoplay = false;
-            if (!profile.dmSetting) profile.dmSetting = {};
-            profile.dmSetting.dmSwitch = false;
-            localStorage.setItem('bpx_player_profile', JSON.stringify(profile));
-            console.log("✅ 已写入 localStorage -> autoplay=false, dmSwitch=false");
-        } catch (e) {
-            console.warn("localStorage 写入警告:", e);
-        }
-    }
-
-    // 独立函数：使用正确选择器物理关闭弹幕（模拟真实点击）
-    function forceCloseDanmaku() {
-        try {
-            const danmakuInput = document.querySelector('.bui-danmaku-switch-input');
-            if (danmakuInput) {
-                if (danmakuInput.checked) {
-                    danmakuInput.click();
-                    console.log('🔇 弹幕已通过 .click() 关闭');
-                } else {
-                    console.log('🔇 弹幕已处于关闭状态');
-                }
-                return true; // 操作成功或已关闭
+            if (profile.media.autoplay !== false) {
+                profile.media.autoplay = false;
+                localStorage.setItem('bpx_player_profile', JSON.stringify(profile));
+                logger.log('已写入 localStorage -> autoplay = false');
             }
         } catch (e) {
-            console.warn('关闭弹幕时出错:', e);
+            logger.error('localStorage 写入失败:', e);
         }
-        return false; // 未找到元素
     }
 
-    // 初始化时立即执行 localStorage 写入（仅一次）
-    disableAutoplayLocalStorage();
-
-    // ==================== 弹幕关闭与持续监听（优化版） ====================
-    let danmakuCheckTimer = null;
-
-    // 启动轮询检查：成功关闭一次立即停止，10秒未找到开关也停止
-    function startDanmakuPolling() {
-        // 清除之前的定时器
-        if (danmakuCheckTimer) clearInterval(danmakuCheckTimer);
-        let notFoundCount = 0; // 未找到开关的连续次数
-        danmakuCheckTimer = setInterval(() => {
-            const result = forceCloseDanmaku();
-            if (result) {
-                // 弹幕已确认关闭（或成功操作），立即停止轮询
-                console.log('🛑 弹幕已确认关闭，停止轮询');
-                clearInterval(danmakuCheckTimer);
-                danmakuCheckTimer = null;
+    // ========================= 功能2：关闭弹幕 =========================
+    function closeDanmaku() {
+        const danmakuSwitch = document.querySelector('input.bui-danmaku-switch-input');
+        if (danmakuSwitch) {
+            if (danmakuSwitch.checked) {
+                danmakuSwitch.click();
+                logger.log('已自动关闭弹幕');
             } else {
-                notFoundCount++;
-                if (notFoundCount > 10) {
-                    // 超过10秒仍未找到弹幕开关，放弃轮询
-                    console.log('⚠️ 长时间未找到弹幕开关，暂停轮询');
-                    clearInterval(danmakuCheckTimer);
-                    danmakuCheckTimer = null;
-                }
+                logger.log('弹幕已经是关闭状态');
             }
-        }, 1000);
+        } else {
+            logger.log('未找到弹幕开关，可能播放器未加载完成');
+        }
     }
 
-    // 监听 SPA 路由变化（视频跳转、番剧切换等）
-    let lastPath = location.pathname;
-    const routerObserver = new MutationObserver(() => {
-        if (location.pathname !== lastPath) {
-            lastPath = location.pathname;
-            console.log('🔄 检测到路由变化，重新开始弹幕轮询');
-            startDanmakuPolling();
+    // 等待播放器加载后执行两项基础设置
+    function applyBasicSettings() {
+        disableAutoplayLocalStorage();
+        closeDanmaku();
+    }
+
+    function waitForPlayerAndApply() {
+        let maxWait = 50; // 10秒
+        let count = 0;
+        function check() {
+            if (document.querySelector('input.bui-danmaku-switch-input')) {
+                applyBasicSettings();
+                return;
+            }
+            count++;
+            if (count <= maxWait) {
+                setTimeout(check, 200);
+            } else {
+                logger.log('等待弹幕开关超时，只尝试禁用自动播放');
+                disableAutoplayLocalStorage();
+            }
         }
-    });
-    routerObserver.observe(document.body, { childList: true, subtree: true });
+        check();
+    }
 
-    // 启动首次轮询
-    startDanmakuPolling();
-
-    // ==================== 功能2：自动连播按钮矫正 ====================
-    const logger = {
-        log: (...args) => console.log('[Correct-Next-Button]', ...args),
-        error: (...args) => console.error('[Correct-Next-Button]', ...args),
-    };
-
+    // ========================= 功能3：独立自动连播开关（分P/合集/单视频/收藏列表） =========================
     const type = {
         VIDEO: 'video',
         MULTIPART: 'multipart',
@@ -105,59 +86,116 @@
         PLAYLIST: 'playlist',
     };
 
+    // 为播放列表页面添加自定义开关按钮（如果原生按钮不存在）
+    const prepareSwitchButton = () => {
+        const continuousBtn = document.createElement('div');
+        continuousBtn.className = 'continuous-btn';
+
+        const txt = document.createElement('div');
+        txt.className = 'txt';
+        txt.textContent = '自动连播';
+
+        const switchBtn = document.createElement('div');
+        switchBtn.className = 'switch-btn';
+
+        const switchBlock = document.createElement('div');
+        switchBlock.className = 'switch-block';
+
+        switchBtn.appendChild(switchBlock);
+        continuousBtn.appendChild(txt);
+        continuousBtn.appendChild(switchBtn);
+
+        const headerLeft = document.querySelector('.header-left');
+        headerLeft?.appendChild(continuousBtn);
+        GM_addStyle(`
+            .switch-btn{--switch-btn-width:30px;--switch-btn-height:20px;--switch-btn-gap:2px;cursor:pointer;position:relative;display:inline-block;box-sizing:border-box;border-radius:calc(var(--switch-btn-height)/ 2);width:var(--switch-btn-width);height:var(--switch-btn-height);background-color:var(--graph_bg_thick);transition:.2s}
+            .switch-btn .switch-block{position:absolute;border-radius:50%;top:var(--switch-btn-gap);left:var(--switch-btn-gap);width:calc(var(--switch-btn-height) - calc(2 * var(--switch-btn-gap)));height:calc(var(--switch-btn-height) - calc(2 * var(--switch-btn-gap)));background-color:var(--text_white);transition:.2s}
+            .switch-btn.on{background:var(--brand_blue)}
+            .switch-btn.on .switch-block{left:calc(calc(var(--switch-btn-width) - var(--switch-btn-height)) + var(--switch-btn-gap))}
+            .continuous-btn{cursor:pointer;display:flex;align-items:center}
+            .continuous-btn .txt{color:var(--text3);font-size:14px;margin-right:4px}
+        `);
+        return switchBtn;
+    };
+
     let lastVueInstance = null;
     let globalApp = null;
 
-    const isLastEpisode = (pageType, app) => {
-        if (pageType === type.MULTIPART) {
-            const { embedPlayer, videos } = app.videoData;
-            return embedPlayer.p === videos;
-        }
-        if (pageType === type.COLLECTION) {
-            const sections = app.sectionsInfo?.sections;
-            const episodes = sections?.[0]?.episodes;
-            if (episodes && episodes.length > 0) {
-                const lastBvid = episodes[episodes.length - 1]?.bvid;
-                return app.bvid === lastBvid;
-            }
-            return false;
-        }
-        if (pageType === type.PLAYLIST) {
-            const playlist = app.playlist;
-            if (!playlist) return false;
-            const list = playlist.list || playlist.videos;
-            const current = playlist.current ?? playlist.index;
-            if (list && current !== undefined) {
-                return current === list.length - 1;
-            }
-            return false;
-        }
-        return false;
-    };
-
     const correctNextButton = () => {
-        if (!globalApp) return;
+        if (!globalApp) {
+            logger.error('globalApp is not available');
+            return;
+        }
         const videoData = globalApp.videoData;
-        if (!videoData) return;
-
+        if (!videoData) {
+            logger.error('videoData is not available');
+            return;
+        }
         const { videos: videosCount } = videoData;
         const pageType =
             videosCount > 1
                 ? type.MULTIPART
                 : globalApp.isSection
-                    ? type.COLLECTION
-                    : globalApp.playlist?.type
-                        ? type.PLAYLIST
-                        : type.VIDEO;
+                  ? type.COLLECTION
+                  : globalApp.playlist?.type
+                    ? type.PLAYLIST
+                    : type.VIDEO;
+        const pageStatus = globalApp.continuousPlay;
+        let userStatus = GM_getValue(pageType);
+        if (userStatus === undefined) {
+            GM_setValue(pageType, pageStatus);
+        } else if (pageStatus !== userStatus) {
+            globalApp.setContinuousPlay(userStatus);
+        }
+        logger.log(`当前页面类型: ${pageType}`, {
+            collection: GM_getValue(type.COLLECTION),
+            multipart: GM_getValue(type.MULTIPART),
+            video: GM_getValue(type.VIDEO),
+            playlist: GM_getValue(type.PLAYLIST),
+        });
 
-        const desired =
-            pageType === type.VIDEO
-                ? false
-                : !isLastEpisode(pageType, globalApp);
+        let switchButton = document.querySelector('.switch-btn');
+        if (!switchButton) {
+            switchButton = prepareSwitchButton();
+            switchButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                switchButton.classList.toggle('on');
+                globalApp.setContinuousPlay(!globalApp.continuousPlay);
+                GM_setValue(pageType, globalApp.continuousPlay);
+            });
+            switchButton.classList.toggle('on', globalApp.continuousPlay);
+        } else {
+            // 避免重复绑定，先移除再添加
+            const newSwitch = switchButton.cloneNode(true);
+            switchButton.parentNode?.replaceChild(newSwitch, switchButton);
+            switchButton = newSwitch;
+            switchButton.addEventListener('click', () => {
+                GM_setValue(pageType, !globalApp.continuousPlay);
+            });
+        }
 
-        if (globalApp.continuousPlay !== desired) {
-            logger.log(`设置自动连播为 ${desired}，页面类型：${pageType}`);
-            globalApp.setContinuousPlay(desired);
+        // 分P的最后一个视频强制关闭连播
+        if (pageType === type.MULTIPART) {
+            logger.log('分P的最后一个视频不自动连播');
+            if (videoData.embedPlayer.p === videoData.videos) {
+                globalApp.setContinuousPlay(false);
+                switchButton.classList.remove('on');
+            }
+        }
+        // 合集的最后一个视频强制关闭连播
+        if (pageType === type.COLLECTION) {
+            logger.log('合集的最后一个视频不自动连播');
+            const currentBvid = globalApp.bvid;
+            const sections = globalApp.sectionsInfo?.sections;
+            const episodes = sections?.[0]?.episodes;
+            if (episodes && episodes.length > 0) {
+                const lastBvid = episodes[episodes.length - 1]?.bvid;
+                if (currentBvid === lastBvid) {
+                    globalApp.setContinuousPlay(false);
+                    switchButton.classList.remove('on');
+                }
+            }
         }
     };
 
@@ -166,10 +204,9 @@
         lastVueInstance = vueInstance;
         globalApp = vueInstance;
         correctNextButton();
-
         if (!vueInstance.__correctNextButtonHooked) {
             const __loadVideoData = vueInstance.loadVideoData;
-            vueInstance.loadVideoData = function () {
+            vueInstance.loadVideoData = function() {
                 return __loadVideoData.call(this).then(
                     (res) => {
                         correctNextButton();
@@ -188,13 +225,58 @@
         if (appContainer.__vue__) {
             hookVueInstance(appContainer.__vue__);
         }
-        new MutationObserver(() => {
+        const observer = new MutationObserver(() => {
             const app = document.querySelector('#app');
             if (app?.__vue__) {
                 hookVueInstance(app.__vue__);
             }
-        }).observe(appContainer, { childList: true, subtree: true });
+        });
+        observer.observe(appContainer, { childList: true, subtree: true });
     };
 
+    const registerMenuCommands = () => {
+        Object.entries(type).forEach(([key, value]) => {
+            const status = GM_getValue(value);
+            const statusText = status ? '✅ 开启' : '❌ 关闭';
+            const typeMap = {
+                [type.VIDEO]: '单视频',
+                [type.MULTIPART]: '分P',
+                [type.COLLECTION]: '合集',
+                [type.PLAYLIST]: '收藏列表',
+            };
+            GM_registerMenuCommand(`${typeMap[value]} 连播: ${statusText}`, () => {
+                GM_setValue(value, !status);
+                location.reload();
+            });
+        });
+    };
+
+    // ========================= 初始化 =========================
+    // 1. 启动基础设置（自动播放+弹幕）
+    waitForPlayerAndApply();
+    // 2. 启动独立连播开关
+    registerMenuCommands();
     observeVueInstance();
+
+    // 额外监听 SPA 导航，确保基础设置在页面切换后重新生效
+    let currentUrl = location.href;
+    function handleUrlChange() {
+        const newUrl = location.href;
+        if (newUrl !== currentUrl) {
+            currentUrl = newUrl;
+            setTimeout(waitForPlayerAndApply, 800);
+        }
+    }
+    window.addEventListener('popstate', handleUrlChange);
+    const originalPushState = history.pushState;
+    const originalReplaceState = history.replaceState;
+    history.pushState = function() {
+        originalPushState.apply(this, arguments);
+        handleUrlChange();
+    };
+    history.replaceState = function() {
+        originalReplaceState.apply(this, arguments);
+        handleUrlChange();
+    };
+    setInterval(handleUrlChange, 2000);
 })();
