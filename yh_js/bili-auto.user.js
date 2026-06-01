@@ -1,13 +1,14 @@
 // ==UserScript==
 // @name         B站视频植入广告检测器(自动跳过+音频识别+进度条标记+多API切换)
-// @version      2.4.3
+// @version      2.4.4
 // @author       aiedit Warma10032 (modified)
 // @license      GPLv2
-// @description  基于大语言模型检测B站视频中的植入广告，支持自动跳过。优化提示词以识别洗面奶、转转等常见广告。缓存天数可自定义，新增多套API配置及快速切换。
+// @description  基于大语言模型检测B站视频中的植入广告，支持自动跳过。同一网页内每段广告仅跳过第一次，刷新重置。所有控制移入油猴菜单。
 // @match        *://*.bilibili.com/video/*
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setValue
 // @grant        GM_getValue
+// @grant        GM_registerMenuCommand
 // @connect      open.bigmodel.cn
 // @connect      api.openai.com
 // @connect      api.deepseek.com
@@ -31,7 +32,6 @@
 
     function getAIConfig() {
         const cfg = GM_getValue(CONFIG_KEY, {});
-        // 自动迁移旧配置
         if (!cfg.apiConfigs && cfg.apiUrl) {
             cfg.apiConfigs = [{
                 name: '默认配置',
@@ -40,12 +40,10 @@
                 model: cfg.model || DEFAULT_MODEL
             }];
             cfg.activeApiIndex = 0;
-            // 清理旧字段（可选）
             delete cfg.apiUrl;
             delete cfg.apiKey;
             delete cfg.model;
         }
-        // 确保必有字段
         cfg.apiConfigs = cfg.apiConfigs || [];
         if (cfg.activeApiIndex === undefined || cfg.activeApiIndex >= cfg.apiConfigs.length) {
             cfg.activeApiIndex = 0;
@@ -57,7 +55,6 @@
         GM_setValue(CONFIG_KEY, config);
     }
 
-    // 获取缓存保留天数，未设置时默认3天
     function getCacheDurationDays() {
         const cfg = getAIConfig();
         return (cfg.cacheDurationDays && cfg.cacheDurationDays > 0) ? cfg.cacheDurationDays : 3;
@@ -458,6 +455,7 @@
         autoSkipHandler: null,
         videoDuration: 0,
         analyzingBvid: null,
+        skippedRanges: new Set(),
 
         async getCurrentBvid() {
             const match = window.location.pathname.match(/\/video\/(BV[\w]+)/);
@@ -488,6 +486,8 @@
             this.analyzingBvid = bvid;
 
             try {
+                this.skippedRanges = new Set();
+
                 const existingButton = document.querySelector('.skip-ad-button10032');
                 if (existingButton) existingButton.remove();
                 this.removeAutoSkip();
@@ -691,7 +691,10 @@
                 for (let [start, end] of this.adTimeRanges) {
                     end = Math.min(end, duration);
                     if (currentTime >= start && currentTime < end) {
-                        if (duration - end < 2) return;
+                        const rangeKey = `${start.toFixed(2)}-${end.toFixed(2)}`;
+                        if (this.skippedRanges.has(rangeKey)) continue;
+
+                        this.skippedRanges.add(rangeKey);
                         video.currentTime = end;
                         console.log(`【VideoAdGuard】自动跳过广告: ${this.second2time(start)}~${this.second2time(end)}`);
                         break;
@@ -783,27 +786,6 @@
                 noti.style.transition = 'opacity 0.5s';
                 setTimeout(() => noti.remove(), 500);
             }, 5000);
-        },
-
-        addSettingsButton() {
-            const btn = document.createElement('button');
-            btn.textContent = '⚙️';
-            btn.style.cssText = `
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                background: rgba(0, 0, 0, 0.7);
-                color: white;
-                border: none;
-                font-size: 20px;
-                cursor: pointer;
-                z-index: 9999;
-            `;
-            document.body.appendChild(btn);
-            btn.addEventListener('click', () => this.showSettingsPanel());
         },
 
         showSettingsPanel() {
@@ -940,7 +922,6 @@
             panel.innerHTML = `
                 <h3 style="margin: 0 0 15px 0; font-size: 18px;">广告检测设置</h3>
 
-                <!-- API配置管理区 -->
                 <div class="form-group">
                     <label>当前API配置：</label>
                     <select id="vag-api-select">${optionsHtml}</select>
@@ -951,7 +932,6 @@
                     </div>
                 </div>
 
-                <!-- 当前配置详情（只读预览，编辑时使用另一个区域） -->
                 <div id="vag-config-detail" style="background:#f5f5f5; padding:10px; border-radius:4px; font-size:13px;">
                     <div><b>名称：</b><span id="vag-disp-name">${activeCfg.name || '无'}</span></div>
                     <div><b>地址：</b><span id="vag-disp-url">${activeCfg.apiUrl || DEFAULT_API_URL}</span></div>
@@ -959,7 +939,6 @@
                     <div><b>模型：</b><span id="vag-disp-model">${activeCfg.model || DEFAULT_MODEL}</span></div>
                 </div>
 
-                <!-- 编辑表单（默认隐藏） -->
                 <div id="vag-edit-form" style="display:none; border:1px solid #ccc; padding:10px; border-radius:4px; margin-top:10px;">
                     <div class="form-group">
                         <label>配置名称：</label>
@@ -1034,7 +1013,6 @@
                 setTimeout(() => { messageDiv.textContent = ''; messageDiv.className = ''; }, 5000);
             };
 
-            // 辅助函数：更新详情显示
             const updateDetailDisplay = () => {
                 const cfg = getAIConfig();
                 const list = cfg.apiConfigs || [];
@@ -1044,7 +1022,6 @@
                 document.getElementById('vag-disp-url').textContent = active.apiUrl || DEFAULT_API_URL;
                 document.getElementById('vag-disp-key').textContent = active.apiKey ? '***已填写***' : '(未填写)';
                 document.getElementById('vag-disp-model').textContent = active.model || DEFAULT_MODEL;
-                // 刷新下拉框
                 const select = document.getElementById('vag-api-select');
                 if (select) {
                     select.innerHTML = list.map((c, i) =>
@@ -1053,7 +1030,6 @@
                 }
             };
 
-            // 下拉框切换激活配置
             document.getElementById('vag-api-select').addEventListener('change', (e) => {
                 const newIdx = parseInt(e.target.value, 10);
                 if (isNaN(newIdx)) return;
@@ -1064,7 +1040,6 @@
                 showMsg('已切换到配置：' + ((config.apiConfigs[newIdx] || {}).name || '未命名'), 'success');
             });
 
-            // 新增配置
             document.getElementById('vag-add-config').addEventListener('click', () => {
                 const config = getAIConfig();
                 if (!config.apiConfigs) config.apiConfigs = [];
@@ -1081,7 +1056,6 @@
                 showMsg('已添加新配置，可点击“编辑”修改', 'info');
             });
 
-            // 编辑当前配置：显示编辑表单并填充当前值
             document.getElementById('vag-edit-config').addEventListener('click', () => {
                 const config = getAIConfig();
                 const list = config.apiConfigs || [];
@@ -1095,7 +1069,6 @@
                 document.getElementById('vag-edit-form').style.display = 'block';
             });
 
-            // 保存编辑
             document.getElementById('vag-save-edit').addEventListener('click', () => {
                 const config = getAIConfig();
                 const list = config.apiConfigs || [];
@@ -1120,12 +1093,10 @@
                 showMsg('配置已更新', 'success');
             });
 
-            // 取消编辑
             document.getElementById('vag-cancel-edit').addEventListener('click', () => {
                 document.getElementById('vag-edit-form').style.display = 'none';
             });
 
-            // 删除配置
             document.getElementById('vag-del-config').addEventListener('click', () => {
                 const config = getAIConfig();
                 const list = config.apiConfigs || [];
@@ -1144,7 +1115,6 @@
                 showMsg('配置已删除', 'success');
             });
 
-            // 测试连接（使用当前激活的配置）
             document.getElementById('vag-test-connection').addEventListener('click', async () => {
                 const config = getAIConfig();
                 const list = config.apiConfigs || [];
@@ -1196,10 +1166,8 @@
                 }
             });
 
-            // 保存全部设置（Groq、白名单等）
             document.getElementById('vag-save-all').addEventListener('click', () => {
                 const config = getAIConfig();
-                // 先检查当前激活配置的完整性（可能还没保存编辑，但提示用户）
                 const list = config.apiConfigs || [];
                 const idx = config.activeApiIndex ?? 0;
                 if (idx < list.length) {
@@ -1227,7 +1195,6 @@
 
             document.getElementById('vag-cancel').addEventListener('click', () => panel.remove());
 
-            // 阻止事件冒泡，避免触发视频快捷键
             ['vag-api-select', 'vag-add-config', 'vag-edit-config', 'vag-del-config',
              'vag-edit-name', 'vag-edit-url', 'vag-edit-key', 'vag-edit-model',
              'vag-groq-key', 'vag-up-whitelist', 'vag-cache-days'].forEach(id => {
@@ -1243,7 +1210,24 @@
     // ========== 初始化 ==========
     function init() {
         AdDetector.analyze();
-        AdDetector.addSettingsButton();
+
+        // 油猴菜单：设置
+        GM_registerMenuCommand('【VideoAdGuard】设置', () => {
+            AdDetector.showSettingsPanel();
+        });
+
+        // 油猴菜单：临时切换自动跳过
+        GM_registerMenuCommand('【VideoAdGuard】切换自动跳过', () => {
+            AdDetector.autoSkipEnabled = !AdDetector.autoSkipEnabled;
+            if (AdDetector.autoSkipEnabled && AdDetector.adTimeRanges.length) {
+                AdDetector.setupAutoSkip();
+            } else {
+                AdDetector.removeAutoSkip();
+            }
+            AdDetector.showNotification(
+                AdDetector.autoSkipEnabled ? '已开启广告自动跳过（临时）' : '已临时禁用广告跳过'
+            );
+        });
 
         let lastUrl = location.href;
         new MutationObserver(() => {
