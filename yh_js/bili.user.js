@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          B站增强：默认关闭弹幕+禁用自动播放+独立连播开关
 // @namespace     https://github.com/yourname/bilibili-enhance
-// @version       1.0.0
+// @version       1.0.1
 // @description   自动关闭弹幕，禁用自动播放，并分别记忆分P/合集/单视频/收藏列表的自动连播状态。
 // @author        YourName
 // @match         https://www.bilibili.com/video/*
@@ -11,6 +11,8 @@
 // @grant         GM_addStyle
 // @grant         GM_registerMenuCommand
 // @license       MIT
+//https://greasyfork.org/scripts/451504/
+https://greasyfork.org/scripts/445241/
 // ==/UserScript==
 
 (function() {
