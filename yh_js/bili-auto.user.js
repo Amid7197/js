@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         B站视频植入广告检测器(自动跳过+音频识别+进度条标记+多API切换)
-// @version      2.4.4
+// @version      2.4.5
 // @author       aiedit Warma10032 (modified)
 // @license      GPLv2
 // @description  基于大语言模型检测B站视频中的植入广告，支持自动跳过。同一网页内每段广告仅跳过第一次，刷新重置。所有控制移入油猴菜单。
@@ -1212,12 +1212,12 @@
         AdDetector.analyze();
 
         // 油猴菜单：设置
-        GM_registerMenuCommand('【VideoAdGuard】设置', () => {
+        GM_registerMenuCommand('设置', () => {
             AdDetector.showSettingsPanel();
         });
 
         // 油猴菜单：临时切换自动跳过
-        GM_registerMenuCommand('【VideoAdGuard】切换自动跳过', () => {
+        GM_registerMenuCommand('切换自动跳过', () => {
             AdDetector.autoSkipEnabled = !AdDetector.autoSkipEnabled;
             if (AdDetector.autoSkipEnabled && AdDetector.adTimeRanges.length) {
                 AdDetector.setupAutoSkip();
