@@ -1,284 +1,559 @@
 // ==UserScript==
-// @name          B站增强：默认关闭弹幕+禁用自动播放+独立连播开关
-// @namespace     https://github.com/yourname/bilibili-enhance
-// @version       1.0.1
-// @description   自动关闭弹幕，禁用自动播放，并分别记忆分P/合集/单视频/收藏列表的自动连播状态。
-// @author        YourName
-// @match         https://www.bilibili.com/video/*
-// @match         https://www.bilibili.com/list/*
-// @grant         GM_setValue
-// @grant         GM_getValue
-// @grant         GM_addStyle
-// @grant         GM_registerMenuCommand
-// @license       MIT
-//https://greasyfork.org/scripts/451504/
-https://greasyfork.org/scripts/445241/
+// @name         B站极简增强 - 播放器模式 & 布局 & 弹幕 & 评论优化 & 自动开播 & 智能连播
+// @namespace    http://tampermonkey.net/
+// @version      2.3
+// @description  整合面板（紧凑布局）：播放器模式、移动标题/UP主信息、评论优化、弹幕控制、自动开播、智能连播
+// @author       aiedit
+// @match        https://www.bilibili.com/video/*
+// @match        https://www.bilibili.com/list/*
+// @grant        GM_getValue
+// @grant        GM_setValue
+// @grant        GM_addStyle
+// @grant        GM_registerMenuCommand
+// @run-at       document-body
 // ==/UserScript==
 
 (function() {
     'use strict';
 
-    // ========================= 日志工具 =========================
-    const logger = {
-        log: (...args) => console.log('[B站增强]', ...args),
-        error: (...args) => console.error('[B站增强]', ...args),
-    };
+    const SCRIPT_NAME = 'B站极简增强';
+    let loadReady = false;
+    let menuVisible = false;
+    let globalApp = null;
+    let lastVueInstance = null;
 
-    // ========================= 功能1：禁用自动播放 =========================
-    function disableAutoplayLocalStorage() {
-        try {
-            let raw = localStorage.getItem('bpx_player_profile');
-            let profile = raw ? JSON.parse(raw) : {};
-            if (!profile.media) profile.media = {};
-            if (profile.media.autoplay !== false) {
-                profile.media.autoplay = false;
-                localStorage.setItem('bpx_player_profile', JSON.stringify(profile));
-                logger.log('已写入 localStorage -> autoplay = false');
-            }
-        } catch (e) {
-            logger.error('localStorage 写入失败:', e);
-        }
-    }
-
-    // ========================= 功能2：关闭弹幕 =========================
-    function closeDanmaku() {
-        const danmakuSwitch = document.querySelector('input.bui-danmaku-switch-input');
-        if (danmakuSwitch) {
-            if (danmakuSwitch.checked) {
-                danmakuSwitch.click();
-                logger.log('已自动关闭弹幕');
-            } else {
-                logger.log('弹幕已经是关闭状态');
-            }
-        } else {
-            logger.log('未找到弹幕开关，可能播放器未加载完成');
-        }
-    }
-
-    // 等待播放器加载后执行两项基础设置
-    function applyBasicSettings() {
-        disableAutoplayLocalStorage();
-        closeDanmaku();
-    }
-
-    function waitForPlayerAndApply() {
-        let maxWait = 50; // 10秒
-        let count = 0;
-        function check() {
-            if (document.querySelector('input.bui-danmaku-switch-input')) {
-                applyBasicSettings();
-                return;
-            }
-            count++;
-            if (count <= maxWait) {
-                setTimeout(check, 200);
-            } else {
-                logger.log('等待弹幕开关超时，只尝试禁用自动播放');
-                disableAutoplayLocalStorage();
-            }
-        }
-        check();
-    }
-
-    // ========================= 功能3：独立自动连播开关（分P/合集/单视频/收藏列表） =========================
-    const type = {
+    const VIDEO_TYPE = {
         VIDEO: 'video',
         MULTIPART: 'multipart',
         COLLECTION: 'collection',
         PLAYLIST: 'playlist',
     };
 
-    // 为播放列表页面添加自定义开关按钮（如果原生按钮不存在）
-    const prepareSwitchButton = () => {
-        const continuousBtn = document.createElement('div');
-        continuousBtn.className = 'continuous-btn';
+    function initConfig() {
+        const defaults = {
+            playerMode: 1,
+            moveTitleUpinfo: true,
+            removeKeyword: true,
+            removeUselessComment: true,
+            danmakuEnabled: false,
+            danmakuMode: 0,
+            autoPlayEnabled: false,
+            autoPlayMode: 1
+        };
 
-        const txt = document.createElement('div');
-        txt.className = 'txt';
-        txt.textContent = '自动连播';
+        let isFirstRun = GM_getValue('playerMode') === undefined &&
+                         GM_getValue('moveTitleUpinfo') === undefined &&
+                         GM_getValue('removeKeyword') === undefined &&
+                         GM_getValue('removeUselessComment') === undefined &&
+                         GM_getValue('danmakuEnabled') === undefined &&
+                         GM_getValue('autoPlayEnabled') === undefined &&
+                         GM_getValue(VIDEO_TYPE.VIDEO) === undefined &&
+                         GM_getValue(VIDEO_TYPE.MULTIPART) === undefined &&
+                         GM_getValue(VIDEO_TYPE.COLLECTION) === undefined &&
+                         GM_getValue(VIDEO_TYPE.PLAYLIST) === undefined;
 
-        const switchBtn = document.createElement('div');
-        switchBtn.className = 'switch-btn';
+        if (GM_getValue('playerMode') === undefined) GM_setValue('playerMode', defaults.playerMode);
+        if (GM_getValue('moveTitleUpinfo') === undefined) GM_setValue('moveTitleUpinfo', defaults.moveTitleUpinfo);
+        if (GM_getValue('removeKeyword') === undefined) GM_setValue('removeKeyword', defaults.removeKeyword);
+        if (GM_getValue('removeUselessComment') === undefined) GM_setValue('removeUselessComment', defaults.removeUselessComment);
+        if (GM_getValue('danmakuEnabled') === undefined) GM_setValue('danmakuEnabled', defaults.danmakuEnabled);
+        if (GM_getValue('danmakuMode') === undefined) GM_setValue('danmakuMode', defaults.danmakuMode);
+        if (GM_getValue('autoPlayEnabled') === undefined) GM_setValue('autoPlayEnabled', defaults.autoPlayEnabled);
+        if (GM_getValue('autoPlayMode') === undefined) GM_setValue('autoPlayMode', defaults.autoPlayMode);
 
-        const switchBlock = document.createElement('div');
-        switchBlock.className = 'switch-block';
+        if (isFirstRun) {
+            menuVisible = true;
+            console.log(`[${SCRIPT_NAME}] 首次使用，自动打开设置面板`);
+        }
+    }
 
-        switchBtn.appendChild(switchBlock);
-        continuousBtn.appendChild(txt);
-        continuousBtn.appendChild(switchBtn);
+    function createSettingsPanel() {
+        const panel = document.createElement('div');
+        panel.id = 'bili-plus-panel';
+        panel.innerHTML = `
+            <div id="bili-plus-panel-content">
+                <div id="bili-plus-panel-header">
+                    <span id="bili-plus-panel-title">⚙️ B站极简增强</span>
+                    <button id="bili-plus-panel-close">✕</button>
+                </div>
+                <div id="bili-plus-panel-body">
+                    <!-- 播放器模式 -->
+                    <div class="bili-plus-section">
+                        <div class="bili-plus-section-title">播放器模式</div>
+                        <div class="bili-plus-option">
+                            <label><input type="radio" name="playerMode" value="0"> 默认模式</label>
+                            <label><input type="radio" name="playerMode" value="1"> 自动宽屏</label>
+                            <label><input type="radio" name="playerMode" value="2"> 网页全屏</label>
+                        </div>
+                    </div>
+                    <hr>
+                    <!-- 布局优化 -->
+                    <div class="bili-plus-section">
+                        <div class="bili-plus-section-title">布局优化</div>
+                        <div class="bili-plus-option">
+                            <label class="bili-plus-switch">
+                                <input type="checkbox" id="moveTitleUpinfo"> 移动标题/UP主信息到下方
+                            </label>
+                        </div>
+                    </div>
+                    <hr>
+                    <!-- 评论优化（并排） -->
+                    <div class="bili-plus-section">
+                        <div class="bili-plus-section-title">评论优化</div>
+                        <div class="bili-plus-option" style="display: flex; gap: 20px; flex-wrap: wrap;">
+                            <label class="bili-plus-switch">
+                                <input type="checkbox" id="removeKeyword"> 去除评论蓝色关键字
+                            </label>
+                            <label class="bili-plus-switch">
+                                <input type="checkbox" id="removeUselessComment"> 隐藏纯@评论
+                            </label>
+                        </div>
+                    </div>
+                    <hr>
+                    <!-- 弹幕控制 -->
+                    <div class="bili-plus-section">
+                        <div class="bili-plus-section-title">弹幕控制</div>
+                        <div class="bili-plus-option" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                            <label class="bili-plus-switch">
+                                <input type="checkbox" id="danmakuEnabled"> 启用强制弹幕状态
+                            </label>
+                            <span id="danmakuModeRow" style="display: none; white-space: nowrap;">
+                                <label><input type="radio" name="danmakuMode" value="0"> 总是开启</label>
+                                <label><input type="radio" name="danmakuMode" value="1"> 总是关闭</label>
+                            </span>
+                        </div>
+                    </div>
+                    <hr>
+                    <!-- 自动开播控制 -->
+                    <div class="bili-plus-section">
+                        <div class="bili-plus-section-title">自动开播控制</div>
+                        <div class="bili-plus-option" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                            <label class="bili-plus-switch">
+                                <input type="checkbox" id="autoPlayEnabled"> 启用自动开播控制
+                            </label>
+                            <span id="autoPlayModeRow" style="display: none; white-space: nowrap;">
+                                <label><input type="radio" name="autoPlayMode" value="0"> 总是开启</label>
+                                <label><input type="radio" name="autoPlayMode" value="1"> 总是关闭</label>
+                            </span>
+                        </div>
+                    </div>
+                    <hr>
+                    <!-- 智能连播（分P、合集、列表并排，单视频单独） -->
+                    <div class="bili-plus-section">
+                        <div class="bili-plus-section-title">智能连播（勾选代表连播）</div>
+                        <div class="bili-plus-option" style="display: flex; gap: 20px; flex-wrap: wrap;">
+                            <label class="bili-plus-switch">
+                                <input type="checkbox" id="autoNextMultipart" disabled> 分P视频
+                            </label>
+                            <label class="bili-plus-switch">
+                                <input type="checkbox" id="autoNextCollection" disabled> 合集视频
+                            </label>
+                            <label class="bili-plus-switch">
+                                <input type="checkbox" id="autoNextPlaylist" disabled> 收藏列表
+                            </label>
+                        </div>
+                        <div class="bili-plus-option">
+                            <label class="bili-plus-switch">
+                                <input type="checkbox" id="autoNextVideo" disabled> 单视频
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(panel);
 
-        const headerLeft = document.querySelector('.header-left');
-        headerLeft?.appendChild(continuousBtn);
         GM_addStyle(`
-            .switch-btn{--switch-btn-width:30px;--switch-btn-height:20px;--switch-btn-gap:2px;cursor:pointer;position:relative;display:inline-block;box-sizing:border-box;border-radius:calc(var(--switch-btn-height)/ 2);width:var(--switch-btn-width);height:var(--switch-btn-height);background-color:var(--graph_bg_thick);transition:.2s}
-            .switch-btn .switch-block{position:absolute;border-radius:50%;top:var(--switch-btn-gap);left:var(--switch-btn-gap);width:calc(var(--switch-btn-height) - calc(2 * var(--switch-btn-gap)));height:calc(var(--switch-btn-height) - calc(2 * var(--switch-btn-gap)));background-color:var(--text_white);transition:.2s}
-            .switch-btn.on{background:var(--brand_blue)}
-            .switch-btn.on .switch-block{left:calc(calc(var(--switch-btn-width) - var(--switch-btn-height)) + var(--switch-btn-gap))}
-            .continuous-btn{cursor:pointer;display:flex;align-items:center}
-            .continuous-btn .txt{color:var(--text3);font-size:14px;margin-right:4px}
+            #bili-plus-panel {
+                position: fixed;
+                top: 20%;
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: 100000;
+                background: #fff;
+                border-radius: 12px;
+                box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+                font-size: 14px;
+                color: #222;
+                width: 480px;
+                display: ${menuVisible ? 'block' : 'none'};
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            }
+            #bili-plus-panel-content { padding: 16px; }
+            #bili-plus-panel-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 12px;
+            }
+            #bili-plus-panel-title { font-weight: 600; font-size: 16px; }
+            #bili-plus-panel-close {
+                background: transparent;
+                border: none;
+                font-size: 18px;
+                cursor: pointer;
+                color: #666;
+            }
+            .bili-plus-section { margin: 10px 0; }
+            .bili-plus-section-title {
+                font-weight: 600;
+                margin-bottom: 6px;
+                color: #00a1d6;
+            }
+            .bili-plus-option { margin: 6px 0; }
+            .bili-plus-switch { display: flex; align-items: center; cursor: pointer; white-space: nowrap; }
+            input[type="radio"], input[type="checkbox"] { margin-right: 6px; }
+            hr { border: 0.5px solid #eee; }
+            #danmakuModeRow label, #autoPlayModeRow label { margin-right: 10px; }
+            @media (prefers-color-scheme: dark) {
+                #bili-plus-panel {
+                    background: #2a2a2a;
+                    color: #eee;
+                    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+                }
+                #bili-plus-panel-close { color: #aaa; }
+                .bili-plus-section-title { color: #23ade5; }
+                hr { border-color: #444; }
+            }
         `);
-        return switchBtn;
-    };
 
-    let lastVueInstance = null;
-    let globalApp = null;
+        bindPanelEvents();
+    }
 
-    const correctNextButton = () => {
-        if (!globalApp) {
-            logger.error('globalApp is not available');
-            return;
+    function bindPanelEvents() {
+        document.getElementById('bili-plus-panel-close').addEventListener('click', () => {
+            menuVisible = false;
+            document.getElementById('bili-plus-panel').style.display = 'none';
+        });
+
+        let isDragging = false, startX, startY, initialLeft, initialTop;
+        const panelHeader = document.getElementById('bili-plus-panel-header');
+        panelHeader.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            const rect = document.getElementById('bili-plus-panel').getBoundingClientRect();
+            startX = e.clientX;
+            startY = e.clientY;
+            initialLeft = rect.left;
+            initialTop = rect.top;
+            e.preventDefault();
+        });
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const panel = document.getElementById('bili-plus-panel');
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            panel.style.left = (initialLeft + dx) + 'px';
+            panel.style.top = (initialTop + dy) + 'px';
+            panel.style.transform = 'none';
+        });
+        window.addEventListener('mouseup', () => { isDragging = false; });
+
+        // 初始化控件状态
+        document.querySelector(`input[name="playerMode"][value="${GM_getValue('playerMode')}"]`).checked = true;
+        document.getElementById('moveTitleUpinfo').checked = GM_getValue('moveTitleUpinfo');
+        document.getElementById('removeKeyword').checked = GM_getValue('removeKeyword');
+        document.getElementById('removeUselessComment').checked = GM_getValue('removeUselessComment');
+        document.getElementById('danmakuEnabled').checked = GM_getValue('danmakuEnabled');
+        document.querySelector(`input[name="danmakuMode"][value="${GM_getValue('danmakuMode')}"]`).checked = true;
+        document.getElementById('autoPlayEnabled').checked = GM_getValue('autoPlayEnabled');
+        document.querySelector(`input[name="autoPlayMode"][value="${GM_getValue('autoPlayMode')}"]`).checked = true;
+        updateDanmakuModeRow();
+        updateAutoPlayModeRow();
+
+        // 事件
+        document.querySelectorAll('input[name="playerMode"]').forEach(r => {
+            r.addEventListener('change', () => {
+                GM_setValue('playerMode', parseInt(r.value));
+                applyPlayerMode();
+            });
+        });
+        document.getElementById('moveTitleUpinfo').addEventListener('change', e => {
+            GM_setValue('moveTitleUpinfo', e.target.checked);
+            applyMoveTitle();
+        });
+        document.getElementById('removeKeyword').addEventListener('change', e => {
+            GM_setValue('removeKeyword', e.target.checked);
+            applyRemoveKeyword();
+        });
+        document.getElementById('removeUselessComment').addEventListener('change', e => {
+            GM_setValue('removeUselessComment', e.target.checked);
+            applyRemoveUselessComment();
+        });
+        document.getElementById('danmakuEnabled').addEventListener('change', e => {
+            GM_setValue('danmakuEnabled', e.target.checked);
+            updateDanmakuModeRow();
+            applyDanmakuControl();
+        });
+        document.querySelectorAll('input[name="danmakuMode"]').forEach(r => {
+            r.addEventListener('change', () => {
+                GM_setValue('danmakuMode', parseInt(r.value));
+                applyDanmakuControl();
+            });
+        });
+        document.getElementById('autoPlayEnabled').addEventListener('change', e => {
+            GM_setValue('autoPlayEnabled', e.target.checked);
+            updateAutoPlayModeRow();
+            applyAutoPlayControl();
+        });
+        document.querySelectorAll('input[name="autoPlayMode"]').forEach(r => {
+            r.addEventListener('change', () => {
+                GM_setValue('autoPlayMode', parseInt(r.value));
+                applyAutoPlayControl();
+            });
+        });
+
+        // 智能连播事件
+        ['autoNextMultipart', 'autoNextCollection', 'autoNextVideo', 'autoNextPlaylist'].forEach(id => {
+            document.getElementById(id).addEventListener('change', function(e) {
+                const typeMap = {
+                    autoNextMultipart: VIDEO_TYPE.MULTIPART,
+                    autoNextCollection: VIDEO_TYPE.COLLECTION,
+                    autoNextVideo: VIDEO_TYPE.VIDEO,
+                    autoNextPlaylist: VIDEO_TYPE.PLAYLIST,
+                };
+                GM_setValue(typeMap[id], e.target.checked);
+                if (globalApp) correctNextButton();
+            });
+        });
+    }
+
+    function updateDanmakuModeRow() {
+        document.getElementById('danmakuModeRow').style.display = GM_getValue('danmakuEnabled') ? 'inline' : 'none';
+    }
+    function updateAutoPlayModeRow() {
+        document.getElementById('autoPlayModeRow').style.display = GM_getValue('autoPlayEnabled') ? 'inline' : 'none';
+    }
+
+    function syncAutoNextPanel() {
+        const mapping = {
+            autoNextMultipart: VIDEO_TYPE.MULTIPART,
+            autoNextCollection: VIDEO_TYPE.COLLECTION,
+            autoNextVideo: VIDEO_TYPE.VIDEO,
+            autoNextPlaylist: VIDEO_TYPE.PLAYLIST,
+        };
+        Object.entries(mapping).forEach(([id, type]) => {
+            const cb = document.getElementById(id);
+            if (!cb) return;
+            const stored = GM_getValue(type);
+            if (stored !== undefined) cb.checked = stored;
+            cb.disabled = false;
+        });
+    }
+
+    // ---------- 功能实现 ----------
+    function applyPlayerMode() {
+        const mode = GM_getValue('playerMode');
+        if (mode === 1) {
+            const btn = document.querySelector('.bpx-player-ctrl-wide') || document.querySelector('.squirtle-video-widescreen');
+            if (btn && !btn.classList.contains('bpx-state-entered') && !btn.classList.contains('active')) btn.click();
+        } else if (mode === 2) {
+            console.log('网页全屏模式需完整函数支持，此处仅示意');
+        } else {
+            const btn = document.querySelector('.bpx-player-ctrl-wide');
+            if (btn && btn.classList.contains('bpx-state-entered')) btn.click();
+            const btn2 = document.querySelector('.squirtle-video-widescreen');
+            if (btn2 && btn2.classList.contains('active')) btn2.click();
         }
+    }
+
+    function applyMoveTitle() {
+        if (!loadReady) return setTimeout(applyMoveTitle, 500);
+        const enabled = GM_getValue('moveTitleUpinfo');
+        const viewbox = document.getElementById('viewbox_report');
+        const upPanel = document.querySelector('.up-panel-container') || document.querySelector('.members-info-container');
+        const toolbar = document.getElementById('arc_toolbar_report');
+        if (!viewbox || !upPanel || !toolbar) return setTimeout(applyMoveTitle, 500);
+        const leftContainer = document.querySelector('.left-container') || document.querySelector('.playlist-container--left');
+        if (!leftContainer) return;
+        if (enabled) {
+            leftContainer.insertBefore(viewbox, toolbar);
+            leftContainer.insertBefore(upPanel, toolbar);
+            viewbox.setAttribute('mr_layout', 'true');
+            upPanel.setAttribute('mr_layout', 'true');
+        } else {
+            const playerWrap = document.getElementById('playerWrap');
+            if (playerWrap) leftContainer.insertBefore(viewbox, playerWrap);
+            const rightInner = document.querySelector('.right-container-inner');
+            if (rightInner) rightInner.insertBefore(upPanel, document.getElementById('danmukuBox'));
+            viewbox.removeAttribute('mr_layout');
+            upPanel.removeAttribute('mr_layout');
+        }
+    }
+
+    function applyRemoveKeyword() {
+        function process() {
+            const comments = document.querySelector('bili-comments')?.shadowRoot?.querySelector('#feed')?.children;
+            if (!comments) return setTimeout(process, 500);
+            const enabled = GM_getValue('removeKeyword');
+            Array.from(comments).forEach(comment => {
+                const richText = comment.shadowRoot?.querySelector('#comment')?.shadowRoot?.querySelector('bili-rich-text');
+                const contents = richText?.shadowRoot?.querySelector('#contents');
+                if (!contents) return;
+                contents.querySelectorAll('a').forEach(a => {
+                    if (!a.textContent.includes('@') && !a.textContent.includes('http') && a.href.includes('search.bilibili.com')) {
+                        if (enabled) {
+                            a.style.pointerEvents = 'none';
+                            a.style.cursor = 'text';
+                            a.style.color = 'var(--text1)';
+                            if (a.children[0]) a.children[0].style.display = 'none';
+                        } else {
+                            a.style.pointerEvents = '';
+                            a.style.cursor = '';
+                            a.style.color = '';
+                            if (a.children[0]) a.children[0].style.display = '';
+                        }
+                    }
+                });
+            });
+            setTimeout(process, 1000);
+        }
+        process();
+    }
+
+    function applyRemoveUselessComment() {
+        function process() {
+            const comments = document.querySelector('bili-comments')?.shadowRoot?.querySelector('#feed')?.children;
+            if (!comments) return setTimeout(process, 500);
+            const enabled = GM_getValue('removeUselessComment');
+            Array.from(comments).forEach(comment => {
+                const richText = comment.shadowRoot?.querySelector('#comment')?.shadowRoot?.querySelector('bili-rich-text');
+                const contents = richText?.shadowRoot?.querySelector('#contents');
+                if (!contents) return;
+                const children = contents.children;
+                let onlyAt = children.length > 0;
+                for (let i = 0; i < children.length; i++) {
+                    if (children[i].tagName !== 'A' || !children[i].textContent.startsWith('@')) {
+                        onlyAt = false;
+                        break;
+                    }
+                }
+                comment.style.display = (enabled && onlyAt) ? 'none' : '';
+            });
+            setTimeout(process, 1000);
+        }
+        process();
+    }
+
+    function applyDanmakuControl() {
+        const enabled = GM_getValue('danmakuEnabled');
+        if (!enabled) return;
+        const mode = GM_getValue('danmakuMode');
+        function trigger() {
+            const toggle = document.querySelector('.bui-danmaku-switch-input');
+            if (!toggle) return setTimeout(trigger, 500);
+            const isOn = toggle.checked;
+            if ((mode === 0 && !isOn) || (mode === 1 && isOn)) toggle.click();
+        }
+        trigger();
+    }
+
+    function applyAutoPlayControl() {
+        const enabled = GM_getValue('autoPlayEnabled');
+        if (!enabled) return;
+        const mode = GM_getValue('autoPlayMode');
+        try {
+            let raw = localStorage.getItem('bpx_player_profile');
+            let profile = raw ? JSON.parse(raw) : {};
+            if (!profile.media) profile.media = {};
+            const desired = (mode === 0);
+            if (profile.media.autoplay !== desired) {
+                profile.media.autoplay = desired;
+                localStorage.setItem('bpx_player_profile', JSON.stringify(profile));
+                console.log(`[${SCRIPT_NAME}] 自动开播已设置：autoplay=${desired}`);
+            }
+        } catch (e) {
+            console.warn('写入 localStorage 失败:', e);
+        }
+    }
+
+    // ---------- 智能连播 ----------
+    function correctNextButton() {
+        if (!globalApp) return;
         const videoData = globalApp.videoData;
-        if (!videoData) {
-            logger.error('videoData is not available');
-            return;
-        }
+        if (!videoData) return;
         const { videos: videosCount } = videoData;
         const pageType =
             videosCount > 1
-                ? type.MULTIPART
+                ? VIDEO_TYPE.MULTIPART
                 : globalApp.isSection
-                  ? type.COLLECTION
-                  : globalApp.playlist?.type
-                    ? type.PLAYLIST
-                    : type.VIDEO;
+                    ? VIDEO_TYPE.COLLECTION
+                    : globalApp.playlist?.type
+                        ? VIDEO_TYPE.PLAYLIST
+                        : VIDEO_TYPE.VIDEO;
         const pageStatus = globalApp.continuousPlay;
-        let userStatus = GM_getValue(pageType);
+        const userStatus = GM_getValue(pageType);
         if (userStatus === undefined) {
             GM_setValue(pageType, pageStatus);
         } else if (pageStatus !== userStatus) {
             globalApp.setContinuousPlay(userStatus);
         }
-        logger.log(`当前页面类型: ${pageType}`, {
-            collection: GM_getValue(type.COLLECTION),
-            multipart: GM_getValue(type.MULTIPART),
-            video: GM_getValue(type.VIDEO),
-            playlist: GM_getValue(type.PLAYLIST),
-        });
-
-        let switchButton = document.querySelector('.switch-btn');
-        if (!switchButton) {
-            switchButton = prepareSwitchButton();
-            switchButton.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                switchButton.classList.toggle('on');
-                globalApp.setContinuousPlay(!globalApp.continuousPlay);
-                GM_setValue(pageType, globalApp.continuousPlay);
-            });
-            switchButton.classList.toggle('on', globalApp.continuousPlay);
-        } else {
-            // 避免重复绑定，先移除再添加
-            const newSwitch = switchButton.cloneNode(true);
-            switchButton.parentNode?.replaceChild(newSwitch, switchButton);
-            switchButton = newSwitch;
-            switchButton.addEventListener('click', () => {
-                GM_setValue(pageType, !globalApp.continuousPlay);
-            });
-        }
-
-        // 分P的最后一个视频强制关闭连播
-        if (pageType === type.MULTIPART) {
-            logger.log('分P的最后一个视频不自动连播');
-            if (videoData.embedPlayer.p === videoData.videos) {
-                globalApp.setContinuousPlay(false);
-                switchButton.classList.remove('on');
-            }
-        }
-        // 合集的最后一个视频强制关闭连播
-        if (pageType === type.COLLECTION) {
-            logger.log('合集的最后一个视频不自动连播');
+        if (pageType === VIDEO_TYPE.MULTIPART && videoData.embedPlayer?.p === videoData.videos) {
+            globalApp.setContinuousPlay(false);
+        } else if (pageType === VIDEO_TYPE.COLLECTION) {
             const currentBvid = globalApp.bvid;
             const sections = globalApp.sectionsInfo?.sections;
             const episodes = sections?.[0]?.episodes;
             if (episodes && episodes.length > 0) {
                 const lastBvid = episodes[episodes.length - 1]?.bvid;
-                if (currentBvid === lastBvid) {
-                    globalApp.setContinuousPlay(false);
-                    switchButton.classList.remove('on');
-                }
+                if (currentBvid === lastBvid) globalApp.setContinuousPlay(false);
             }
         }
-    };
+        syncAutoNextPanel();
+    }
 
-    const hookVueInstance = (vueInstance) => {
+    function observeVueInstance() {
+        const appContainer = document.querySelector('#app');
+        if (!appContainer) { setTimeout(observeVueInstance, 200); return; }
+        if (appContainer.__vue__) hookVueInstance(appContainer.__vue__);
+        const observer = new MutationObserver(() => {
+            const app = document.querySelector('#app');
+            if (app?.__vue__) hookVueInstance(app.__vue__);
+        });
+        observer.observe(appContainer, { childList: true, subtree: true });
+    }
+
+    function hookVueInstance(vueInstance) {
         if (!vueInstance || vueInstance === lastVueInstance) return;
         lastVueInstance = vueInstance;
         globalApp = vueInstance;
         correctNextButton();
         if (!vueInstance.__correctNextButtonHooked) {
             const __loadVideoData = vueInstance.loadVideoData;
-            vueInstance.loadVideoData = function() {
+            vueInstance.loadVideoData = function () {
                 return __loadVideoData.call(this).then(
-                    (res) => {
-                        correctNextButton();
-                        return res;
-                    },
+                    (res) => { correctNextButton(); return res; },
                     (error) => Promise.reject(error)
                 );
             };
             vueInstance.__correctNextButtonHooked = true;
         }
-    };
+    }
 
-    const observeVueInstance = () => {
-        const appContainer = document.querySelector('#app');
-        if (!appContainer) return;
-        if (appContainer.__vue__) {
-            hookVueInstance(appContainer.__vue__);
-        }
-        const observer = new MutationObserver(() => {
-            const app = document.querySelector('#app');
-            if (app?.__vue__) {
-                hookVueInstance(app.__vue__);
-            }
-        });
-        observer.observe(appContainer, { childList: true, subtree: true });
-    };
-
-    const registerMenuCommands = () => {
-        Object.entries(type).forEach(([key, value]) => {
-            const status = GM_getValue(value);
-            const statusText = status ? '✅ 开启' : '❌ 关闭';
-            const typeMap = {
-                [type.VIDEO]: '单视频',
-                [type.MULTIPART]: '分P',
-                [type.COLLECTION]: '合集',
-                [type.PLAYLIST]: '收藏列表',
-            };
-            GM_registerMenuCommand(`${typeMap[value]} 连播: ${statusText}`, () => {
-                GM_setValue(value, !status);
-                location.reload();
-            });
-        });
-    };
-
-    // ========================= 初始化 =========================
-    // 1. 启动基础设置（自动播放+弹幕）
-    waitForPlayerAndApply();
-    // 2. 启动独立连播开关
-    registerMenuCommands();
-    observeVueInstance();
-
-    // 额外监听 SPA 导航，确保基础设置在页面切换后重新生效
-    let currentUrl = location.href;
-    function handleUrlChange() {
-        const newUrl = location.href;
-        if (newUrl !== currentUrl) {
-            currentUrl = newUrl;
-            setTimeout(waitForPlayerAndApply, 800);
+    function checkLoadReady() {
+        const input = document.querySelector('.nav-search-input');
+        if (input && input.title && (document.querySelector('.bpx-player-video-info') || document.querySelector('.bpx-player-dm-wrap'))) {
+            loadReady = true;
+            console.log(`[${SCRIPT_NAME}] 页面加载完成`);
+            applyPlayerMode();
+            applyMoveTitle();
+            applyRemoveKeyword();
+            applyRemoveUselessComment();
+            applyDanmakuControl();
+            applyAutoPlayControl();
+            observeVueInstance();
+            if (globalApp) syncAutoNextPanel();
+        } else {
+            setTimeout(checkLoadReady, 500);
         }
     }
-    window.addEventListener('popstate', handleUrlChange);
-    const originalPushState = history.pushState;
-    const originalReplaceState = history.replaceState;
-    history.pushState = function() {
-        originalPushState.apply(this, arguments);
-        handleUrlChange();
-    };
-    history.replaceState = function() {
-        originalReplaceState.apply(this, arguments);
-        handleUrlChange();
-    };
-    setInterval(handleUrlChange, 2000);
+
+    initConfig();
+    createSettingsPanel();
+    checkLoadReady();
+
+    GM_registerMenuCommand('⚙️ 极简增强面板', () => {
+        menuVisible = !menuVisible;
+        const panel = document.getElementById('bili-plus-panel');
+        if (panel) panel.style.display = menuVisible ? 'block' : 'none';
+    });
 })();
