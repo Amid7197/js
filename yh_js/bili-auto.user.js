@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         B站视频植入广告检测器(自动跳过+音频识别+进度条标记+多API切换)
-// @version      2.4.5
+// @version      2.4.6
 // @author       aiedit Warma10032 (modified)
 // @license      GPLv2
 // @description  基于大语言模型检测B站视频中的植入广告，支持自动跳过。同一网页内每段广告仅跳过第一次，刷新重置。所有控制移入油猴菜单。
