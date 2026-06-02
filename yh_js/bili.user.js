@@ -11,6 +11,8 @@
 // @grant        GM_addStyle
 // @grant        GM_registerMenuCommand
 // @run-at       document-body
+//https://greasyfork.org/scripts/451504/
+//https://greasyfork.org/scripts/445241/
 // ==/UserScript==
 
 (function() {
