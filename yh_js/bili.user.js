@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         B站极简增强 - 播放器模式 & 布局 & 弹幕 & 评论优化 & 自动开播 & 智能连播
 // @namespace    http://tampermonkey.net/
-// @version      2.3
+// @version      2.4
 // @description  整合面板（紧凑布局）：播放器模式、移动标题/UP主信息、评论优化、弹幕控制、自动开播、智能连播
 // @author       aiedit
 // @match        https://www.bilibili.com/video/*
@@ -9,6 +9,7 @@
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_addStyle
+// @icon         https://www.bilibili.com/favicon.ico
 // @grant        GM_registerMenuCommand
 // @run-at       document-body
 //https://greasyfork.org/scripts/451504/
