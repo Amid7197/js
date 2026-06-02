@@ -9,6 +9,7 @@
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_registerMenuCommand
+// @icon         https://www.bilibili.com/favicon.ico
 // @connect      open.bigmodel.cn
 // @connect      api.openai.com
 // @connect      api.deepseek.com
