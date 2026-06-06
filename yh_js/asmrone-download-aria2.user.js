@@ -3,9 +3,9 @@
 // @name:zh-CN   asmrone-download-aria2
 // @name:en      asmrone-download-aria2
 // @namespace    http://tampermonkey.net/
-// @version      2.3.3
+// @version      2.3.4
 // @license      MIT
-// @description  通过面板配置Aria2，一键下载ASMR One作品，标题模式支持临时自定义文件夹名
+// @description  通过面板配置Aria2，一键下载ASMR One作品，修复标题清理不生效的bug
 // @author       aiedit crudBoy
 // @match        https://asmr-200.com/work/*
 // @match        https://asmr-100.com/work/*
@@ -116,10 +116,10 @@
         const old = document.getElementById('aria2-settings-panel');
         if (old) old.remove();
 
-        // 获取当前作品 ID，用于生成默认标题文件夹名
         const urlWithoutParams = window.location.href.split(/[?#]/)[0];
-        const workId = urlWithoutParams.split('/').pop().substring(2);
-        const defaultTitleFolder = sanitizeFolderName(document.title, workId) || workId;
+        const fullId = urlWithoutParams.split('/').pop();   // 完整 ID，如 RJ01529650
+        const workId = fullId.substring(2);                // 短 ID，如 01529650（保持兼容）
+        const defaultTitleFolder = sanitizeFolderName(document.title, fullId) || fullId;
 
         const overlay = document.createElement('div');
         overlay.id = 'aria2-settings-panel';
@@ -143,7 +143,7 @@
 
                 <label style="display:block; margin-bottom:2px; font-weight:500;">根文件夹命名方式</label>
                 <select id="aria2-folderNameType" style="width:100%; margin-bottom:12px; padding:8px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;">
-                    <option value="id" ${config.folderNameType === 'id' ? 'selected' : ''}>使用作品 ID（如 ${escapeHtml(workId)}）</option>
+                    <option value="id" ${config.folderNameType === 'id' ? 'selected' : ''}>使用作品 ID（如 ${escapeHtml(fullId)}）</option>
                     <option value="title" ${config.folderNameType === 'title' ? 'selected' : ''}>使用网页标题（可临时修改）</option>
                 </select>
 
@@ -188,24 +188,20 @@
         folderNameTypeSelect.addEventListener('change', () => {
             if (folderNameTypeSelect.value === 'title') {
                 customFolderRow.style.display = 'block';
-                // 如果输入框为空，填入默认值
                 if (!customFolderInput.value) {
                     customFolderInput.value = defaultTitleFolder;
                 }
             } else {
                 customFolderRow.style.display = 'none';
-                customFolderInput.value = '';   // 清除输入，避免误用
+                customFolderInput.value = '';
             }
         });
 
-        // 用户编辑时实时更新临时变量
         customFolderInput.addEventListener('input', () => {
             customFolderName = customFolderInput.value.trim();
         });
 
-        // 保存按钮
         document.getElementById('aria2-save').addEventListener('click', () => {
-            // 保存配置前，如果标题模式下输入框有内容，确保同步到临时变量
             if (folderNameTypeSelect.value === 'title') {
                 customFolderName = customFolderInput.value.trim();
             }
@@ -226,16 +222,13 @@
             overlay.remove();
         });
 
-        // 取消按钮
         document.getElementById('aria2-cancel').addEventListener('click', () => {
-            // 取消时也可以同步一下临时变量（非必须）
             if (folderNameTypeSelect.value === 'title') {
                 customFolderName = customFolderInput.value.trim();
             }
             overlay.remove();
         });
 
-        // 测试连接按钮
         document.getElementById('aria2-test').addEventListener('click', () => {
             const host = hostInput.value.trim();
             const port = portInput.value.trim();
@@ -302,18 +295,19 @@
 
     function fetchTrack() {
         const urlWithoutParams = window.location.href.split(/[?#]/)[0];
-        const id = urlWithoutParams.split('/').pop().substring(2);
+        const fullId = urlWithoutParams.split('/').pop();       // 完整 ID，如 RJ01529650
+        const shortId = fullId.substring(2);                    // 短 ID，用于 API
 
         // 根据配置决定根文件夹名称
         let folderName;
         if (config.folderNameType === 'title') {
-            // 优先使用用户临时设置的名称，若无则使用自动清理的标题
-            folderName = (customFolderName && customFolderName.trim()) || sanitizeFolderName(document.title, id) || id;
+            // 优先用户自定义，其次自动清理标题，最后回退到完整 ID
+            folderName = (customFolderName && customFolderName.trim()) || sanitizeFolderName(document.title, fullId) || fullId;
         } else {
-            folderName = id;
+            folderName = fullId;   // 现在用完整 ID 作为文件夹名（更直观）
         }
 
-        const apiUrl = `https://api.${window.location.host}/api/tracks/${id}`;
+        const apiUrl = `https://api.${window.location.host}/api/tracks/${shortId}`;
         fetchData(apiUrl)
             .then(response => {
                 const trackData = JSON.parse(response.responseText);
@@ -324,15 +318,15 @@
     }
 
     // 智能清理标题：删除末尾的 “- ASMR Online” 及其前面紧贴的标签（最多1个），
-    // 删除开头 ID 后最多 2 个用空格分隔的【标签】，然后移除非法字符并限制长度
-    function sanitizeFolderName(name, id) {
+    // 删除开头完整 ID 后最多 2 个用空格分隔的【标签】，然后移除非法字符并限制长度
+    function sanitizeFolderName(name, fullId) {
         let cleaned = name;
-        if (id && cleaned.startsWith(id)) {
-            // 1. 删除末尾的 “- ASMR Online” 及前面可能紧贴的一个【标签】
-            cleaned = cleaned.replace(/(【[^】]*】)?\s*-\s*ASMR\s*Online\s*$/i, '');
+        // 1. 删除末尾的 “- ASMR Online” 及前面可能紧贴的一个【标签】
+        cleaned = cleaned.replace(/(【[^】]*】)?\s*-\s*ASMR\s*Online\s*$/i, '');
 
-            // 2. 删除 ID 之后最多 2 个【标签】（用空格分隔或紧紧连接）
-            let afterId = cleaned.slice(id.length).replace(/^\s+/, '');
+        // 2. 删除开头完整 ID 之后最多 2 个【标签】（用空格分隔或紧紧连接）
+        if (fullId && cleaned.startsWith(fullId)) {
+            let afterId = cleaned.slice(fullId.length).replace(/^\s+/, '');
             for (let i = 0; i < 2; i++) {
                 const match = afterId.match(/^(【[^】]*】)\s*/);
                 if (match) {
@@ -341,7 +335,7 @@
                     break;
                 }
             }
-            cleaned = id + (afterId ? ' ' + afterId : '');
+            cleaned = fullId + (afterId ? ' ' + afterId : '');
         }
 
         // 常规非法字符清理
