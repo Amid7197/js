@@ -3,9 +3,9 @@
 // @name:zh-CN   asmrone-download-aria2
 // @name:en      asmrone-download-aria2
 // @namespace    http://tampermonkey.net/
-// @version      2.1.0
+// @version      2.3.3
 // @license      MIT
-// @description  通过面板配置Aria2，一键下载ASMR One作品
+// @description  通过面板配置Aria2，一键下载ASMR One作品，标题模式支持临时自定义文件夹名
 // @author       aiedit crudBoy
 // @match        https://asmr-200.com/work/*
 // @match        https://asmr-100.com/work/*
@@ -29,14 +29,19 @@
 (function () {
     'use strict';
 
+    // ----- 自定义文件夹名（仅内存，刷新失效）-----
+    let customFolderName = null;
+
     // ----- 从存储读取配置，带默认值 -----
     function loadConfig() {
         return {
             secret: GM_getValue('secret', ''),
             host: GM_getValue('host', 'localhost'),
             port: GM_getValue('port', 16800),
-            path: GM_getValue('path', 'E:/新建文件夹'),   // 内部统一用正斜杠
-            onlySE: GM_getValue('onlySE', false)
+            path: GM_getValue('path', 'E:/新建文件夹'),
+            onlySE: GM_getValue('onlySE', false),
+            skipWav: GM_getValue('skipWav', false),
+            folderNameType: GM_getValue('folderNameType', 'id')
         };
     }
 
@@ -48,10 +53,11 @@
         GM_setValue('host', newConfig.host);
         const portNum = parseInt(newConfig.port, 10);
         GM_setValue('port', isNaN(portNum) ? 6800 : portNum);
-        // 自动将反斜杠转为正斜杠
         const normalizedPath = newConfig.path.replace(/\\/g, '/');
         GM_setValue('path', normalizedPath);
         GM_setValue('onlySE', newConfig.onlySE);
+        GM_setValue('skipWav', newConfig.skipWav);
+        GM_setValue('folderNameType', newConfig.folderNameType);
         config = loadConfig();
         alert('配置已保存！');
     }
@@ -107,9 +113,13 @@
 
     // ----- 创建设置面板（浅色主题）-----
     function openSettings() {
-        // 移除已存在的面板
         const old = document.getElementById('aria2-settings-panel');
         if (old) old.remove();
+
+        // 获取当前作品 ID，用于生成默认标题文件夹名
+        const urlWithoutParams = window.location.href.split(/[?#]/)[0];
+        const workId = urlWithoutParams.split('/').pop().substring(2);
+        const defaultTitleFolder = sanitizeFolderName(document.title, workId) || workId;
 
         const overlay = document.createElement('div');
         overlay.id = 'aria2-settings-panel';
@@ -120,7 +130,7 @@
         `;
         overlay.innerHTML = `
             <div style="background: #fff; padding: 20px; border-radius: 8px;
-                width: 400px; color: #333; font-family: sans-serif; box-shadow: 0 0 15px rgba(0,0,0,0.3);">
+                width: 440px; color: #333; font-family: sans-serif; box-shadow: 0 0 15px rgba(0,0,0,0.3);">
                 <h3 style="margin-top:0; color:#222;">Aria2 下载设置</h3>
                 <label style="display:block; margin-bottom:2px; font-weight:500;">主机地址</label>
                 <input id="aria2-host" value="${escapeHtml(config.host)}" style="width:100%; margin-bottom:12px; padding:8px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;">
@@ -130,9 +140,25 @@
                 <input id="aria2-secret" value="${escapeHtml(config.secret)}" style="width:100%; margin-bottom:12px; padding:8px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;">
                 <label style="display:block; margin-bottom:2px; font-weight:500;">下载路径（如 F:/新建文件夹）</label>
                 <input id="aria2-path" value="${escapeHtml(config.path)}" style="width:100%; margin-bottom:12px; padding:8px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;">
+
+                <label style="display:block; margin-bottom:2px; font-weight:500;">根文件夹命名方式</label>
+                <select id="aria2-folderNameType" style="width:100%; margin-bottom:12px; padding:8px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;">
+                    <option value="id" ${config.folderNameType === 'id' ? 'selected' : ''}>使用作品 ID（如 ${escapeHtml(workId)}）</option>
+                    <option value="title" ${config.folderNameType === 'title' ? 'selected' : ''}>使用网页标题（可临时修改）</option>
+                </select>
+
+                <div id="custom-folder-row" style="margin-bottom:12px; display:${config.folderNameType === 'title' ? 'block' : 'none'};">
+                    <label style="display:block; margin-bottom:2px; font-weight:500;">文件夹名称（临时修改，刷新后失效）</label>
+                    <input id="aria2-customFolder" type="text" value="${escapeHtml(customFolderName || defaultTitleFolder)}" placeholder="${escapeHtml(defaultTitleFolder)}" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;">
+                </div>
+
                 <label style="display:flex; align-items:center; margin-bottom:16px; font-weight:500;">
                     <input id="aria2-onlySE" type="checkbox" ${config.onlySE ? 'checked' : ''} style="margin-right:8px;">
                     只下载带SE的文件（跳过“SEなし”等）
+                </label>
+                <label style="display:flex; align-items:center; margin-bottom:16px; font-weight:500;">
+                    <input id="aria2-skipWav" type="checkbox" ${config.skipWav ? 'checked' : ''} style="margin-right:8px;">
+                    跳过 WAV 相关文件（文件名包含 .wav）
                 </label>
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <button id="aria2-test" style="padding:8px 16px; background:#007bff; color:#fff; border:none; border-radius:4px; cursor:pointer;">测试连接</button>
@@ -148,21 +174,49 @@
         `;
         document.body.appendChild(overlay);
 
-        // 获取输入元素引用
         const hostInput = document.getElementById('aria2-host');
         const portInput = document.getElementById('aria2-port');
         const secretInput = document.getElementById('aria2-secret');
         const pathInput = document.getElementById('aria2-path');
+        const folderNameTypeSelect = document.getElementById('aria2-folderNameType');
+        const customFolderInput = document.getElementById('aria2-customFolder');
+        const customFolderRow = document.getElementById('custom-folder-row');
         const onlySEInput = document.getElementById('aria2-onlySE');
+        const skipWavInput = document.getElementById('aria2-skipWav');
+
+        // 切换命名方式时显示/隐藏自定义输入框
+        folderNameTypeSelect.addEventListener('change', () => {
+            if (folderNameTypeSelect.value === 'title') {
+                customFolderRow.style.display = 'block';
+                // 如果输入框为空，填入默认值
+                if (!customFolderInput.value) {
+                    customFolderInput.value = defaultTitleFolder;
+                }
+            } else {
+                customFolderRow.style.display = 'none';
+                customFolderInput.value = '';   // 清除输入，避免误用
+            }
+        });
+
+        // 用户编辑时实时更新临时变量
+        customFolderInput.addEventListener('input', () => {
+            customFolderName = customFolderInput.value.trim();
+        });
 
         // 保存按钮
         document.getElementById('aria2-save').addEventListener('click', () => {
+            // 保存配置前，如果标题模式下输入框有内容，确保同步到临时变量
+            if (folderNameTypeSelect.value === 'title') {
+                customFolderName = customFolderInput.value.trim();
+            }
             const newCfg = {
                 secret: secretInput.value.trim(),
                 host: hostInput.value.trim(),
                 port: parseInt(portInput.value.trim(), 10) || 6800,
                 path: pathInput.value.trim(),
-                onlySE: onlySEInput.checked
+                folderNameType: folderNameTypeSelect.value,
+                onlySE: onlySEInput.checked,
+                skipWav: skipWavInput.checked
             };
             if (!newCfg.host) {
                 alert('主机地址不能为空');
@@ -173,7 +227,13 @@
         });
 
         // 取消按钮
-        document.getElementById('aria2-cancel').addEventListener('click', () => overlay.remove());
+        document.getElementById('aria2-cancel').addEventListener('click', () => {
+            // 取消时也可以同步一下临时变量（非必须）
+            if (folderNameTypeSelect.value === 'title') {
+                customFolderName = customFolderInput.value.trim();
+            }
+            overlay.remove();
+        });
 
         // 测试连接按钮
         document.getElementById('aria2-test').addEventListener('click', () => {
@@ -194,23 +254,19 @@
             }, 2000);
         });
 
-        // 点击遮罩关闭
         overlay.addEventListener('click', (e) => {
             if (e.target === overlay) overlay.remove();
         });
     }
 
-    // 转义HTML
     function escapeHtml(text) {
         return String(text).replace(/[&<>"']/g, (m) => ({
             '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
         }[m]));
     }
 
-    // 注册菜单命令
     GM_registerMenuCommand('⚙️ 设置', openSettings);
 
-    // 页面加载后添加按钮
     window.addEventListener('load', function () {
         setTimeout(addButtons, 300);
     }, false);
@@ -221,7 +277,6 @@
 
         const parent = container[container.length - 1];
 
-        // 下载按钮
         const downloadBtn = document.createElement('button');
         downloadBtn.className = 'q-btn q-btn-item non-selectable no-outline q-mt-sm shadow-4 q-mx-xs q-px-sm q-btn--standard q-btn--rectangle bg-green text-white q-btn--actionable q-focusable q-hoverable q-btn--wrap q-btn--dense';
         downloadBtn.innerHTML = `<span class="q-btn__content text-center col items-center q-anchor--skip justify-center row">
@@ -231,7 +286,6 @@
         downloadBtn.addEventListener('click', download);
         parent.appendChild(downloadBtn);
 
-        // 设置按钮
         const settingsBtn = document.createElement('button');
         settingsBtn.className = 'q-btn q-btn-item non-selectable no-outline q-mt-sm shadow-4 q-mx-xs q-px-sm q-btn--standard q-btn--rectangle bg-grey-8 text-white q-btn--actionable q-focusable q-hoverable q-btn--wrap q-btn--dense';
         settingsBtn.innerHTML = `<span class="q-btn__content text-center col items-center q-anchor--skip justify-center row">
@@ -249,14 +303,57 @@
     function fetchTrack() {
         const urlWithoutParams = window.location.href.split(/[?#]/)[0];
         const id = urlWithoutParams.split('/').pop().substring(2);
+
+        // 根据配置决定根文件夹名称
+        let folderName;
+        if (config.folderNameType === 'title') {
+            // 优先使用用户临时设置的名称，若无则使用自动清理的标题
+            folderName = (customFolderName && customFolderName.trim()) || sanitizeFolderName(document.title, id) || id;
+        } else {
+            folderName = id;
+        }
+
         const apiUrl = `https://api.${window.location.host}/api/tracks/${id}`;
         fetchData(apiUrl)
             .then(response => {
                 const trackData = JSON.parse(response.responseText);
-                const basePath = config.path + '/' + urlWithoutParams.split('/').pop();
+                const basePath = config.path + '/' + folderName;
                 downloadTracksByAria2(basePath, trackData);
             })
             .catch(error => console.error('获取音轨数据失败：', error));
+    }
+
+    // 智能清理标题：删除末尾的 “- ASMR Online” 及其前面紧贴的标签（最多1个），
+    // 删除开头 ID 后最多 2 个用空格分隔的【标签】，然后移除非法字符并限制长度
+    function sanitizeFolderName(name, id) {
+        let cleaned = name;
+        if (id && cleaned.startsWith(id)) {
+            // 1. 删除末尾的 “- ASMR Online” 及前面可能紧贴的一个【标签】
+            cleaned = cleaned.replace(/(【[^】]*】)?\s*-\s*ASMR\s*Online\s*$/i, '');
+
+            // 2. 删除 ID 之后最多 2 个【标签】（用空格分隔或紧紧连接）
+            let afterId = cleaned.slice(id.length).replace(/^\s+/, '');
+            for (let i = 0; i < 2; i++) {
+                const match = afterId.match(/^(【[^】]*】)\s*/);
+                if (match) {
+                    afterId = afterId.slice(match[0].length);
+                } else {
+                    break;
+                }
+            }
+            cleaned = id + (afterId ? ' ' + afterId : '');
+        }
+
+        // 常规非法字符清理
+        cleaned = cleaned.replace(/[\\\/:*?"<>|]/g, '')
+                         .replace(/\s+/g, ' ')
+                         .trim()
+                         .replace(/\.+$/g, '');
+
+        if (cleaned.length > 240) {
+            cleaned = cleaned.substring(0, 240).replace(/\.+$/g, '');
+        }
+        return cleaned;
     }
 
     async function downloadTracksByAria2(folderPath, tracks) {
@@ -266,6 +363,10 @@
                 const subPath = folderPath + '/' + track.title;
                 await downloadTracksByAria2(subPath, track.children);
             } else {
+                if (config.skipWav && isWavOrSubtitle(track.title)) {
+                    console.log(`跳过 WAV 相关文件: ${track.title}`);
+                    continue;
+                }
                 const downParam = {
                     dir: folderPath,
                     out: track.title || 'unknown_file',
@@ -332,6 +433,11 @@
             'SEなし', '左右反転', '音なし', 'noSE', '声なし', '无SE',
             'SE無', '音無し', '無SE', '無し', '无音效'
         ];
+        return keywords.some(k => title?.toLowerCase().includes(k.toLowerCase()));
+    }
+
+    function isWavOrSubtitle(title) {
+        const keywords = ['.wav'];
         return keywords.some(k => title?.toLowerCase().includes(k.toLowerCase()));
     }
 
