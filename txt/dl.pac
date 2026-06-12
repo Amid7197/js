@@ -1404,6 +1404,7 @@ var rules = [
             "godaddy.com",
             "godfootsteps.org",
             "godoc.org",
+            "gofile.io",
             "gofundme.com",
             "gohappy.com.tw",
             "golang.org",
