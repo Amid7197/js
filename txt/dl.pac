@@ -2655,6 +2655,7 @@ var rules = [
             "opendemocracy.net",
             "openid.net",
             "openleaks.org",
+            "openrouter.ai",
             "opensea.io",
             "openstreetmap.fr",
             "openstreetmap.org",
