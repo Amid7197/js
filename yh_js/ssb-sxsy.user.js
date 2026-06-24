@@ -7,11 +7,11 @@
 // @match        *://sxsy*.tld/forum.php?mod=forumdisplay&fid=*
 // @match        *://sxsy*.tld/search.php?mod=forum&searchid=*
 // @match        *://sxsy*.tld/forum.php?mod=viewthread&tid=*
-// @exclude      *://*/forum.php?mod=collection&tid=*
-// @exclude      *://*/forum.php?mod=collection&action=*
+// @exclude      *://sxsy*.tld/forum.php?mod=collection&tid=*
+// @exclude      *://sxsy*.tld/forum.php?mod=collection&action=*
 // @exclude      *://sxsy*.tld/*orderby=dateline*
 // @exclude      *://sxsy*.tld/forum.php?mod=viewthread&tid=*
-// @exclude      https://sxsy*.tld/forum.php?mod=attachment*
+// @exclude      *://sxsy*.tld/forum.php?mod=attachment*
 // @run-at       document-start
 // ==/UserScript==
 
