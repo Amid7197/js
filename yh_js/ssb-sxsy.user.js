@@ -1,12 +1,11 @@
 // ==UserScript==
 // @name         ssb-sxsy新Discuz
 // @author       aiedit
-// @version      0.1.8
+// @version      0.1.9
 // @match        *://vv9b.vbrwd4qd356.com/*
 // @match        *://mu3h.vr6erw5d.com/*
 // @match        *://sxsy*.tld/forum.php?mod=forumdisplay&fid=*
 // @match        *://sxsy*.tld/search.php?mod=forum&searchid=*
-// @match        *://sxsy*.tld/forum.php?mod=viewthread&tid=*
 // @exclude      *://sxsy*.tld/forum.php?mod=collection&tid=*
 // @exclude      *://sxsy*.tld/forum.php?mod=collection&action=*
 // @exclude      *://sxsy*.tld/*orderby=dateline*
