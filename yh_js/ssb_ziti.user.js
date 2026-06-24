@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ssb_字体 Discuz! 依赖式加载霞鹜文楷（精简检测版）
 // @description  仅通过文本检测Discuz!网站，以依赖形式加载霞鹜文楷字体
-// @version      1.1.2
+// @version      1.1.3
 // @match        *://vv9b.vbrwd4qd356.com/*
 // @match        *://mu3h.vr6erw5d.com/*
 // @grant        GM_addStyle
