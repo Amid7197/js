@@ -23,6 +23,7 @@ var rules = [
             "10beasts.net",
             "10minutemail.net",
             "10musume.com",
+            "11.com",
             "111666.best",
             "111bz.cc",
             "12bet.com",
