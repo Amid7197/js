@@ -1,20 +1,16 @@
 // ==UserScript==
 // @name         ssb-sxsy新Discuz
 // @author       aiedit
-// @version      0.1.6
+// @version      0.1.7
 // @match        *://vv9b.vbrwd4qd356.com/*
 // @match        *://mu3h.vr6erw5d.com/*
 // @match        *://sxsy*.tld/forum.php?mod=forumdisplay&fid=*
 // @match        *://sxsy*.tld/search.php?mod=forum&searchid=*
 // @match        *://sxsy*.tld/forum.php?mod=viewthread&tid=*
-// @match        *://404*.tld/forum-*.html
-// @match        *://404*.tld/forum.php?mod=forumdisplay&fid=*
-// @match        *://404*.tld/search.php?mod=forum&searchid=*
-// @match        *://404*.tld/forum.php?mod=viewthread&tid=*
 // @exclude      *://*/forum.php?mod=collection&tid=*
 // @exclude      *://*/forum.php?mod=collection&action=*
 // @exclude      *://sxsy*.tld/*orderby=dateline*
-// @exclude      *://404*.tld/*orderby=dateline*
+// @exclude      *://sxsy*.tld/forum.php?mod=viewthread&tid=*
 // @grant        none
 // @run-at       document-start
 // ==/UserScript==
