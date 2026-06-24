@@ -3,8 +3,7 @@
 // @description  隐藏带黑名单标签的帖子，但标题含白名单关键词的除外，纯黑名单页面正常显示
 // @version      1.5.7
 // @author       aiedit 南竹
-// @match        https://sxsy*.*/forum.php?mod=forumdisplay&fid=*
-// @match        https://404*.*/forum.php?mod=forumdisplay&fid=*
+// @match        https://sxsy*.tld/forum.php?mod=forumdisplay&fid=*
 // @license      MIT
 // @grant        none
 // @run-at       document-start  // 提前执行，优先加载字体资源
