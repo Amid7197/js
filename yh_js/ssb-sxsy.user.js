@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ssb-sxsy新Discuz
 // @author       aiedit
-// @version      0.1.7
+// @version      0.1.8
 // @match        *://vv9b.vbrwd4qd356.com/*
 // @match        *://mu3h.vr6erw5d.com/*
 // @match        *://sxsy*.tld/forum.php?mod=forumdisplay&fid=*
@@ -11,7 +11,7 @@
 // @exclude      *://*/forum.php?mod=collection&action=*
 // @exclude      *://sxsy*.tld/*orderby=dateline*
 // @exclude      *://sxsy*.tld/forum.php?mod=viewthread&tid=*
-// @grant        none
+// @exclude      https://sxsy*.tld/forum.php?mod=attachment*
 // @run-at       document-start
 // ==/UserScript==
 
