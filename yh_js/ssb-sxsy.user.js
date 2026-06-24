@@ -3,7 +3,7 @@
 // @author       aiedit
 // @version      0.1.5
 // @match        *://vv9b.vbrwd4qd356.com/*
-// @match        *://vr6erw5d.com/*
+// @match        *://mu3h.vr6erw5d.com/*
 // @match        *://sxsy*.tld/forum.php?mod=forumdisplay&fid=*
 // @match        *://sxsy*.tld/search.php?mod=forum&searchid=*
 // @match        *://sxsy*.tld/forum.php?mod=viewthread&tid=*
@@ -23,7 +23,7 @@
     'use strict';
 
 
-    if (location.hostname === 'vr6erw5d.com') {
+    if (location.hostname === 'mu3h.vr6erw5d.com') {
         const newUrl = new URL(location.href);
         newUrl.hostname = 'vv9b.vbrwd4qd356.com';
         location.href = 'https://' + newUrl.hostname + '/forum.php?mod=forumdisplay&fid=40&filter=author&orderby=dateline';
