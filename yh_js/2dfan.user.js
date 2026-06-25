@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         2dfan跳转
 // @namespace    http://tampermonkey.net/
-// @version      1.0.9
+// @version      1.0.10
 // @description  多彩渐变搜索按钮1.0.2
 // @author       aiedit cuddly
-// @match        *://ddfan.*/*
-// @match        *://2dfan.*/*
+// @match        *://ddfan.tld/*
+// @match        *://2dfan.tld/*
 // @match        *://*2dfan.com/*
 // @match        *://*.moyu.moe/*
 // @grant        none
