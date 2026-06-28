@@ -2382,6 +2382,7 @@ var rules = [
             "mgstage.com",
             "mh4u.org",
             "mhh1.com",
+            "mhwindow.org",
             "mi.com",
             "microsoft.com",
             "microvpn.com",
