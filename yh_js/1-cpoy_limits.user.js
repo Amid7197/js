@@ -44,7 +44,7 @@
 // @include           *://www.xxsy.net/*
 // @include           *://www.z3z4.com/*
 // @include           *://yuedu.163.com/*
-
+// @include           *://*now.lenovo.com.cn/*
 // @include           *://*2dfan.*/topics/*
 // @include           *://*sis001.*/*
 // @include           *://*.sayhanabi.*/thread-*.html
