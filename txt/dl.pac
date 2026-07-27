@@ -3669,6 +3669,7 @@ var rules = [
             "trxs.cc",
             "trxs.me",
             "trxs.org",
+            "tryai.dev",
             "tryheart.jp",
             "tsdm39.com",
             "tt1069.com",
