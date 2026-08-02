@@ -623,6 +623,7 @@ var rules = [
             "centerforhumanreprod.com",
             "centralnation.com",
             "centurys.net",
+            "cerebras.ai",
             "certificate-transparency.org",
             "cfr.org",
             "cfsh99.com",
