@@ -3054,6 +3054,7 @@ var rules = [
             "redditspace.com",
             "redditstatic.com",
             "redhotlabs.com",
+            "redteago.com",
             "referer.us",
             "reflectivecode.com",
             "reimu.net",
