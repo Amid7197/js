@@ -3402,7 +3402,7 @@ var rules = [
             "switch1.jp",
             "switchvpn.net",
             "sxsy.org",
-            "sxsy13.com",
+            "sxsy45.com",
             "sydneytoday.com",
             "sylfoundation.org",
             "synapse.org",
