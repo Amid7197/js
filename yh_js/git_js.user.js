@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Github 高速下载 (自定义加速源+apk二维码)
 // @match        *://github.com/*
-// @version      1.0.14
+// @version      1.0.15
 // @icon         https://github.githubassets.com/favicons/favicon.png
 // @author       aiedit
 // @grant        GM_setClipboard
@@ -100,7 +100,7 @@
                     a.parentElement.nextElementSibling.insertAdjacentHTML('beforeend', html);
 
                     // --- APK/IPA 文件悬停显示二维码 (保留) ---
-                    if (a.href.toLowerCase().endsWith('.apk') || a.href.toLowerCase().endsWith('.ipa')) {
+                    if (a.href.toLowerCase().endsWith('.apk') || a.href.toLowerCase().endsWith('.ipa')|| a.href.toLowerCase().endsWith('.hap')) {
                         const newBtn = a.parentElement.nextElementSibling.querySelector('.XIU2-RS a');
                         let hoverTimeout;
                         let qrCodeElement = null;
