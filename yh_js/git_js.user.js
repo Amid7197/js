@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Github 高速下载 (自定义加速源+apk二维码)
+// @name         Github 高速下载 (自定义加速源+二维码)
 // @match        *://github.com/*
 // @version      1.0.15
 // @icon         https://github.githubassets.com/favicons/favicon.png
