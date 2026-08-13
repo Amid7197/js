@@ -2721,6 +2721,7 @@ var rules = [
             "ooni.org",
             "openai.com",
             "openart.ai",
+            "opencode.ai",
             "opencritic.com",
             "opendemocracy.net",
             "openid.net",
