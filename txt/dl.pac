@@ -3831,6 +3831,7 @@ var rules = [
             "urchin.com",
             "urlborg.com",
             "urlparser.com",
+            "us-west-2.amazonaws.com",
             "usacn.com",
             "usaip.eu",
             "uscardforum.com",
