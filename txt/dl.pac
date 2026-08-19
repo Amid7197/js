@@ -4064,6 +4064,7 @@ var rules = [
             "willw.net",
             "wilsoncenter.org",
             "windscribe.com",
+            "windy.com",
             "wingamestore.com",
             "wingy.site",
             "wionews.com",
