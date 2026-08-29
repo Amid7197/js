@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         B站极简增强 - 播放器模式 & 布局 & 弹幕 & 评论优化 & 自动开播 & 智能连播
 // @namespace    http://tampermonkey.net/
-// @version      2.4
+// @version      2.5
 // @description  整合面板（紧凑布局）：播放器模式、移动标题/UP主信息、评论优化、弹幕控制、自动开播、智能连播
 // @author       aiedit
 // @match        https://www.bilibili.com/video/*
@@ -146,18 +146,18 @@
                         <div class="bili-plus-section-title">智能连播（勾选代表连播）</div>
                         <div class="bili-plus-option" style="display: flex; gap: 20px; flex-wrap: wrap;">
                             <label class="bili-plus-switch">
-                                <input type="checkbox" id="autoNextMultipart" disabled> 分P视频
+                                <input type="checkbox" id="autoNextMultipart"> 分P视频
                             </label>
                             <label class="bili-plus-switch">
-                                <input type="checkbox" id="autoNextCollection" disabled> 合集视频
+                                <input type="checkbox" id="autoNextCollection"> 合集视频
                             </label>
                             <label class="bili-plus-switch">
-                                <input type="checkbox" id="autoNextPlaylist" disabled> 收藏列表
+                                <input type="checkbox" id="autoNextPlaylist"> 收藏列表
                             </label>
                         </div>
                         <div class="bili-plus-option">
                             <label class="bili-plus-switch">
-                                <input type="checkbox" id="autoNextVideo" disabled> 单视频
+                                <input type="checkbox" id="autoNextVideo"> 单视频
                             </label>
                         </div>
                     </div>
@@ -318,6 +318,9 @@
                 if (globalApp) correctNextButton();
             });
         });
+
+        // 启用并同步智能连播复选框（修复：移除disabled后立即生效）
+        syncAutoNextPanel();
     }
 
     function updateDanmakuModeRow() {
