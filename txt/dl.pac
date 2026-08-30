@@ -2603,6 +2603,7 @@ var rules = [
             "nhentai.net",
             "nhentai.xxx",
             "nic.gov",
+            "nicoseiga.jp",
             "nicovideo.jp",
             "nightlife141.com",
             "nightswatch.top",
