@@ -1387,6 +1387,7 @@ var rules = [
             "getlantern.org",
             "getmalus.com",
             "getmdl.io",
+            "getmonero.org",
             "getoutline.org",
             "getsession.org",
             "getsync.com",
