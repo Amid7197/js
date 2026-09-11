@@ -3006,6 +3006,7 @@ var rules = [
             "qq.co.za",
             "qstatus.com",
             "qtrac.eu",
+            "quakemachinex.com",
             "questvisual.com",
             "quitccp.org",
             "quiz.directory",
