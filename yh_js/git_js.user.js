@@ -1,8 +1,7 @@
 // ==UserScript==
 // @name         Github 高速下载 (自定义加速源+二维码)
 // @match        *://github.com/*
-// @version      1.1.0
-// @icon         https://github.githubassets.com/favicons/favicon.png
+// @version      1.1.1
 // @author       aiedit
 // @grant        GM_setClipboard
 // @grant        GM_addStyle
@@ -251,8 +250,6 @@
         let prefix = '';
 
         if (input.nextElementSibling) input.nextElementSibling.hidden = true;
-        const sib = input.parentElement.nextElementSibling;
-        if (sib && sib.tagName === 'P') sib.textContent += ' (↑点击文字自动复制)';
 
         if (GM_getValue('menu_gitClone')) {
             prefix = 'git clone ';
@@ -263,7 +260,7 @@
         let html = '';
         for (const u of clone_url) {
             const url = u[0] === 'https://gitclone.com' ? u[0] + '/github.com' + href : u[0] + href;
-            clone.title = `${url}\n\n${u[2]}\n\n提示：点击文字可直接复制`;
+            clone.title = `${url}\n\n${u[2]}`;
             clone.setAttribute('value', prefix + url);
             html += wrapper + clone.outerHTML + '</div>';
         }
@@ -289,7 +286,7 @@
             const base = raw_url[i][0];
             const useAt = base.indexOf('/gh') + 3 === base.length && base.indexOf('cdn.staticaly.com') === -1;
             const url = useAt ? base + p.replace('/blob/', '@') : base + p2;
-            html += `<a href="${url}" title="${raw_url[i][2]}\n\n提示：可使用 [Alt + 左键] 直接下载" target="_blank" role="button" rel="noreferrer noopener nofollow" data-size="small" data-variant="default" class="${btn.className} XIU2-RF" style="border-radius:0;margin-left:-1px;">${raw_url[i][1].replace(/ \d/, '')}</a>`;
+            html += `<a href="${url}" title="${raw_url[i][2]}" target="_blank" role="button" rel="noreferrer noopener nofollow" data-size="small" data-variant="default" class="${btn.className} XIU2-RF" style="border-radius:0;margin-left:-1px;">${raw_url[i][1].replace(/ \d/, '')}</a>`;
         }
 
         document.querySelectorAll('.XIU2-RF').forEach(e => e.remove());
@@ -328,7 +325,7 @@
             const href = a.getAttribute('href');
             const url = useAt ? cur[0] + href.replace('/blob/', '@') : cur[0] + href.replace('/blob/', '/');
             fileElm.insertAdjacentHTML('afterend',
-                `<a href="${url}" download="${a.innerText}" target="_blank" rel="noreferrer noopener nofollow" class="fileDownLink" style="display:none;" title="[${cur[1]}] ${cur[2]}">${svgIcon}</a>`
+                `<a href="${url}" download="${a.innerText}" target="_blank" rel="noreferrer noopener nofollow" class="fileDownLink" style="display:none;" title="${cur[2]}">${svgIcon}</a>`
             );
         });
     }
