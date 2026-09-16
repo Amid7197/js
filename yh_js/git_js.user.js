@@ -1,5 +1,4 @@
 // ==UserScript==
-// ==UserScript==
 // @name         Github 高速下载 (自定义加速源+二维码)
 // @match        *://github.com/*
 // @version      1.1.0
@@ -286,7 +285,7 @@
         const p2 = p.replace('/blob/', '/');
         let html = '';
 
-        for (let i = 1; i < raw_url.length; i++) {
+        for (let i = 0; i < raw_url.length; i++) {
             const base = raw_url[i][0];
             const useAt = base.indexOf('/gh') + 3 === base.length && base.indexOf('cdn.staticaly.com') === -1;
             const url = useAt ? base + p.replace('/blob/', '@') : base + p2;
