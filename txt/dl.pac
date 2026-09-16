@@ -776,6 +776,9 @@ var rules = [
             "colacloud.net",
             "collateralmurder.com",
             "collateralmurder.org",
+            "com #\u6309\u91cf\u8ba1\u8d39.com",
+            "com #\u8d54\u94b1.com",
+            "com #\u8d54\u94b1\u673a\u573a.com",
             "comedycentral.com",
             "comefromchina.com",
             "comments.app",
@@ -3255,6 +3258,7 @@ var rules = [
             "sinyalee.com",
             "sipml5.org",
             "sis001.com",
+            "site #\u8d54\u94b1\u673a\u573a.site",
             "site.new",
             "sitekreator.com",
             "sitemaps.org",
@@ -4455,11 +4459,7 @@ var rules = [
             "zvereff.com",
             "zynamics.com",
             "zyxel.com",
-            "zzcloud.me",
-            "\u6309\u91cf\u8ba1\u8d39.com",
-            "\u8d54\u94b1.com",
-            "\u8d54\u94b1\u673a\u573a.com",
-            "\u8d54\u94b1\u673a\u573a.site"
+            "zzcloud.me"
         ]
     ]
 ];
