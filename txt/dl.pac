@@ -3821,6 +3821,7 @@ var rules = [
             "tunnelblick.net",
             "tunnelr.com",
             "tunsafe.com",
+            "tupian.li",
             "turbobit.net",
             "turbohide.com",
             "turkistantimes.com",
