@@ -889,6 +889,7 @@ var rules = [
             "db.tt",
             "dbgjd.com",
             "dcard.tw",
+            "dd.ci",
             "ddc.com.tw",
             "ddex.io",
             "ddfan.org",
