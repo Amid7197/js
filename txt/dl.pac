@@ -2065,6 +2065,7 @@ var rules = [
             "iyouport.com",
             "iyouport.org",
             "j.mp",
+            "j8.pics",
             "jable.tv",
             "jackjia.com",
             "jamestown.org",
