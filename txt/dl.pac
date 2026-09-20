@@ -1093,6 +1093,7 @@ var rules = [
             "etizer.org",
             "etokki.com",
             "etsy.com",
+            "eu.org",
             "eurekavpt.com",
             "euronews.com",
             "everipedia.org",
