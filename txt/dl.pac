@@ -1980,6 +1980,7 @@ var rules = [
             "imb.org",
             "img.ly",
             "imgasd.com",
+            "imgccc.com",
             "imgchili.net",
             "imgur.com",
             "imkev.com",
