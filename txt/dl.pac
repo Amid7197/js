@@ -2648,6 +2648,7 @@ var rules = [
             "nordstromrack.com",
             "nordvpn.com",
             "nos.nl",
+            "note.com",
             "notepad-plus-plus.org",
             "nottinghampost.com",
             "novel543.com",
