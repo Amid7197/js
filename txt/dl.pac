@@ -3334,6 +3334,7 @@ var rules = [
             "soundofhope.org",
             "soundon.fm",
             "soup.io",
+            "sourceforge.net",
             "south-plus.net",
             "south-plus.org",
             "southmongolia.org",
