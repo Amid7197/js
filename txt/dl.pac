@@ -4019,6 +4019,7 @@ var rules = [
             "vansky.com",
             "vaticannews.va",
             "vatn.org",
+            "vava8.com",
             "vbrwd4qd356.com",
             "vcf-online.org",
             "vcfbuilder.org",
