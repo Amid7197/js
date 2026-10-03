@@ -573,6 +573,7 @@ var rules = [
             "campaign-archive.com",
             "campaignforuyghurs.org",
             "cams.com",
+            "cangku.moe",
             "cantonese.asia",
             "canva.com",
             "canyu.org",
