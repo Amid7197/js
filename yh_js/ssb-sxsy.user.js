@@ -21,7 +21,7 @@
     if (location.hostname === 'dq3s.b4e5w4dqwde.com') {
         const newUrl = new URL(location.href);
         newUrl.hostname = 'sp6m.fwsefwef66s.com';
-        location.href = 'https://' + newUrl.hostname + '/forum.php?mod=forumdisplay&fid=40&filter=author&orderby=dateline';
+        location.href = 'https://' + newUrl.hostname + '/forum.php?mod=forumdisplay&fid=40&filter=author&orderby=dateline&soushuba.com';
         //location.href = newUrl.href;
         return; // 跳转后停止后续执行
     }
