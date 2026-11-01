@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         ssb-sxsy新Discuz
 // @author       aiedit
-// @version      0.1.13
+// @version      0.1.14
+// @match        *://1y0c.brpbkw3n.com/*
 // @match        *://sp6m.fwsefwef66s.com/*
-// @match        *://dq3s.b4e5w4dqwde.com/*
 // @match        *://sxsy*.tld/forum.php?mod=forumdisplay&fid=*
 // @match        *://sxsy*.tld/search.php?mod=forum&searchid=*
 // @exclude      *://sxsy*.tld/forum.php?mod=collection&tid=*
@@ -18,9 +18,9 @@
     'use strict';
 
 
-    if (location.hostname === 'dq3s.b4e5w4dqwde.com') {
+    if (location.hostname === 'sp6m.fwsefwef66s.com') {
         const newUrl = new URL(location.href);
-        newUrl.hostname = 'sp6m.fwsefwef66s.com';
+        newUrl.hostname = '1y0c.brpbkw3n.com';
         location.href = 'https://' + newUrl.hostname + '/forum.php?mod=forumdisplay&fid=40&filter=author&orderby=dateline&%E6%90%9C%E4%B9%A6%E5%90%A7';
         //location.href = newUrl.href;
         return; // 跳转后停止后续执行
