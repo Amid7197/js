@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ssb-sxsy新Discuz
 // @author       aiedit
-// @version      0.1.14
+// @version      0.1.15
 // @match        *://1y0c.brpbkw3n.com/*
 // @match        *://sp6m.fwsefwef66s.com/*
 // @match        *://sxsy*.tld/forum.php?mod=forumdisplay&fid=*
