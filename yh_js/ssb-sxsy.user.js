@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         ssb-sxsy新Discuz
 // @author       aiedit
-// @version      0.1.17
+// @version      0.1.18
 // @match        *://nyt6y.bew2459m.com/*
 // @match        *://1y0c.brpbkw3n.com/*
-// @match        *://sxsy*.tld/forum.php?mod=forumdisplay&fid=*
-// @match        *://sxsy*.tld/search.php?mod=forum&searchid=*
+// @exclude        *://sxsy*.tld/forum.php?mod=forumdisplay&fid=*
+// @exclude        *://sxsy*.tld/search.php?mod=forum&searchid=*
 // @exclude      *://sxsy*.tld/forum.php?mod=collection&tid=*
 // @exclude      *://sxsy*.tld/forum.php?mod=collection&action=*
 // @exclude      *://sxsy*.tld/*orderby=dateline*
@@ -56,24 +56,6 @@
         const newUrl = currentUrl.toString();
         if (newUrl !== location.href) {
             location.href = newUrl;
-        }
-    }
-
-    // 旧版URL跳转，仅用于 404 域名下的旧格式
-    function handle404Redirect() {
-        const titleCheck = () => document.title.includes("404书吧");
-        const match = location.href.match(/^https:\/\/(404[^.]+)\.([a-zA-Z0-9.-]+)\/forum-(\d+)-1\.html$/);
-
-        if (match) {
-            const [, sub, domain, fid] = match;
-            const newUrl = `https://${sub}.${domain}/forum.php?mod=forumdisplay&fid=${fid}&filter=author&orderby=dateline`;
-
-            const waitForTitle = setInterval(() => {
-                if (titleCheck()) {
-                    clearInterval(waitForTitle);
-                    location.href = newUrl;
-                }
-            }, 50);
         }
     }
 
