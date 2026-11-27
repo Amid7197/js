@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ssb-sxsy新Discuz
 // @author       aiedit
-// @version      0.1.18
+// @version      0.1.19
 // @match        *://nyt6y.bew2459m.com/*
 // @match        *://1y0c.brpbkw3n.com/*
 // @exclude        *://sxsy*.tld/forum.php?mod=forumdisplay&fid=*
@@ -80,7 +80,6 @@
     // 启动逻辑
     document.addEventListener("DOMContentLoaded", () => {
         handleOrderByUpdate();
-        handle404Redirect();
         decodeAttachpayLinks();
     });
 })();
