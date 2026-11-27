@@ -27,8 +27,7 @@
     }
     const allowedTitles = [
         "搜书吧 - Powered by Discuz!",
-        "尚香书苑",
-        "404书吧"
+        "尚香书苑"
     ];
 
     // 判断当前页面类型
